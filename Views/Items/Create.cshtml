@@ -1,0 +1,194 @@
+﻿@model StoreItem
+
+@{
+    ViewData["Title"] = "Add New Item";
+}
+
+<div class="page-header">
+    <h2><i class="bi bi-plus-circle"></i> Add New Item</h2>
+</div>
+
+<div class="row">
+    <div class="col-md-10 mx-auto">
+        <div class="card">
+            <div class="card-body p-4">
+                <form asp-action="Create" method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                    <div class="row g-3">
+                        <!-- Basic Information -->
+                        <div class="col-12">
+                            <h5 class="text-primary mb-3">
+                                <i class="bi bi-info-circle"></i> Basic Information
+                            </h5>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="ItemCode" class="form-label">Item Code <span class="text-danger">*</span></label>
+                            <input asp-for="ItemCode" class="form-control" placeholder="Enter item code" />
+                            <span asp-validation-for="ItemCode" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="HRCode" class="form-label">Reference Code</label>
+                            <input asp-for="HRCode" class="form-control" placeholder="Optional code" />
+                        </div>
+
+                        <div class="col-md-12">
+                            <label asp-for="ItemName" class="form-label">Item Name <span class="text-danger">*</span></label>
+                            <input asp-for="ItemName" class="form-control" placeholder="Enter item name" />
+                            <span asp-validation-for="ItemName" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label asp-for="Description" class="form-label">Description</label>
+                            <textarea asp-for="Description" class="form-control" rows="3" placeholder="Detailed description"></textarea>
+                        </div>
+
+                        <!-- Category and Units -->
+                        <div class="col-12 mt-4">
+                            <h5 class="text-primary mb-3">
+                                <i class="bi bi-tags"></i> Category & Units
+                            </h5>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="SubCategoryId" class="form-label">Sub Category</label>
+                            <select asp-for="SubCategoryId" class="form-select">
+                                <option value="">-- Select Category --</option>
+                                @foreach (var subCat in ViewBag.SubCategories as List<DeffSubCategory>)
+                                {
+                                    <option value="@subCat.Id">@subCat.Category.Name - @subCat.Name</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="SubUOMId" class="form-label">Unit of Measure</label>
+                            <select asp-for="SubUOMId" class="form-select">
+                                <option value="">-- Select Unit --</option>
+                                @foreach (var uom in ViewBag.SubUOMs as List<DefSubUOM>)
+                                {
+                                    <option value="@uom.Id">@uom.UOM.UOMName - @uom.SubUOMName</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="CityId" class="form-label">City</label>
+                            <select asp-for="CityId" class="form-select">
+                                <option value="">-- Select City --</option>
+                                @foreach (var city in ViewBag.Cities as List<DeffCity>)
+                                {
+                                    <option value="@city.Id">@city.Name</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="HSBarcode" class="form-label">Barcode</label>
+                            <input asp-for="HSBarcode" class="form-control" placeholder="Barcode number" />
+                        </div>
+
+                        <!-- Inventory and Pricing -->
+                        <div class="col-12 mt-4">
+                            <h5 class="text-primary mb-3">
+                                <i class="bi bi-cash-stack"></i> Inventory & Pricing
+                            </h5>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="QuantityInStore" class="form-label">Quantity in Store</label>
+                            <input asp-for="QuantityInStore" type="number" step="0.001" class="form-control" placeholder="0.000" />
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="MinCity" class="form-label">Minimum Level</label>
+                            <input asp-for="MinCity" type="number" class="form-control" placeholder="Min quantity" />
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="MaxCity" class="form-label">Maximum Level</label>
+                            <input asp-for="MaxCity" type="number" class="form-control" placeholder="Max quantity" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="PurchaseValue" class="form-label">Purchase Price</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input asp-for="PurchaseValue" type="number" step="0.01" class="form-control" placeholder="0.00" />
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="SaleValue" class="form-label">Sale Price</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input asp-for="SaleValue" type="number" step="0.01" class="form-control" placeholder="0.00" />
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="PurchaseValueDefault" class="form-label">Default Purchase Price</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input asp-for="PurchaseValueDefault" type="number" step="0.01" class="form-control" placeholder="0.00" />
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="SaleValueDefault" class="form-label">Default Sale Price</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input asp-for="SaleValueDefault" type="number" step="0.01" class="form-control" placeholder="0.00" />
+                            </div>
+                        </div>
+
+                        <!-- Additional Information -->
+                        <div class="col-12 mt-4">
+                            <h5 class="text-primary mb-3">
+                                <i class="bi bi-gear"></i> Additional Information
+                            </h5>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="ExpireDate" class="form-label">Expiry Date</label>
+                            <input asp-for="ExpireDate" type="date" class="form-control" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="OperationWeight" class="form-label">Weight</label>
+                            <input asp-for="OperationWeight" class="form-control" placeholder="Item weight" />
+                        </div>
+
+                        <div class="col-md-12">
+                            <label asp-for="OperationsOrOperations" class="form-label">Operations</label>
+                            <textarea asp-for="OperationsOrOperations" class="form-control" rows="2" placeholder="Operation details"></textarea>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="form-check form-switch">
+                                <input asp-for="Active" class="form-check-input" type="checkbox" checked />
+                                <label asp-for="Active" class="form-check-label">Active</label>
+                            </div>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="col-12 mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> Save
+                            </button>
+                            <a href="/Items" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
