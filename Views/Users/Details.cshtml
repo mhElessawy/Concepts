@@ -1,0 +1,149 @@
+@model UserInfo
+
+@{
+    ViewData["Title"] = "User Details";
+}
+
+<div class="page-header">
+    <h2><i class="bi bi-person-badge"></i> User Details</h2>
+</div>
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-person-circle"></i> @Model.FullName
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h6 class="text-muted mb-3">
+                            <i class="bi bi-info-circle"></i> Basic Information
+                        </h6>
+                        
+                        <dl class="row">
+                            <dt class="col-sm-5">User Code:</dt>
+                            <dd class="col-sm-7">
+                                <span class="badge bg-primary">@Model.UserCode</span>
+                            </dd>
+
+                            <dt class="col-sm-5">Full Name:</dt>
+                            <dd class="col-sm-7">@Model.FullName</dd>
+
+                            <dt class="col-sm-5">Username:</dt>
+                            <dd class="col-sm-7">
+                                <strong>@Model.UserName</strong>
+                            </dd>
+
+                            <dt class="col-sm-5">Status:</dt>
+                            <dd class="col-sm-7">
+                                @if (Model.Active)
+                                {
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-check-circle"></i> Active
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">
+                                        <i class="bi bi-x-circle"></i> Inactive
+                                    </span>
+                                }
+                            </dd>
+                        </dl>
+                    </div>
+
+                    <div class="col-md-6">
+                        <h6 class="text-muted mb-3">
+                            <i class="bi bi-briefcase"></i> Job Information
+                        </h6>
+                        
+                        <dl class="row">
+                            <dt class="col-sm-5">Department:</dt>
+                            <dd class="col-sm-7">
+                                @if (Model.Department != null)
+                                {
+                                    <span class="badge bg-info">
+                                        @Model.Department.DepartmentName
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">N/A</span>
+                                }
+                            </dd>
+
+                            <dt class="col-sm-5">Job Title:</dt>
+                            <dd class="col-sm-7">
+                                @if (Model.JobTitle != null)
+                                {
+                                    <span class="badge bg-secondary">
+                                        @Model.JobTitle.JobName
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">N/A</span>
+                                }
+                            </dd>
+
+                            <dt class="col-sm-5">PO Authorise:</dt>
+                            <dd class="col-sm-7">
+                                @if (Model.PurchaseOrderAuthorise)
+                                {
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-check-circle"></i> Authorized
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">
+                                        <i class="bi bi-x-circle"></i> Not Authorized
+                                    </span>
+                                }
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+
+                <hr />
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <h6 class="text-muted mb-3">
+                            <i class="bi bi-clock-history"></i> Timestamps
+                        </h6>
+                        
+                        <dl class="row">
+                            <dt class="col-sm-3">Created Date:</dt>
+                            <dd class="col-sm-3">
+                                <i class="bi bi-calendar-plus"></i>
+                                @Model.CreatedDate.ToString("dd/MM/yyyy HH:mm")
+                            </dd>
+
+                            <dt class="col-sm-3">Modified Date:</dt>
+                            <dd class="col-sm-3">
+                                <i class="bi bi-calendar-check"></i>
+                                @Model.ModifiedDate.ToString("dd/MM/yyyy HH:mm")
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
+                        <i class="bi bi-pencil"></i> Edit
+                    </a>
+                    <a asp-action="ChangePassword" asp-route-id="@Model.Id" class="btn btn-warning">
+                        <i class="bi bi-key"></i> Change Password
+                    </a>
+                    <a href="/Users" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to List
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

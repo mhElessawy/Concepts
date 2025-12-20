@@ -21,6 +21,9 @@ namespace Concept.Data
         public DbSet<DeffJobTitle> DeffJobTitles { get; set; }
         public DbSet<UserInfo> UserInfos { get; set; }
         public DbSet<StoreItem> StoreItems { get; set; }
+        public DbSet<DefBank> DefBanks { get; set; }
+        public DbSet<Vender> Venders { get; set; }
+        public DbSet<DeffLocation> DeffLocations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -37,6 +40,7 @@ namespace Concept.Data
             modelBuilder.Entity<DeffJobTitle>().ToTable("Deff_JobTitle");
             modelBuilder.Entity<UserInfo>().ToTable("UserInfo");
             modelBuilder.Entity<StoreItem>().ToTable("Store_Item");
+            modelBuilder.Entity<DeffLocation>().ToTable("Deff_Location");
 
             // Configure unique constraints
             modelBuilder.Entity<DeffCountry>().HasIndex(c => c.Code).IsUnique();
@@ -76,9 +80,9 @@ namespace Concept.Data
                 .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<StoreItem>()
-                .HasOne(i => i.City)
+                .HasOne(i => i.Country)
                 .WithMany(c => c.Items)
-                .HasForeignKey(i => i.CityId)
+                .HasForeignKey(i => i.CountryId)
                 .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<StoreItem>()
@@ -87,7 +91,51 @@ namespace Concept.Data
                 .HasForeignKey(i => i.SubUOMId)
                 .OnDelete(DeleteBehavior.SetNull);
 
-            
+            // Configure table names
+            modelBuilder.Entity<DefBank>().ToTable("Def_Bank");
+            modelBuilder.Entity<Vender>().ToTable("Vender");
+
+            // Configure indexes
+            modelBuilder.Entity<DefBank>().HasIndex(b => b.BankCode).IsUnique();
+            modelBuilder.Entity<Vender>().HasIndex(v => v.VenderCode).IsUnique();
+
+            // Configure relationships
+            modelBuilder.Entity<Vender>()
+                .HasOne(v => v.City)
+                .WithMany()
+                .HasForeignKey(v => v.CityId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<Vender>()
+                .HasOne(v => v.JobTitle)
+                .WithMany()
+                .HasForeignKey(v => v.JobTitleId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<Vender>()
+                .HasOne(v => v.Bank)
+                .WithMany()
+                .HasForeignKey(v => v.BankId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            // User relationships
+            modelBuilder.Entity<UserInfo>()
+                .HasOne(u => u.JobTitle)
+                .WithMany(j => j.Users)
+                .HasForeignKey(u => u.JobTitleId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<UserInfo>()
+                .HasOne(u => u.Department)
+                .WithMany()
+                .HasForeignKey(u => u.DepartmentId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<UserInfo>()
+                .HasOne(u => u.Location)
+                .WithMany()
+                .HasForeignKey(u => u.LocationId)
+                .OnDelete(DeleteBehavior.SetNull);
         }
 
     

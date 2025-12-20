@@ -4,6 +4,7 @@ using Concept.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Concept.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251218151955_AddVenderAndBank")]
+    partial class AddVenderAndBank
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -69,10 +72,6 @@ namespace Concept.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("ModifiedDate")
                         .HasColumnType("datetime2");
 
@@ -107,10 +106,6 @@ namespace Concept.Migrations
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("ModifiedDate")
                         .HasColumnType("datetime2");
@@ -149,10 +144,6 @@ namespace Concept.Migrations
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("ModifiedDate")
                         .HasColumnType("datetime2");
@@ -267,10 +258,6 @@ namespace Concept.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("ModifiedDate")
                         .HasColumnType("datetime2");
 
@@ -309,6 +296,8 @@ namespace Concept.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("DepartmentId");
+
                     b.ToTable("Deff_JobTitle", (string)null);
                 });
 
@@ -336,10 +325,6 @@ namespace Concept.Migrations
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("ModifiedDate")
                         .HasColumnType("datetime2");
@@ -475,12 +460,6 @@ namespace Concept.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("DeffDepartmentId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("DepartmentId")
-                        .HasColumnType("int");
-
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -508,10 +487,6 @@ namespace Concept.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DeffDepartmentId");
-
-                    b.HasIndex("DepartmentId");
-
                     b.HasIndex("JobTitleId");
 
                     b.ToTable("UserInfo", (string)null);
@@ -524,9 +499,6 @@ namespace Concept.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("AccountId")
-                        .HasColumnType("int");
 
                     b.Property<int?>("AccounttId")
                         .HasColumnType("int");
@@ -567,15 +539,8 @@ namespace Concept.Migrations
                     b.Property<int?>("CostCenterId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("CostCenterIdd")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -635,6 +600,15 @@ namespace Concept.Migrations
                     b.Navigation("Country");
                 });
 
+            modelBuilder.Entity("Concept.Models.DeffJobTitle", b =>
+                {
+                    b.HasOne("Concept.Models.DeffDepartment", "Department")
+                        .WithMany("JobTitles")
+                        .HasForeignKey("DepartmentId");
+
+                    b.Navigation("Department");
+                });
+
             modelBuilder.Entity("Concept.Models.DeffSubCategory", b =>
                 {
                     b.HasOne("Concept.Models.DeffCategory", "Category")
@@ -678,21 +652,9 @@ namespace Concept.Migrations
 
             modelBuilder.Entity("Concept.Models.UserInfo", b =>
                 {
-                    b.HasOne("Concept.Models.DeffDepartment", null)
-                        .WithMany("Users")
-                        .HasForeignKey("DeffDepartmentId");
-
-                    b.HasOne("Concept.Models.DeffDepartment", "Department")
-                        .WithMany()
-                        .HasForeignKey("DepartmentId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.HasOne("Concept.Models.DeffJobTitle", "JobTitle")
                         .WithMany("Users")
-                        .HasForeignKey("JobTitleId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("Department");
+                        .HasForeignKey("JobTitleId");
 
                     b.Navigation("JobTitle");
                 });
@@ -745,7 +707,7 @@ namespace Concept.Migrations
 
             modelBuilder.Entity("Concept.Models.DeffDepartment", b =>
                 {
-                    b.Navigation("Users");
+                    b.Navigation("JobTitles");
                 });
 
             modelBuilder.Entity("Concept.Models.DeffJobTitle", b =>

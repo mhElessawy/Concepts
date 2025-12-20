@@ -37,10 +37,16 @@
                             <input asp-for="HRCode" class="form-control" />
                         </div>
 
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <label asp-for="ItemName" class="form-label">Item Name <span class="text-danger">*</span></label>
                             <input asp-for="ItemName" class="form-control" />
                             <span asp-validation-for="ItemName" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="ShortItemName" class="form-label">Short Name <span class="text-danger">*</span></label>
+                            <input asp-for="ShortItemName" class="form-control" />
+                            <span asp-validation-for="ShortItemName" class="text-danger"></span>
                         </div>
 
                         <div class="col-md-12">
@@ -55,35 +61,94 @@
                             </h5>
                         </div>
 
+                        <!-- Category Selection -->
+                        <div class="col-md-6">
+                            <label for="CategoryId" class="form-label">Category</label>
+                            <select id="CategoryId" class="form-select">
+                                <option value="">-- Select Category --</option>
+                                @{
+                                    var categories = (ViewBag.SubCategories as List<DeffSubCategory>)?
+                                    .Select(sc => sc.Category)
+                                    .DistinctBy(c => c.Id)
+                                    .OrderBy(c => c.Name)
+                                    .ToList();
+                                    var selectedCategoryId = Model.SubCategory?.CategoryId;
+                                }
+                                @if (categories != null)
+                                {
+                                    foreach (var cat in categories)
+                                    {
+                                        <option value="@cat.Id" selected="@(cat.Id == selectedCategoryId)">@cat.Name</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+
+                        <!-- Sub Category Selection -->
                         <div class="col-md-6">
                             <label asp-for="SubCategoryId" class="form-label">Sub Category</label>
-                            <select asp-for="SubCategoryId" class="form-select">
-                                <option value="">-- Select Category --</option>
+                            <select asp-for="SubCategoryId" id="SubCategoryId" class="form-select">
+                                <option value="">-- Select Category First --</option>
                                 @foreach (var subCat in ViewBag.SubCategories as List<DeffSubCategory>)
                                 {
-                                    <option value="@subCat.Id">@subCat.Category.Name - @subCat.Name</option>
+                                    if (subCat.CategoryId == selectedCategoryId)
+                                    {
+                                        <option value="@subCat.Id" selected="@(subCat.Id == Model.SubCategoryId)">@subCat.Name</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+
+                        <!-- UOM Selection -->
+                        <div class="col-md-6">
+                            <label for="UOMId" class="form-label">Unit of Measure</label>
+                            <select id="UOMId" class="form-select">
+                                <option value="">-- Select UOM --</option>
+                                @{
+                                    var uoms = (ViewBag.SubUOMs as List<DefSubUOM>)?
+                                    .Select(su => su.UOM)
+                                    .DistinctBy(u => u.Id)
+                                    .OrderBy(u => u.UOMName)
+                                    .ToList();
+                                    var selectedUOMId = Model.SubUOM?.UOMId;
+                                }
+                                @if (uoms != null)
+                                {
+                                    foreach (var uom in uoms)
+                                    {
+                                        <option value="@uom.Id" selected="@(uom.Id == selectedUOMId)">@uom.UOMName</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+
+                        <!-- Sub UOM Selection -->
+                        <div class="col-md-6">
+                            <label asp-for="SubUOMId" class="form-label">Sub Unit</label>
+                            <select asp-for="SubUOMId" id="SubUOMId" class="form-select">
+                                <option value="">-- Select UOM First --</option>
+                                @foreach (var subUOM in ViewBag.SubUOMs as List<DefSubUOM>)
+                                {
+                                    if (subUOM.UOMId == selectedUOMId)
+                                    {
+                                        <option value="@subUOM.Id" selected="@(subUOM.Id == Model.SubUOMId)">@subUOM.SubUOMName</option>
+                                    }
                                 }
                             </select>
                         </div>
 
                         <div class="col-md-6">
-                            <label asp-for="SubUOMId" class="form-label">Unit of Measure</label>
-                            <select asp-for="SubUOMId" class="form-select">
-                                <option value="">-- Select Unit --</option>
-                                @foreach (var uom in ViewBag.SubUOMs as List<DefSubUOM>)
-                                {
-                                    <option value="@uom.Id">@uom.UOM.UOMName - @uom.SubUOMName</option>
-                                }
-                            </select>
+                            <label asp-for="PackSize" class="form-label">Pack Size</label>
+                            <input asp-for="PackSize" type="number" class="form-control" />
                         </div>
 
                         <div class="col-md-6">
-                            <label asp-for="CityId" class="form-label">City</label>
-                            <select asp-for="CityId" class="form-select">
-                                <option value="">-- Select City --</option>
-                                @foreach (var city in ViewBag.Cities as List<DeffCity>)
+                            <label asp-for="CountryId" class="form-label">Country</label>
+                            <select asp-for="CountryId" class="form-select">
+                                <option value="">-- Select Country --</option>
+                                @foreach (var country in ViewBag.Countries as List<DeffCountry>)
                                 {
-                                    <option value="@city.Id">@city.Name</option>
+                                    <option value="@country.Id">@country.Name</option>
                                 }
                             </select>
                         </div>
@@ -155,25 +220,20 @@
                         </div>
 
                         <div class="col-md-6">
-                            <label asp-for="ExpireDate" class="form-label">Expiry Date</label>
-                            <input asp-for="ExpireDate" type="date" class="form-control" />
+                            <label asp-for="OperationWeight" class="form-label">Weight</label>
+                            <input asp-for="OperationWeight" class="form-control" />
                         </div>
 
                         <div class="col-md-6">
-                            <label asp-for="OperationWeight" class="form-label">Weight</label>
-                            <input asp-for="OperationWeight" class="form-control" />
+                            <div class="form-check form-switch mt-4">
+                                <input asp-for="Active" class="form-check-input" type="checkbox" />
+                                <label asp-for="Active" class="form-check-label">Active</label>
+                            </div>
                         </div>
 
                         <div class="col-md-12">
                             <label asp-for="OperationsOrOperations" class="form-label">Operations</label>
                             <textarea asp-for="OperationsOrOperations" class="form-control" rows="2"></textarea>
-                        </div>
-
-                        <div class="col-md-12">
-                            <div class="form-check form-switch">
-                                <input asp-for="Active" class="form-check-input" type="checkbox" />
-                                <label asp-for="Active" class="form-check-label">Active</label>
-                            </div>
                         </div>
 
                         <!-- Buttons -->
@@ -194,4 +254,55 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function() {
+            // Category -> SubCategory
+            $('#CategoryId').change(function() {
+                var categoryId = $(this).val();
+                var subCategoryDropdown = $('#SubCategoryId');
+
+                subCategoryDropdown.empty().append('<option value="">-- Loading... --</option>');
+
+                if (categoryId) {
+                    $.ajax({
+                        url: '/Items/GetSubCategoriesByCategory',
+                        type: 'GET',
+                        data: { categoryId: categoryId },
+                        success: function(data) {
+                            subCategoryDropdown.empty().append('<option value="">-- Select Sub Category --</option>');
+                            $.each(data, function(i, item) {
+                                subCategoryDropdown.append($('<option></option>').val(item.id).html(item.name));
+                            });
+                        }
+                    });
+                } else {
+                    subCategoryDropdown.empty().append('<option value="">-- Select Category First --</option>');
+                }
+            });
+
+            // UOM -> SubUOM
+            $('#UOMId').change(function() {
+                var uomId = $(this).val();
+                var subUOMDropdown = $('#SubUOMId');
+
+                subUOMDropdown.empty().append('<option value="">-- Loading... --</option>');
+
+                if (uomId) {
+                    $.ajax({
+                        url: '/Items/GetSubUOMsByUOM',
+                        type: 'GET',
+                        data: { uomId: uomId },
+                        success: function(data) {
+                            subUOMDropdown.empty().append('<option value="">-- Select Sub Unit --</option>');
+                            $.each(data, function(i, item) {
+                                subUOMDropdown.append($('<option></option>').val(item.id).html(item.subUOMName));
+                            });
+                        }
+                    });
+                } else {
+                    subUOMDropdown.empty().append('<option value="">-- Select UOM First --</option>');
+                }
+            });
+        });
+    </script>
 }

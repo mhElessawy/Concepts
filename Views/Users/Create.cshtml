@@ -1,0 +1,141 @@
+@model UserInfo
+
+@{
+    ViewData["Title"] = "Add User";
+}
+
+<div class="page-header">
+    <h2><i class="bi bi-person-plus"></i> Add New User</h2>
+</div>
+
+<div class="row">
+    <div class="col-md-10 mx-auto">
+        <div class="card">
+            <div class="card-body p-4">
+                <form asp-action="Create" method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                    <div class="row">
+                        <!-- User Code -->
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="UserCode" class="form-label">
+                                User Code <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="UserCode" class="form-control" placeholder="e.g., U001" />
+                            <span asp-validation-for="UserCode" class="text-danger"></span>
+                        </div>
+
+                        <!-- Full Name -->
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="FullName" class="form-label">
+                                Full Name <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="FullName" class="form-control" placeholder="e.g., John Doe" />
+                            <span asp-validation-for="FullName" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Username -->
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="UserName" class="form-label">
+                                Username <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="UserName" class="form-control" placeholder="e.g., johndoe" />
+                            <span asp-validation-for="UserName" class="text-danger"></span>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="UserPassword" class="form-label">
+                                Password <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <input asp-for="UserPassword" class="form-control" type="password" 
+                                       placeholder="Enter password" id="userPassword" />
+                                <button class="btn btn-outline-secondary" type="button" 
+                                        onclick="togglePassword()">
+                                    <i class="bi bi-eye" id="toggleIcon"></i>
+                                </button>
+                            </div>
+                            <span asp-validation-for="UserPassword" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Job Title -->
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="JobTitleId" class="form-label">Job Title</label>
+                            <select asp-for="JobTitleId" class="form-select" asp-items="ViewBag.JobTitles">
+                                <option value="">-- Select Job Title --</option>
+                            </select>
+                            <span asp-validation-for="JobTitleId" class="text-danger"></span>
+                        </div>
+
+                        <!-- Department -->
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="DepartmentId" class="form-label">Department</label>
+                            <select asp-for="DepartmentId" class="form-select" asp-items="ViewBag.Departments">
+                                <option value="">-- Select Department --</option>
+                            </select>
+                            <span asp-validation-for="DepartmentId" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Purchase Order Authorise -->
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                <input asp-for="PurchaseOrderAuthorise" class="form-check-input" type="checkbox" />
+                                <label asp-for="PurchaseOrderAuthorise" class="form-check-label">
+                                    Purchase Order Authorise
+                                </label>
+                            </div>
+                            <small class="text-muted">
+                                <i class="bi bi-info-circle"></i> Allow user to authorize purchase orders
+                            </small>
+                        </div>
+
+                        <!-- Active -->
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch">
+                                <input asp-for="Active" class="form-check-input" type="checkbox" checked />
+                                <label asp-for="Active" class="form-check-label">Active</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> Save User
+                        </button>
+                        <a href="/Users" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    
+    <script>
+        function togglePassword() {
+            const passwordInput = document.getElementById('userPassword');
+            const toggleIcon = document.getElementById('toggleIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('bi-eye');
+                toggleIcon.classList.add('bi-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('bi-eye-slash');
+                toggleIcon.classList.add('bi-eye');
+            }
+        }
+    </script>
+}

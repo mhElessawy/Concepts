@@ -1,0 +1,232 @@
+@model Vender
+
+@{
+    ViewData["Title"] = "Edit Vendor";
+}
+
+<div class="page-header">
+    <h2><i class="bi bi-plus-circle"></i> Edit Vendor</h2>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body p-4">
+                <form asp-action="Edit" method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                    <div class="row g-3">
+                        <!-- Basic Information -->
+                        <div class="col-12">
+                            <h5 class="text-primary mb-3">
+                                <i class="bi bi-info-circle"></i> Basic Information
+                            </h5>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="VenderCode" class="form-label">
+                                Vendor Code <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="VenderCode" class="form-control" placeholder="e.g., V001" />
+                            <span asp-validation-for="VenderCode" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-8">
+                            <label asp-for="VenderName" class="form-label">
+                                Vendor Name <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="VenderName" class="form-control" placeholder="Full vendor name" />
+                            <span asp-validation-for="VenderName" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="BusinessType" class="form-label">Business Type</label>
+                            <input asp-for="BusinessType" class="form-control" 
+                                   placeholder="e.g., Manufacturer, Distributor" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="Email" class="form-label">Email</label>
+                            <input asp-for="Email" type="email" class="form-control" 
+                                   placeholder="vendor@example.com" />
+                        </div>
+
+                        <div class="col-md-12">
+                            <label asp-for="Address" class="form-label">Address</label>
+                            <textarea asp-for="Address" class="form-control" rows="2" 
+                                      placeholder="Full address"></textarea>
+                        </div>
+
+                        <!-- Location -->
+                        <div class="col-12 mt-4">
+                            <h5 class="text-primary mb-3">
+                                <i class="bi bi-geo-alt"></i> Location
+                            </h5>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="CountryId" class="form-label">Country</label>
+                            <select id="CountryId" class="form-select">
+                                <option value="">-- Select Country --</option>
+                                @if (ViewBag.Countries != null)
+                                {
+                                    foreach (var country in ViewBag.Countries)
+                                    {
+                                        <option value="@country.Id">@country.CountryName</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="CityId" class="form-label">City</label>
+                            <select asp-for="CityId" id="CityId" class="form-select">
+                                <option value="">-- Select Country First --</option>
+                            </select>
+                        </div>
+
+                        <!-- Contact Information -->
+                        <div class="col-12 mt-4">
+                            <h5 class="text-primary mb-3">
+                                <i class="bi bi-person"></i> Contact Information
+                            </h5>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="ContactPerson" class="form-label">Contact Person</label>
+                            <input asp-for="ContactPerson" class="form-control" 
+                                   placeholder="Contact name" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="PhoneNumber" class="form-label">Phone Number</label>
+                            <input asp-for="PhoneNumber" class="form-control" 
+                                   placeholder="+965 XXXX XXXX" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="JobTitleId" class="form-label">Job Title</label>
+                            <select asp-for="JobTitleId" class="form-select" asp-items="ViewBag.JobTitles">
+                                <option value="">-- Select Job Title --</option>
+                            </select>
+                        </div>
+
+                        <!-- Banking Information -->
+                        <div class="col-12 mt-4">
+                            <h5 class="text-primary mb-3">
+                                <i class="bi bi-bank"></i> Banking Information
+                            </h5>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="BankId" class="form-label">Bank</label>
+                            <select asp-for="BankId" class="form-select" asp-items="ViewBag.Banks">
+                                <option value="">-- Select Bank --</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="BankAccountNumber" class="form-label">Account Number</label>
+                            <input asp-for="BankAccountNumber" class="form-control" 
+                                   placeholder="Account number" />
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="BankAccountIBan" class="form-label">IBAN</label>
+                            <input asp-for="BankAccountIBan" class="form-control" 
+                                   placeholder="KW..." />
+                        </div>
+
+                        <!-- Additional Information -->
+                        <div class="col-12 mt-4">
+                            <h5 class="text-primary mb-3">
+                                <i class="bi bi-file-text"></i> Additional Information
+                            </h5>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label asp-for="Description" class="form-label">Description</label>
+                            <textarea asp-for="Description" class="form-control" rows="3" 
+                                      placeholder="Vendor description"></textarea>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label asp-for="AdditionalInfo" class="form-label">Additional Info</label>
+                            <textarea asp-for="AdditionalInfo" class="form-control" rows="2" 
+                                      placeholder="Any additional information"></textarea>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-check form-switch mt-4">
+                                <input asp-for="Active" class="form-check-input" type="checkbox" checked />
+                                <label asp-for="Active" class="form-check-label">Active</label>
+                            </div>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="col-12 mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> Update Vendor
+                            </button>
+                            <a href="/Venders" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    
+    <script>
+        $(document).ready(function() {
+            // Country -> City
+            $('#CountryId').change(function() {
+                var countryId = $(this).val();
+                var cityDropdown = $('#CityId');
+
+                if (countryId) {
+                    cityDropdown.prop('disabled', true)
+                        .empty()
+                        .append('<option value="">-- Loading... --</option>');
+
+                    $.ajax({
+                        url: '/Venders/GetCitiesByCountry',
+                        type: 'GET',
+                        data: { countryId: countryId },
+                        success: function(data) {
+                            cityDropdown.prop('disabled', false)
+                                .empty()
+                                .append('<option value="">-- Select City --</option>');
+
+                            if (data && data.length > 0) {
+                                $.each(data, function(i, item) {
+                                    cityDropdown.append(
+                                        $('<option></option>')
+                                            .val(item.id)
+                                            .html(item.name)
+                                    );
+                                });
+                            } else {
+                                cityDropdown.append('<option value="">-- No Cities Found --</option>');
+                            }
+                        },
+                        error: function() {
+                            cityDropdown.prop('disabled', false)
+                                .empty()
+                                .append('<option value="">-- Error Loading --</option>');
+                        }
+                    });
+                } else {
+                    cityDropdown.prop('disabled', false)
+                        .empty()
+                        .append('<option value="">-- Select Country First --</option>');
+                }
+            });
+        });
+    </script>
+}

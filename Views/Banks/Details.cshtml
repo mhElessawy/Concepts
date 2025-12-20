@@ -1,0 +1,46 @@
+﻿@model DefBank
+
+@{
+    ViewData["Title"] = "Bank Details";
+}
+
+<div class="page-header">
+    <h2><i class="bi bi-info-circle"></i> Bank Details</h2>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card">
+            <div class="card-body p-4">
+                <dl class="row">
+                    <dt class="col-sm-4">Bank Code:</dt>
+                    <dd class="col-sm-8">@Model.BankCode</dd>
+
+                    <dt class="col-sm-4">Bank Name:</dt>
+                    <dd class="col-sm-8">@Model.BankName</dd>
+
+                    <dt class="col-sm-4">Status:</dt>
+                    <dd class="col-sm-8">
+                        @if (Model.Active)
+                        {
+                            <span class="badge bg-success">Active</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Inactive</span>
+                        }
+                    </dd>
+                </dl>
+
+                <div class="mt-4">
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
+                        <i class="bi bi-pencil"></i> Edit
+                    </a>
+                    <a href="/Banks" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to List
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

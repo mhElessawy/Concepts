@@ -1,0 +1,65 @@
+﻿@model IEnumerable<DefSubUOM>
+
+@{
+    ViewData["Title"] = "Sub Units of Measure";
+}
+
+<div class="page-header d-flex justify-content-between align-items-center">
+    <h2><i class="bi bi-distribute-vertical"></i> Sub Units of Measure Management</h2>
+    <a href="/SubUOM/Create" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Add New Sub UOM
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th>Parent UOM</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var subUOM in Model)
+                    {
+                        <tr>
+                            <td><span class="badge bg-secondary">@subUOM.SubUOMCode</span></td>
+                            <td>@subUOM.SubUOMName</td>
+                            <td><span class="badge bg-primary">@subUOM.UOM.UOMName</span></td>
+                            <td>
+                                @if (subUOM.Active)
+                                {
+                                    <span class="badge bg-success">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Inactive</span>
+                                }
+                            </td>
+                            <td class="action-buttons">
+                                <a href="/SubUOM/Edit/@subUOM.Id" class="btn btn-sm btn-warning" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a href="/SubUOM/Delete/@subUOM.Id" class="btn btn-sm btn-danger" title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info mt-4">
+        <i class="bi bi-info-circle"></i> No sub units found. Click "Add New Sub UOM" to create one.
+    </div>
+}

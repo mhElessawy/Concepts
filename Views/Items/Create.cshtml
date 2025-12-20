@@ -34,10 +34,16 @@
                             <input asp-for="HRCode" class="form-control" placeholder="Optional code" />
                         </div>
 
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <label asp-for="ItemName" class="form-label">Item Name <span class="text-danger">*</span></label>
                             <input asp-for="ItemName" class="form-control" placeholder="Enter item name" />
                             <span asp-validation-for="ItemName" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="ShortItemName" class="form-label">Short Name <span class="text-danger">*</span></label>
+                            <input asp-for="ShortItemName" class="form-control" placeholder="Enter short name" />
+                            <span asp-validation-for="ShortItemName" class="text-danger"></span>
                         </div>
 
                         <div class="col-md-12">
@@ -52,35 +58,67 @@
                             </h5>
                         </div>
 
+                        <!-- Category Selection -->
+                        <div class="col-md-6">
+                            <label for="CategoryId" class="form-label">Category</label>
+                            <select id="CategoryId" class="form-select">
+                                <option value="">-- Select Category --</option>
+                                @if (ViewBag.Categories != null)
+                                {
+                                    foreach (var cat in ViewBag.Categories)
+                                    {
+                                        <option value="@cat.Id">@cat.Name</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+
+                        <!-- Sub Category Selection -->
                         <div class="col-md-6">
                             <label asp-for="SubCategoryId" class="form-label">Sub Category</label>
-                            <select asp-for="SubCategoryId" class="form-select">
-                                <option value="">-- Select Category --</option>
-                                @foreach (var subCat in ViewBag.SubCategories as List<DeffSubCategory>)
+                            <select asp-for="SubCategoryId" id="SubCategoryId" class="form-select">
+                                <option value="">-- Select Category First --</option>
+                            </select>
+                        </div>
+
+                        <!-- UOM Selection -->
+                        <div class="col-md-6">
+                            <label for="UOMId" class="form-label">Unit of Measure</label>
+                            <select id="UOMId" class="form-select">
+                                <option value="">-- Select UOM --</option>
+                                @if (ViewBag.UOMs != null)
                                 {
-                                    <option value="@subCat.Id">@subCat.Category.Name - @subCat.Name</option>
+                                    foreach (var uom in ViewBag.UOMs)
+                                    {
+                                        <option value="@uom.Id">@uom.UOMName</option>
+                                    }
                                 }
                             </select>
                         </div>
 
+                        <!-- Sub UOM Selection -->
                         <div class="col-md-6">
-                            <label asp-for="SubUOMId" class="form-label">Unit of Measure</label>
-                            <select asp-for="SubUOMId" class="form-select">
-                                <option value="">-- Select Unit --</option>
-                                @foreach (var uom in ViewBag.SubUOMs as List<DefSubUOM>)
-                                {
-                                    <option value="@uom.Id">@uom.UOM.UOMName - @uom.SubUOMName</option>
-                                }
+                            <label asp-for="SubUOMId" class="form-label">Sub Unit</label>
+                            <select asp-for="SubUOMId" id="SubUOMId" class="form-select">
+                                <option value="">-- Select UOM First --</option>
                             </select>
                         </div>
 
                         <div class="col-md-6">
-                            <label asp-for="CityId" class="form-label">City</label>
-                            <select asp-for="CityId" class="form-select">
-                                <option value="">-- Select City --</option>
-                                @foreach (var city in ViewBag.Cities as List<DeffCity>)
+                            <label asp-for="PackSize" class="form-label">Pack Size</label>
+                            <input asp-for="PackSize" type="number" class="form-control" placeholder="e.g., 12" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="CountryId" class="form-label">Country</label>
+                            <select asp-for="CountryId" class="form-select">
+                                <option value="">-- Select Country --</option>
+                                @if (ViewBag.Countries != null)
                                 {
-                                    <option value="@city.Id">@city.Name</option>
+                                    foreach (var country in ViewBag.Countries)
+                                    {
+                                        <option value="@country.Id">@country.Name</option>
+                                    }
                                 }
                             </select>
                         </div>
@@ -99,24 +137,24 @@
 
                         <div class="col-md-4">
                             <label asp-for="QuantityInStore" class="form-label">Quantity in Store</label>
-                            <input asp-for="QuantityInStore" type="number" step="0.001" class="form-control" placeholder="0.000" />
+                            <input asp-for="QuantityInStore" type="number" step="0.001" class="form-control" placeholder="0.000" value="0" />
                         </div>
 
                         <div class="col-md-4">
                             <label asp-for="MinCity" class="form-label">Minimum Level</label>
-                            <input asp-for="MinCity" type="number" class="form-control" placeholder="Min quantity" />
+                            <input asp-for="MinCity" type="number" class="form-control" placeholder="Minimum quantity" />
                         </div>
 
                         <div class="col-md-4">
                             <label asp-for="MaxCity" class="form-label">Maximum Level</label>
-                            <input asp-for="MaxCity" type="number" class="form-control" placeholder="Max quantity" />
+                            <input asp-for="MaxCity" type="number" class="form-control" placeholder="Maximum quantity" />
                         </div>
 
                         <div class="col-md-6">
                             <label asp-for="PurchaseValue" class="form-label">Purchase Price</label>
                             <div class="input-group">
                                 <span class="input-group-text">$</span>
-                                <input asp-for="PurchaseValue" type="number" step="0.01" class="form-control" placeholder="0.00" />
+                                <input asp-for="PurchaseValue" type="number" step="0.01" class="form-control" placeholder="0.00" value="0" />
                             </div>
                         </div>
 
@@ -124,7 +162,7 @@
                             <label asp-for="SaleValue" class="form-label">Sale Price</label>
                             <div class="input-group">
                                 <span class="input-group-text">$</span>
-                                <input asp-for="SaleValue" type="number" step="0.01" class="form-control" placeholder="0.00" />
+                                <input asp-for="SaleValue" type="number" step="0.01" class="form-control" placeholder="0.00" value="0" />
                             </div>
                         </div>
 
@@ -132,7 +170,7 @@
                             <label asp-for="PurchaseValueDefault" class="form-label">Default Purchase Price</label>
                             <div class="input-group">
                                 <span class="input-group-text">$</span>
-                                <input asp-for="PurchaseValueDefault" type="number" step="0.01" class="form-control" placeholder="0.00" />
+                                <input asp-for="PurchaseValueDefault" type="number" step="0.01" class="form-control" placeholder="0.00" value="0" />
                             </div>
                         </div>
 
@@ -140,7 +178,7 @@
                             <label asp-for="SaleValueDefault" class="form-label">Default Sale Price</label>
                             <div class="input-group">
                                 <span class="input-group-text">$</span>
-                                <input asp-for="SaleValueDefault" type="number" step="0.01" class="form-control" placeholder="0.00" />
+                                <input asp-for="SaleValueDefault" type="number" step="0.01" class="form-control" placeholder="0.00" value="0" />
                             </div>
                         </div>
 
@@ -152,13 +190,22 @@
                         </div>
 
                         <div class="col-md-6">
-                            <label asp-for="ExpireDate" class="form-label">Expiry Date</label>
-                            <input asp-for="ExpireDate" type="date" class="form-control" />
+                            <label asp-for="OperationWeight" class="form-label">Weight</label>
+                            <input asp-for="OperationWeight" class="form-control" placeholder="Item weight" />
                         </div>
 
                         <div class="col-md-6">
-                            <label asp-for="OperationWeight" class="form-label">Weight</label>
-                            <input asp-for="OperationWeight" class="form-control" placeholder="Item weight" />
+                            <label asp-for="UserId" class="form-label">Responsible User</label>
+                            <select asp-for="UserId" class="form-select">
+                                <option value="">-- Select User --</option>
+                                @if (ViewBag.Users != null)
+                                {
+                                    foreach (var user in ViewBag.Users)
+                                    {
+                                        <option value="@user.Id">@user.FullName</option>
+                                    }
+                                }
+                            </select>
                         </div>
 
                         <div class="col-md-12">
@@ -166,8 +213,8 @@
                             <textarea asp-for="OperationsOrOperations" class="form-control" rows="2" placeholder="Operation details"></textarea>
                         </div>
 
-                        <div class="col-md-12">
-                            <div class="form-check form-switch">
+                        <div class="col-md-6">
+                            <div class="form-check form-switch mt-4">
                                 <input asp-for="Active" class="form-check-input" type="checkbox" checked />
                                 <label asp-for="Active" class="form-check-label">Active</label>
                             </div>
@@ -176,7 +223,7 @@
                         <!-- Buttons -->
                         <div class="col-12 mt-4">
                             <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-save"></i> Save
+                                <i class="bi bi-save"></i> Save Item
                             </button>
                             <a href="/Items" class="btn btn-secondary">
                                 <i class="bi bi-x-circle"></i> Cancel
@@ -191,4 +238,110 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function() {
+            console.log('Page loaded - initializing dropdowns');
+
+            // Category -> SubCategory
+            $('#CategoryId').change(function() {
+                var categoryId = $(this).val();
+                var subCategoryDropdown = $('#SubCategoryId');
+
+                console.log('Category changed:', categoryId);
+
+                if (categoryId) {
+                    subCategoryDropdown.prop('disabled', true)
+                        .empty()
+                        .append('<option value="">-- Loading... --</option>');
+
+                    $.ajax({
+                        url: '/Items/GetSubCategoriesByCategory',
+                        type: 'GET',
+                        data: { categoryId: categoryId },
+                        success: function(data) {
+                            console.log('SubCategories received:', data);
+                            subCategoryDropdown.prop('disabled', false)
+                                .empty()
+                                .append('<option value="">-- Select Sub Category --</option>');
+
+                            if (data && data.length > 0) {
+                                $.each(data, function(i, item) {
+                                    subCategoryDropdown.append(
+                                        $('<option></option>')
+                                            .val(item.id)
+                                            .html(item.name)
+                                    );
+                                });
+                            } else {
+                                subCategoryDropdown.append('<option value="">-- No Sub Categories Found --</option>');
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error loading subcategories:', error);
+                            subCategoryDropdown.prop('disabled', false)
+                                .empty()
+                                .append('<option value="">-- Error Loading --</option>');
+                            alert('Error loading sub categories. Please try again.');
+                        }
+                    });
+                } else {
+                    subCategoryDropdown.prop('disabled', false)
+                        .empty()
+                        .append('<option value="">-- Select Category First --</option>');
+                }
+            });
+
+            // UOM -> SubUOM
+            $('#UOMId').change(function() {
+                var uomId = $(this).val();
+                var subUOMDropdown = $('#SubUOMId');
+
+                console.log('UOM changed:', uomId);
+
+                if (uomId) {
+                    subUOMDropdown.prop('disabled', true)
+                        .empty()
+                        .append('<option value="">-- Loading... --</option>');
+
+                    $.ajax({
+                        url: '/Items/GetSubUOMsByUOM',
+                        type: 'GET',
+                        data: { uomId: uomId },
+                        success: function(data) {
+                            console.log('SubUOMs received:', data);
+                            subUOMDropdown.prop('disabled', false)
+                                .empty()
+                                .append('<option value="">-- Select Sub Unit --</option>');
+
+                            if (data && data.length > 0) {
+                                $.each(data, function(i, item) {
+                                    subUOMDropdown.append(
+                                        $('<option></option>')
+                                            .val(item.id)
+                                            .html(item.subUOMName)
+                                    );
+                                });
+                            } else {
+                                subUOMDropdown.append('<option value="">-- No Sub Units Found --</option>');
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error loading sub UOMs:', error);
+                            subUOMDropdown.prop('disabled', false)
+                                .empty()
+                                .append('<option value="">-- Error Loading --</option>');
+                            alert('Error loading sub units. Please try again.');
+                        }
+                    });
+                } else {
+                    subUOMDropdown.prop('disabled', false)
+                        .empty()
+                        .append('<option value="">-- Select UOM First --</option>');
+                }
+            });
+
+            // Test if jQuery is loaded
+            console.log('jQuery version:', $.fn.jquery);
+        });
+    </script>
 }

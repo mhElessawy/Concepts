@@ -1,0 +1,68 @@
+﻿@model DeffCity
+
+@{
+    ViewData["Title"] = "Edit City";
+}
+
+<div class="page-header">
+    <h2><i class="bi bi-pencil-square"></i> Edit City: @Model.Name</h2>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card">
+            <div class="card-body p-4">
+                <form asp-action="Edit" method="post">
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="CreatedDate" />
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Code" class="form-label">City Code <span class="text-danger">*</span></label>
+                        <input asp-for="Code" class="form-control" maxlength="50" />
+                        <span asp-validation-for="Code" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label">City Name <span class="text-danger">*</span></label>
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="CountryId" class="form-label">Country <span class="text-danger">*</span></label>
+                        <select asp-for="CountryId" class="form-select">
+                            <option value="">-- Select Country --</option>
+                            @foreach (var country in ViewBag.Countries as List<DeffCountry>)
+                            {
+                                <option value="@country.Id">@country.Name (@country.Code)</option>
+                            }
+                        </select>
+                        <span asp-validation-for="CountryId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input asp-for="Active" class="form-check-input" type="checkbox" />
+                            <label asp-for="Active" class="form-check-label">Active</label>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> Save Changes
+                        </button>
+                        <a href="/Cities" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,9 +1,7 @@
-﻿
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-
-
 
 namespace Concept.Models
 {
@@ -14,11 +12,11 @@ namespace Concept.Models
 
         [Required]
         [StringLength(50)]
-        public required string Code { get; set; }
+        public string Code { get; set; }
 
         [Required]
         [StringLength(50)]
-        public required string Name { get; set; }
+        public string Name { get; set; }
 
         public bool Active { get; set; } = true;
 
@@ -26,9 +24,10 @@ namespace Concept.Models
         public DateTime ModifiedDate { get; set; } = DateTime.Now;
 
         // Navigation Properties
-        public virtual required ICollection<DeffCity> Cities { get; set; }
-    }
+        public virtual ICollection<DeffCity> Cities { get; set; } = new List<DeffCity>();
+        public virtual ICollection<StoreItem> Items { get; set; } = new List<StoreItem>();
 
+    }
     public class DeffCity
     {
         [Key]
@@ -36,11 +35,11 @@ namespace Concept.Models
 
         [Required]
         [StringLength(50)]
-        public required string Code { get; set; }
+        public string Code { get; set; }
 
         [Required]
         [StringLength(50)]
-        public required string Name { get; set; }
+        public string Name { get; set; }
 
         [Required]
         public int CountryId { get; set; }
@@ -52,11 +51,10 @@ namespace Concept.Models
 
         // Navigation Properties
         [ForeignKey("CountryId")]
-        public virtual required DeffCountry Country { get; set; }
+        public virtual DeffCountry? Country { get; set; }
 
-        public virtual required ICollection<StoreItem> Items { get; set; }
+    
     }
-
     public class DeffCategory
     {
         [Key]
@@ -73,12 +71,13 @@ namespace Concept.Models
         public int? AccountId { get; set; }
         public bool Active { get; set; } = true;
 
+        public string Description { get; set; }
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public DateTime ModifiedDate { get; set; } = DateTime.Now;
 
-        public virtual  ICollection<DeffSubCategory>? SubCategories { get; set; }
+        // Navigation Properties
+        public virtual ICollection<DeffSubCategory>? SubCategories { get; set; } = new List<DeffSubCategory>();
     }
-
     public class DeffSubCategory
     {
         [Key]
@@ -86,48 +85,47 @@ namespace Concept.Models
 
         [Required]
         [StringLength(50)]
-        public required string Code { get; set; }
+        public string Code { get; set; }
 
         [Required]
         [StringLength(50)]
-        public required string Name { get; set; }
+        public string Name { get; set; }
 
         [Required]
         public int CategoryId { get; set; }
 
         public int? AccountId { get; set; }
         public bool Active { get; set; } = true;
-
+        public string Description { get; set; }
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public DateTime ModifiedDate { get; set; } = DateTime.Now;
 
         // Navigation Properties
         [ForeignKey("CategoryId")]
-        public virtual required DeffCategory Category { get; set; }
+        public virtual DeffCategory? Category { get; set; }
 
-        public virtual required ICollection<StoreItem> Items { get; set; }
+        public virtual ICollection<StoreItem>? Items { get; set; } = new List<StoreItem>();
     }
-
     public class DefUOM
     {
         [Key]
         public int Id { get; set; }
 
         [Required]
-        public required string UOMCode { get; set; }
+        public string UOMCode { get; set; }
 
         [Required]
-        public required string UOMName { get; set; }
+        public string UOMName { get; set; }
 
         public bool Active { get; set; } = true;
 
+        public string Description { get; set; }
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public DateTime ModifiedDate { get; set; } = DateTime.Now;
 
         // Navigation Properties
-        public virtual required ICollection<DefSubUOM> SubUOMs { get; set; }
+        public virtual ICollection<DefSubUOM>? SubUOMs { get; set; } = new List<DefSubUOM>();
     }
-
     public class DefSubUOM
     {
         [Key]
@@ -137,84 +135,88 @@ namespace Concept.Models
         public int UOMId { get; set; }
 
         [Required]
-        public required string SubUOMCode { get; set; }
+        public string SubUOMCode { get; set; }
 
         [Required]
-        public required string SubUOMName { get; set; }
+        public string SubUOMName { get; set; }
 
         public bool Active { get; set; } = true;
+
+        public string Description { get; set; }
 
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public DateTime ModifiedDate { get; set; } = DateTime.Now;
 
         // Navigation Properties
         [ForeignKey("UOMId")]
-        public virtual required DefUOM UOM { get; set; }
+        public virtual DefUOM? UOM { get; set; }
 
-        public virtual required ICollection<StoreItem> Items { get; set; }
+        public virtual ICollection<StoreItem>? Items { get; set; } = new List<StoreItem>();
     }
-
     public class DeffDepartment
     {
         [Key]
         public int Id { get; set; }
-
         [Required]
-        public required string DepartmentCode { get; set; }
-
+        public string DepartmentCode { get; set; }
         [Required]
-        public required string DepartmentName { get; set; }
-
+        public string DepartmentName { get; set; }
         public bool Active { get; set; } = true;
-
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public DateTime ModifiedDate { get; set; } = DateTime.Now;
 
-        // Navigation Properties
-        public virtual required ICollection<DeffJobTitle> JobTitles { get; set; }
-    }
+        public string Description { get; set; }
 
+        public int? AccountId { get; set; }
+
+        public virtual ICollection<UserInfo> Users { get; set; } = new List<UserInfo>();
+    }
     public class DeffJobTitle
     {
+       
         [Key]
         public int Id { get; set; }
 
         [Required]
-        public required string JobCode { get; set; }
+        public string JobCode { get; set; }
 
         [Required]
-        public required string JobName { get; set; }
+        public string JobName { get; set; }
 
+        // احتفظ بالحقل بس اجعله عادي بدون Foreign Key
         public int? DepartmentId { get; set; }
-        public bool Active { get; set; } = true;
 
+        public bool Active { get; set; } = true;
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public DateTime ModifiedDate { get; set; } = DateTime.Now;
 
-        // Navigation Properties
-        [ForeignKey("DepartmentId")]
-        public virtual required DeffDepartment Department { get; set; }
-
-        public virtual required ICollection<UserInfo> Users { get; set; }
+        public virtual ICollection<UserInfo> Users { get; set; } = new List<UserInfo>();
+        
     }
-
     public class UserInfo
     {
         [Key]
         public int Id { get; set; }
 
         [Required]
-        public required string UserCode { get; set; }
+        public string UserCode { get; set; }
 
         [Required]
-        public required string UserName { get; set; }
+        public string FullName { get; set; }
+
+        [Required]
+        public string UserName { get; set; }
 
         [Required]
         [DataType(DataType.Password)]
-        public required string UserPassword { get; set; }
+        public string UserPassword { get; set; }
 
         public int? JobTitleId { get; set; }
-        public int? PurchaseDefaultStatus { get; set; }
+        public int? DepartmentId { get; set; }
+
+        public int? LocationId { get; set; }
+
+        public bool PurchaseOrderAuthorise { get; set; } = false;
         public bool Active { get; set; } = true;
 
         public DateTime CreatedDate { get; set; } = DateTime.Now;
@@ -222,34 +224,40 @@ namespace Concept.Models
 
         // Navigation Properties
         [ForeignKey("JobTitleId")]
-        public virtual required DeffJobTitle JobTitle { get; set; }
+        public virtual DeffJobTitle JobTitle { get; set; }
 
-        public virtual required ICollection<StoreItem> Items { get; set; }
+        [ForeignKey("DepartmentId")]
+        public virtual DeffDepartment? Department { get; set; }
+
+        [ForeignKey("LocationId")]
+        public virtual DeffLocation? Location { get; set; }
+
+
+        public virtual ICollection<StoreItem> Items { get; set; } = new List<StoreItem>();
+    
     }
-
-    // =============================================
-    // Main Store Item Model
-    // =============================================
-
     public class StoreItem
     {
         [Key]
         public int Id { get; set; }
 
         [Required]
-        public required string ItemCode { get; set; }
+        public string ItemCode { get; set; }
 
-        public required string HRCode { get; set; }
+        public string HRCode { get; set; }
 
         [Required]
-        public required string ItemName { get; set; }
+        public string ItemName { get; set; }
+
+        [Required]
+       public string ShortItemName { get; set; }
 
         public int? SubCategoryId { get; set; }
-        public int? LiveDRMMaxcode { get; set; }
-        public int? SubdueVOMMaxcode { get; set; }
 
-        [Column(TypeName = "decimal(18,3)")]
-        public decimal QuantityInStore { get; set; } = 0;
+        public int? SubUOMId { get; set; }
+
+        public int? PackSize { get; set; }
+
 
         [Column(TypeName = "money")]
         public decimal PurchaseValue { get; set; } = 0;
@@ -257,44 +265,137 @@ namespace Concept.Models
         [Column(TypeName = "money")]
         public decimal PurchaseValueDefault { get; set; } = 0;
 
+
+        [Column(TypeName = "decimal(18,3)")]
+        public decimal QuantityInStore { get; set; } = 0;
+
+
         [Column(TypeName = "money")]
         public decimal SaleValue { get; set; } = 0;
 
         [Column(TypeName = "money")]
         public decimal SaleValueDefault { get; set; } = 0;
 
-        public int? CityId { get; set; }
-        public int? SubUOMId { get; set; }
+        public int? CountryId { get; set; }
 
         public double? MaxCity { get; set; }
         public double? MinCity { get; set; }
 
-        [DataType(DataType.Date)]
-        public DateTime? ExpireDate { get; set; }
 
+        
+        public int? UserId { get; set; }
         public bool Active { get; set; } = true;
 
-        public required string Description { get; set; }
-        public required     string OperationsOrOperations { get; set; }
-        public required string OperationWeight { get; set; }
-        public required     string HSBarcode { get; set; }
+        public string Description { get; set; }
 
-        public int? UserId { get; set; }
+        public string OperationsOrOperations { get; set; }
+        public string OperationWeight { get; set; }
+        public string HSBarcode { get; set; }
+
+       
 
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public DateTime ModifiedDate { get; set; } = DateTime.Now;
 
         // Navigation Properties
-        [ForeignKey("SubCategoryId")]
-        public virtual required DeffSubCategory SubCategory { get; set; }
 
-        [ForeignKey("CityId")]
-        public virtual required DeffCity City { get; set; }
+        [ForeignKey("SubCategoryId")]
+        public virtual DeffSubCategory? SubCategory { get; set; }
+
+        [ForeignKey("CountryId")]
+        public virtual DeffCountry? Country { get; set; }
+
 
         [ForeignKey("SubUOMId")]
-        public virtual required DefSubUOM SubUOM { get; set; }
+        public virtual DefSubUOM? SubUOM { get; set; }
 
         [ForeignKey("UserId")]
-        public virtual required UserInfo User { get; set; }
+        public virtual UserInfo? User { get; set; }
     }
+
+    public class Vender
+    {
+        [Key]
+        public int Id { get; set; }
+        [Required]
+        public string VenderCode { get; set; }
+        [Required]
+        public string VenderName { get; set; }
+
+        public int? AccounttId { get; set; }
+
+        public int? CostCenterId { get; set; }
+
+        public string BusinessType { get; set; }
+
+        public string Address { get; set; }
+        public int? CityId { get; set; }
+
+        public string Email { get; set; }
+        public string ContactPerson { get; set; }
+        public string PhoneNumber { get; set; }
+       
+        public int? JobTitleId { get; set; }
+        public int? BankId { get; set; }
+        public string BankAccountNumber { get; set; } = string.Empty;
+
+        public string BankAccountIBan { get; set; } = string.Empty;
+
+        public string AdditionalInfo { get; set; } = string.Empty;
+
+        public bool Active { get; set; } = true;
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime ModifiedDate { get; set; } = DateTime.Now;
+
+        public string Description { get; set; } = string.Empty;
+
+        public int? AccountId { get; set; }
+
+        public int? CostCenterIdd { get; set; }
+
+        // Navigation Properties
+
+        [ForeignKey("CityId")]
+        public virtual DeffCity City { get; set; }
+
+        [ForeignKey("JobTitleId")]
+        public virtual DeffJobTitle JobTitle { get; set; }
+
+        [ForeignKey("BankId")]
+        public virtual DefBank Bank { get; set; }
+
+    }   
+
+    public class DefBank
+    {
+        [Key]
+        public int Id { get; set; }
+        [Required]
+        public string BankCode { get; set; }
+        [Required]
+        public string BankName { get; set; }
+        public bool Active { get; set; } = true;
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime ModifiedDate { get; set; } = DateTime.Now;
+    }
+    public class DeffLocation
+    {
+        [Key]
+        public int Id { get; set; }
+        [Required]
+        public string LocationCode { get; set; }
+        [Required]
+        public string LocationName { get; set; }
+        public bool Active { get; set; } = true;
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime ModifiedDate { get; set; } = DateTime.Now;
+
+        public string Description { get; set; }
+
+        public int? AccountId { get; set; }
+
+        public virtual ICollection<UserInfo> Users { get; set; } = new List<UserInfo>();
+    }
+
+
 }

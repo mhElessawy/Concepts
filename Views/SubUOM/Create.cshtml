@@ -1,0 +1,65 @@
+﻿@model DefSubUOM
+
+@{
+    ViewData["Title"] = "Add Sub UOM";
+}
+
+<div class="page-header">
+    <h2><i class="bi bi-plus-circle"></i> Add New Sub Unit of Measure</h2>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card">
+            <div class="card-body p-4">
+                <form asp-action="Create" method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="SubUOMCode" class="form-label">Sub UOM Code <span class="text-danger">*</span></label>
+                        <input asp-for="SubUOMCode" class="form-control" placeholder="e.g., DOZ" />
+                        <span asp-validation-for="SubUOMCode" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="SubUOMName" class="form-label">Sub UOM Name <span class="text-danger">*</span></label>
+                        <input asp-for="SubUOMName" class="form-control" placeholder="e.g., Dozen" />
+                        <span asp-validation-for="SubUOMName" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="UOMId" class="form-label">Parent UOM <span class="text-danger">*</span></label>
+                        <select asp-for="UOMId" class="form-select">
+                            <option value="">-- Select UOM --</option>
+                            @foreach (var uom in ViewBag.UOMs as List<DefUOM>)
+                            {
+                                <option value="@uom.Id">@uom.UOMName (@uom.UOMCode)</option>
+                            }
+                        </select>
+                        <span asp-validation-for="UOMId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input asp-for="Active" class="form-check-input" type="checkbox" checked />
+                            <label asp-for="Active" class="form-check-label">Active</label>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> Save
+                        </button>
+                        <a href="/SubUOM" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

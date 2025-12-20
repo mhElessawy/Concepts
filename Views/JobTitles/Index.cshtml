@@ -1,0 +1,65 @@
+﻿@model IEnumerable<DeffJobTitle>
+
+@{
+    ViewData["Title"] = "Job Titles";
+}
+
+<div class="page-header d-flex justify-content-between align-items-center">
+    <h2><i class="bi bi-person-badge"></i> Job Titles Management</h2>
+    <a href="/JobTitles/Create" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Add New Job Title
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Job Title</th>
+                        
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var job in Model)
+                    {
+                        <tr>
+                            <td><span class="badge bg-secondary">@job.JobCode</span></td>
+                            <td>@job.JobName</td>
+                            
+                            <td>
+                                @if (job.Active)
+                                {
+                                    <span class="badge bg-success">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Inactive</span>
+                                }
+                            </td>
+                            <td class="action-buttons">
+                                <a href="/JobTitles/Edit/@job.Id" class="btn btn-sm btn-warning" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a href="/JobTitles/Delete/@job.Id" class="btn btn-sm btn-danger" title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info mt-4">
+        <i class="bi bi-info-circle"></i> No job titles found. Click "Add New Job Title" to create one.
+    </div>
+}

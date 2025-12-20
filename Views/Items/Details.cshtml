@@ -30,9 +30,14 @@
                         <p class="mb-2">@(Model.HRCode ?? "N/A")</p>
                     </div>
 
-                    <div class="col-md-12">
+                    <div class="col-md-6">
                         <strong>Item Name:</strong>
                         <p class="mb-2">@Model.ItemName</p>
+                    </div>
+
+                    <div class="col-md-6">
+                        <strong>Short Name:</strong>
+                        <p class="mb-2">@Model.ShortItemName</p>
                     </div>
 
                     <div class="col-md-12">
@@ -40,7 +45,7 @@
                         <p class="mb-2">@(Model.Description ?? "No description")</p>
                     </div>
 
-                    <!-- Category and Units -->
+                    <!-- Category and Location -->
                     <div class="col-12 mt-4">
                         <h5 class="text-primary mb-3">
                             <i class="bi bi-tags"></i> Category & Location
@@ -63,8 +68,13 @@
                     </div>
 
                     <div class="col-md-6">
-                        <strong>City:</strong>
-                        <p class="mb-2">@(Model.City?.Name ?? "N/A")</p>
+                        <strong>Pack Size:</strong>
+                        <p class="mb-2">@(Model.PackSize?.ToString() ?? "N/A")</p>
+                    </div>
+
+                    <div class="col-md-6">
+                        <strong>Country:</strong>
+                        <p class="mb-2">@(Model.Country?.Name ?? "N/A")</p>
                     </div>
 
                     <div class="col-md-6">
@@ -142,11 +152,6 @@
                     </div>
 
                     <div class="col-md-6">
-                        <strong>Expiry Date:</strong>
-                        <p class="mb-2">@(Model.ExpireDate?.ToString("MM/dd/yyyy") ?? "N/A")</p>
-                    </div>
-
-                    <div class="col-md-6">
                         <strong>Weight:</strong>
                         <p class="mb-2">@(Model.OperationWeight ?? "N/A")</p>
                     </div>
@@ -168,6 +173,11 @@
                     <div class="col-md-6">
                         <strong>Created Date:</strong>
                         <p class="mb-2">@Model.CreatedDate.ToString("MM/dd/yyyy HH:mm")</p>
+                    </div>
+
+                    <div class="col-md-6">
+                        <strong>Modified Date:</strong>
+                        <p class="mb-2">@Model.ModifiedDate.ToString("MM/dd/yyyy HH:mm")</p>
                     </div>
 
                     <div class="col-md-12">

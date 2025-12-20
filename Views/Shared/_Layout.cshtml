@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Warehouse Management System</title>
+    <title>@ViewData["Title"] - Concept Management System</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
@@ -38,10 +38,10 @@
             margin: 0 5px;
         }
 
-        .nav-link:hover {
-            background-color: rgba(255,255,255,0.1);
-            transform: translateY(-2px);
-        }
+            .nav-link:hover {
+                background-color: rgba(255,255,255,0.1);
+                transform: translateY(-2px);
+            }
 
         .content-area {
             padding: 30px;
@@ -54,10 +54,10 @@
             transition: all 0.3s ease;
         }
 
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
-        }
+            .card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            }
 
         .stat-card {
             padding: 25px;
@@ -67,16 +67,16 @@
             overflow: hidden;
         }
 
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255,255,255,0.1);
-            transform: skewY(-5deg) translateY(-50%);
-        }
+            .stat-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                right: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(255,255,255,0.1);
+                transform: skewY(-5deg) translateY(-50%);
+            }
 
         .stat-card-primary {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -102,11 +102,11 @@
             transition: all 0.3s ease;
         }
 
-        .btn-primary:hover {
-            background: #1d4ed8;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
-        }
+            .btn-primary:hover {
+                background: #1d4ed8;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
+            }
 
         .table {
             background: white;
@@ -114,19 +114,19 @@
             overflow: hidden;
         }
 
-        .table thead {
-            background: var(--primary-color);
-            color: white;
-        }
+            .table thead {
+                background: var(--primary-color);
+                color: white;
+            }
 
-        .table tbody tr {
-            transition: all 0.3s ease;
-        }
+            .table tbody tr {
+                transition: all 0.3s ease;
+            }
 
-        .table tbody tr:hover {
-            background-color: var(--light-bg);
-            transform: scale(1.01);
-        }
+                .table tbody tr:hover {
+                    background-color: var(--light-bg);
+                    transform: scale(1.01);
+                }
 
         .badge {
             padding: 6px 12px;
@@ -140,75 +140,300 @@
             border-radius: 12px;
             margin-bottom: 30px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .page-header h2 {
-            margin: 0;
-            color: var(--dark-color);
-            font-weight: 700;
-        }
+            .page-header h2 {
+                margin: 0;
+                color: var(--dark-color);
+                font-weight: 700;
+            }
 
         .search-box {
             position: relative;
         }
 
-        .search-box input {
-            padding-left: 45px;
-            border-radius: 10px;
-            border: 2px solid #e2e8f0;
-            transition: all 0.3s ease;
-        }
+            .search-box input {
+                padding-left: 45px;
+                border-radius: 10px;
+                border: 2px solid #e2e8f0;
+                transition: all 0.3s ease;
+            }
 
-        .search-box input:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
+                .search-box input:focus {
+                    border-color: var(--primary-color);
+                    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+                }
 
-        .search-box i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--secondary-color);
-        }
+            .search-box i {
+                position: absolute;
+                left: 15px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: var(--secondary-color);
+            }
 
         .action-buttons .btn {
             margin: 0 3px;
             border-radius: 8px;
         }
+
+        .dropdown-menu {
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            border: none;
+        }
+
+        .dropdown-item {
+            border-radius: 6px;
+            margin: 2px 5px;
+            transition: all 0.2s ease;
+        }
+
+            .dropdown-item:hover {
+                background-color: var(--light-bg);
+                padding-left: 20px;
+            }
+
+            .dropdown-item i {
+                margin-right: 8px;
+                width: 20px;
+                text-align: center;
+            }
+
+        .dropdown-divider {
+            margin: 8px 0;
+        }
+
+        .navbar-nav .dropdown-menu {
+            margin-top: 8px;
+        }
+
+        .navbar-dark .nav-link.active {
+            background-color: rgba(255,255,255,0.15);
+        }
+
+        /* User Menu Styling */
+        .dropdown-item-text {
+            padding: 0.5rem 1rem;
+        }
+
+            .dropdown-item-text strong {
+                font-size: 1.1em;
+            }
+
+        .dropdown-item.logout-item {
+            color: var(--danger-color);
+        }
+
+            .dropdown-item.logout-item:hover {
+                background-color: rgba(239, 68, 68, 0.1);
+                color: var(--danger-color);
+            }
     </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container-fluid">
             <a class="navbar-brand" href="/">
-                <i class="bi bi-box-seam"></i> Warehouse System
+                <i class="bi bi-box-seam"></i> Concept System
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
+                    @{
+                        var fullName = Context.Session.GetString("FullName");
+                        var userName = Context.Session.GetString("UserName");
+                        var userCode = Context.Session.GetString("UserCode");
+                        var isLoggedIn = !string.IsNullOrEmpty(fullName);
+                    }
+
+                    <!-- Dashboard -->
                     <li class="nav-item">
                         <a class="nav-link" href="/">
                             <i class="bi bi-house-door"></i> Dashboard
                         </a>
                     </li>
+
+                    <!-- Items -->
                     <li class="nav-item">
                         <a class="nav-link" href="/Items">
                             <i class="bi bi-box"></i> Items
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/Categories">
+
+                    <!-- Categories -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                             <i class="bi bi-tags"></i> Categories
                         </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item" href="/Categories">
+                                    <i class="bi bi-tag"></i> Main Categories
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/SubCategories">
+                                    <i class="bi bi-tags"></i> Sub Categories
+                                </a>
+                            </li>
+                        </ul>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="bi bi-file-earmark-text"></i> Reports
+
+                    <!-- Units -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-rulers"></i> Units
                         </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item" href="/UOM">
+                                    <i class="bi bi-rulers"></i> Units of Measure
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/SubUOM">
+                                    <i class="bi bi-arrow-down-up"></i> Sub Units
+                                </a>
+                            </li>
+                        </ul>
                     </li>
+
+                    <!-- Banks -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-bank"></i> Banks
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item" href="/Banks">
+                                    <i class="bi bi-list-ul"></i> All Banks
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/Banks/Create">
+                                    <i class="bi bi-plus-circle"></i> Add New Bank
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <!-- Vendors -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-building"></i> Vendors
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item" href="/Vendors">
+                                    <i class="bi bi-list-ul"></i> All Vendors
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/Vendors/Create">
+                                    <i class="bi bi-plus-circle"></i> Add New Vendor
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <!-- HR -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-people"></i> HR
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item" href="/Departments">
+                                    <i class="bi bi-diagram-3"></i> Departments
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/JobTitles">
+                                    <i class="bi bi-briefcase"></i> Job Titles
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="/Users">
+                                    <i class="bi bi-person-badge"></i> Users
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <!-- Locations -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-geo-alt"></i> Locations
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item" href="/Countries">
+                                    <i class="bi bi-globe"></i> Countries
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/Cities">
+                                    <i class="bi bi-pin-map"></i> Cities
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <!-- User Menu -->
+                    @if (isLoggedIn)
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle"></i> @fullName
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <span class="dropdown-item-text">
+                                        <small class="text-muted">Username:</small><br>
+                                        <strong>@userName</strong><br>
+                                        <small class="text-muted">Code: @userCode</small>
+                                    </span>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" href="/Account/Profile">
+                                        <i class="bi bi-person"></i> My Profile
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="/Account/ChangePassword">
+                                        <i class="bi bi-key"></i> Change Password
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item logout-item" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                        <i class="bi bi-box-arrow-right"></i> Logout
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <!-- Hidden Logout Form -->
+                        <form id="logout-form" action="/Account/Logout" method="post" style="display: none;">
+                            @Html.AntiForgeryToken()
+                        </form>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Account/Login">
+                                <i class="bi bi-box-arrow-in-right"></i> Login
+                            </a>
+                        </li>
+                    }
                 </ul>
             </div>
         </div>
@@ -222,6 +447,7 @@
         </div>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

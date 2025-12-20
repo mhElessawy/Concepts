@@ -1,0 +1,53 @@
+﻿@model DefUOM
+
+@{
+    ViewData["Title"] = "Add UOM";
+}
+
+<div class="page-header">
+    <h2><i class="bi bi-plus-circle"></i> Add New Unit of Measure</h2>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card">
+            <div class="card-body p-4">
+                <form asp-action="Create" method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="UOMCode" class="form-label">UOM Code <span class="text-danger">*</span></label>
+                        <input asp-for="UOMCode" class="form-control" placeholder="e.g., PCS" />
+                        <span asp-validation-for="UOMCode" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="UOMName" class="form-label">UOM Name <span class="text-danger">*</span></label>
+                        <input asp-for="UOMName" class="form-control" placeholder="e.g., Pieces" />
+                        <span asp-validation-for="UOMName" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input asp-for="Active" class="form-check-input" type="checkbox" checked />
+                            <label asp-for="Active" class="form-check-label">Active</label>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> Save
+                        </button>
+                        <a href="/UOM" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

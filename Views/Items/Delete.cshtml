@@ -22,8 +22,14 @@
                     <dt class="col-sm-4">Item Name:</dt>
                     <dd class="col-sm-8">@Model.ItemName</dd>
 
+                    <dt class="col-sm-4">Short Name:</dt>
+                    <dd class="col-sm-8">@Model.ShortItemName</dd>
+
                     <dt class="col-sm-4">Category:</dt>
                     <dd class="col-sm-8">@Model.SubCategory?.Category?.Name - @Model.SubCategory?.Name</dd>
+
+                    <dt class="col-sm-4">Pack Size:</dt>
+                    <dd class="col-sm-8">@(Model.PackSize?.ToString() ?? "N/A")</dd>
 
                     <dt class="col-sm-4">Quantity in Store:</dt>
                     <dd class="col-sm-8">

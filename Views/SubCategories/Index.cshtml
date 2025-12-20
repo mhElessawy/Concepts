@@ -1,0 +1,67 @@
+﻿@model IEnumerable<DeffSubCategory>
+
+@{
+    ViewData["Title"] = "Sub Categories";
+}
+
+<div class="page-header d-flex justify-content-between align-items-center">
+    <h2><i class="bi bi-tags-fill"></i> Sub Categories Management</h2>
+    <a href="/SubCategories/Create" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Add New Sub Category
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th>Parent Category</th>
+                        <th>Account ID</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var subCat in Model)
+                    {
+                        <tr>
+                            <td><span class="badge bg-secondary">@subCat.Code</span></td>
+                            <td>@subCat.Name</td>
+                            <td><span class="badge bg-primary">@subCat.Category.Name</span></td>
+                            <td>@(subCat.AccountId?.ToString() ?? "N/A")</td>
+                            <td>
+                                @if (subCat.Active)
+                                {
+                                    <span class="badge bg-success">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Inactive</span>
+                                }
+                            </td>
+                            <td class="action-buttons">
+                                <a href="/SubCategories/Edit/@subCat.Id" class="btn btn-sm btn-warning" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a href="/SubCategories/Delete/@subCat.Id" class="btn btn-sm btn-danger" title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info mt-4">
+        <i class="bi bi-info-circle"></i> No sub categories found. Click "Add New Sub Category" to create one.
+    </div>
+}
