@@ -1,0 +1,355 @@
+@model PurchaseOrderHeader
+
+@{
+    ViewData["Title"] = "Purchase Order Details";
+    var details = ViewBag.Details as List<PurchaseOrderDetails>;
+    var grandTotal = ViewBag.GrandTotal as decimal? ?? 0;
+    var canApprove = ViewBag.CanApprove as bool? ?? false;
+}
+
+<div class="page-header">
+    <h2><i class="bi bi-file-text"></i> Purchase Order Details</h2>
+</div>
+
+<!-- Header Information Card -->
+<div class="card mb-3">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0"><i class="bi bi-info-circle"></i> Order Information</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <dl class="row">
+                    <dt class="col-sm-5">Purchase Code:</dt>
+                    <dd class="col-sm-7">
+                        <span class="badge bg-primary fs-6">@Model.PurchaseCode</span>
+                    </dd>
+
+                    <dt class="col-sm-5">Purchase No:</dt>
+                    <dd class="col-sm-7">
+                        @if (!string.IsNullOrEmpty(Model.PurchaseNo))
+                        {
+                            <strong>@Model.PurchaseNo</strong>
+                        }
+                        else
+                        {
+                            <span class="text-muted">N/A</span>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-5">Purchase Date:</dt>
+                    <dd class="col-sm-7">@Model.PurchaseDate.ToString("dd/MM/yyyy")</dd>
+
+                    <dt class="col-sm-5">Purchase Time:</dt>
+                    <dd class="col-sm-7">
+                        @if (Model.PurchaseTime != default(TimeOnly))
+                        {
+                            @Model.PurchaseTime.ToString(@"hh\:mm")
+                        }
+                        else
+                        {
+                            <span class="text-muted">N/A</span>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-5">Department:</dt>
+                    <dd class="col-sm-7">
+                        @if (Model.Department != null)
+                        {
+                            <span class="badge bg-info">@Model.Department.DepartmentName</span>
+                        }
+                        else
+                        {
+                            <span class="text-muted">N/A</span>
+                        }
+                    </dd>
+                </dl>
+            </div>
+
+            <div class="col-md-6">
+                <dl class="row">
+                    <dt class="col-sm-5">Ordered By:</dt>
+                    <dd class="col-sm-7">
+                        @if (Model.User != null)
+                        {
+                            <span class="badge bg-secondary">@Model.User.FullName</span>
+                        }
+                        else
+                        {
+                            <span class="text-muted">N/A</span>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-5">Vendor:</dt>
+                    <dd class="col-sm-7">
+                        @if (Model.Vender != null)
+                        {
+                            <span class="badge bg-success">@Model.Vender.VenderName</span>
+                        }
+                        else
+                        {
+                            <span class="text-muted">N/A</span>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-5">Status:</dt>
+                    <dd class="col-sm-7">
+                        @switch (Model.PurchaseStatus)
+                        {
+                            case 0:
+                                <span class="badge bg-warning text-dark">Pending</span>
+                                break;
+                            case 1:
+                                <span class="badge bg-success">Completed</span>
+                                break;
+                            case 2:
+                                <span class="badge bg-danger">Cancelled</span>
+                                break;
+                            default:
+                                <span class="badge bg-secondary">Unknown</span>
+                                break;
+                        }
+                    </dd>
+
+                    <dt class="col-sm-5">Approval Status:</dt>
+                    <dd class="col-sm-7">
+                        @switch (Model.Approved)
+                        {
+                            case 0:
+                                <span class="badge bg-warning text-dark">
+                                    <i class="bi bi-clock"></i> Pending Approval
+                                </span>
+                                break;
+                            case 1:
+                                <span class="badge bg-success">
+                                    <i class="bi bi-check-circle"></i> Approved
+                                </span>
+                                break;
+                            case 2:
+                                <span class="badge bg-danger">
+                                    <i class="bi bi-x-circle"></i> Rejected
+                                </span>
+                                break;
+                        }
+                    </dd>
+
+                    <dt class="col-sm-5">Active:</dt>
+                    <dd class="col-sm-7">
+                        @if (Model.Active)
+                        {
+                            <span class="badge bg-success">
+                                <i class="bi bi-check-circle"></i> Active
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">
+                                <i class="bi bi-x-circle"></i> Inactive
+                            </span>
+                        }
+                    </dd>
+                </dl>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.AdditionalNotes))
+        {
+            <hr />
+            <div class="row">
+                <div class="col-md-12">
+                    <dt>Additional Notes:</dt>
+                    <dd>
+                        <div class="alert alert-info mb-0">
+                            <i class="bi bi-info-circle"></i>
+                            @Model.AdditionalNotes
+                        </div>
+                    </dd>
+                </div>
+            </div>
+        }
+
+        <hr />
+        <div class="row">
+            <div class="col-md-6">
+                <small class="text-muted">
+                    <i class="bi bi-calendar-plus"></i>
+                    Created: @Model.CreatedDate.ToString("dd/MM/yyyy HH:mm")
+                </small>
+            </div>
+            <div class="col-md-6 text-end">
+                <small class="text-muted">
+                    <i class="bi bi-calendar-check"></i>
+                    Modified: @Model.ModifiedDate.ToString("dd/MM/yyyy HH:mm")
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Order Items Card -->
+<div class="card mb-3">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0"><i class="bi bi-list-ul"></i> Order Items</h5>
+    </div>
+    <div class="card-body">
+        @if (details != null && details.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th width="3%">#</th>
+                            <th width="20%">Item</th>
+                            <th width="10%">Category</th>
+                            <th width="8%">Av. Qty</th>
+                            <th width="8%">Price</th>
+                            <th width="8%">Qty</th>
+                            <th width="10%">Total</th>
+                            <th width="8%">Discount</th>
+                            <th width="10%">Net Price</th>
+                            <th width="10%">Unit</th>
+                            <th width="5%">Pack</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int rowNum = 1;
+                        }
+                        @foreach (var detail in details)
+                        {
+                            <tr>
+                                <td class="text-center">@rowNum</td>
+                                <td>
+                                    @if (detail.Item != null)
+                                    {
+                                        <strong>@detail.Item.ItemCode</strong>
+                                        <br />
+                                        <small class="text-muted">@detail.Item.ItemName</small>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">N/A</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (detail.SubCategory != null)
+                                    {
+                                        <span class="badge bg-info">@detail.SubCategory.Name</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">N/A</span>
+                                    }
+                                </td>
+                                <td class="text-end">@detail.AvQuantity.ToString("N3")</td>
+                                <td class="text-end">@detail.Price.ToString("N3")</td>
+                                <td class="text-end">@detail.Quantity.ToString("N3")</td>
+                                <td class="text-end">@detail.TotalPrice.ToString("N3")</td>
+                                <td class="text-end text-danger">
+                                    @if (detail.Discount > 0)
+                                    {
+                                        @detail.Discount.ToString("N3")
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+                                <td class="text-end fw-bold text-success">@detail.NetPrice.ToString("N3")</td>
+                                <td>
+                                    @if (detail.SubUOM != null)
+                                    {
+                                        <span class="badge bg-secondary">@detail.SubUOM.SubUOMName</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">N/A</span>
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    @if (detail.PackSize.HasValue && detail.PackSize.Value > 0)
+                                    {
+                                        @detail.PackSize.Value
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+                            </tr>
+                            rowNum++;
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr class="table-success">
+                            <td colspan="8" class="text-end fw-bold fs-5">Grand Total:</td>
+                            <td colspan="3" class="text-start">
+                                <span class="fs-4 fw-bold text-success">@grandTotal.ToString("N3")</span>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-warning text-center py-5">
+                <i class="bi bi-exclamation-triangle fs-1 d-block mb-3"></i>
+                <h5>No Items Found</h5>
+                <p class="mb-0">This purchase order has no items.</p>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Action Buttons -->
+<div class="mb-4">
+    @if (Model.Approved == 0)
+    {
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning btn-lg">
+            <i class="bi bi-pencil"></i> Edit
+        </a>
+        
+        @if (canApprove)
+        {
+            <a asp-action="ApprovalDetails" asp-route-id="@Model.Id" class="btn btn-success btn-lg">
+                <i class="bi bi-clipboard-check"></i> Review for Approval
+            </a>
+        }
+    }
+    else if (Model.Approved == 1)
+    {
+        <span class="badge bg-success fs-6 p-3">
+            <i class="bi bi-check-circle"></i> This order has been approved
+        </span>
+    }
+    else if (Model.Approved == 2)
+    {
+        <span class="badge bg-danger fs-6 p-3">
+            <i class="bi bi-x-circle"></i> This order has been rejected
+        </span>
+    }
+    
+    <a asp-action="Index" class="btn btn-secondary btn-lg">
+        <i class="bi bi-arrow-left"></i> Back to List
+    </a>
+    
+    <button type="button" class="btn btn-primary btn-lg" onclick="window.print()">
+        <i class="bi bi-printer"></i> Print
+    </button>
+</div>
+
+<style>
+    @@media print {
+        .btn, .page-header, .navbar, .footer {
+            display: none !important;
+        }
+        .card {
+            border: 1px solid #000 !important;
+            page-break-inside: avoid;
+        }
+        .table {
+            font-size: 12px;
+        }
+    }
+</style>

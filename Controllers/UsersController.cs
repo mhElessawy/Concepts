@@ -119,7 +119,7 @@ namespace Concept.Controllers
         // POST: Users/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,UserCode,FullName,UserName,UserPassword,JobTitleId,DepartmentId,PurchaseOrderAuthorise,Active,CreatedDate")] UserInfo userInfo)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,UserCode,FullName,UserName,UserPassword,JobTitleId,DepartmentId,PurchaseOrderAuthorise,CanApprovePurchaseOrders,Active,CreatedDate")] UserInfo userInfo)
         {
             if (id != userInfo.Id)
             {

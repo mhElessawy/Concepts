@@ -1,14 +1,16 @@
 @model IEnumerable<UserInfo>
 
 @{
-    ViewData["Title"] = "Users Management";
+    ViewData["Title"] = "Users";
 }
 
 <div class="page-header">
     <h2><i class="bi bi-people"></i> Users Management</h2>
-    <a asp-action="Create" class="btn btn-success">
-        <i class="bi bi-plus-circle"></i> Add New User
-    </a>
+    <div>
+        <a asp-action="Create" class="btn btn-success">
+            <i class="bi bi-person-plus"></i> Add New User
+        </a>
+    </div>
 </div>
 
 @if (TempData["SuccessMessage"] != null)
@@ -25,14 +27,14 @@
         {
             <div class="table-responsive">
                 <table class="table table-hover">
-                    <thead>
+                    <thead class="table-light">
                         <tr>
                             <th>User Code</th>
                             <th>Full Name</th>
                             <th>Username</th>
                             <th>Job Title</th>
                             <th>Department</th>
-                            <th>PO Authorise</th>
+                            <th>Permissions</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
@@ -41,50 +43,80 @@
                         @foreach (var user in Model)
                         {
                             <tr>
-                                <td><strong>@user.UserCode</strong></td>
+                                <td>
+                                    <strong class="text-primary">@user.UserCode</strong>
+                                </td>
                                 <td>@user.FullName</td>
                                 <td>@user.UserName</td>
-                                <td>@(user.JobTitle?.JobName ?? "N/A")</td>
-                                <td>@(user.Department?.DepartmentName ?? "N/A")</td>
                                 <td>
-                                    @if (user.PurchaseOrderAuthorise)
+                                    @if (user.JobTitle != null)
                                     {
-                                        <span class="badge bg-success">
-                                            <i class="bi bi-check-circle"></i> Yes
-                                        </span>
+                                        <span class="badge bg-secondary">@user.JobTitle.JobName</span>
                                     }
                                     else
                                     {
-                                        <span class="badge bg-secondary">
-                                            <i class="bi bi-x-circle"></i> No
-                                        </span>
+                                        <span class="text-muted">-</span>
                                     }
+                                </td>
+                                <td>
+                                    @if (user.Department != null)
+                                    {
+                                        <span class="badge bg-info">@user.Department.DepartmentName</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        @if (user.PurchaseOrderAuthorise)
+                                        {
+                                            <span class="badge bg-primary" title="Purchase Order Authorise">
+                                                <i class="bi bi-check-circle"></i> PO Auth
+                                            </span>
+                                        }
+                                        @if (user.CanApprovePurchaseOrders)
+                                        {
+                                            <span class="badge bg-warning text-dark" title="Can Approve Purchase Orders">
+                                                <i class="bi bi-clipboard-check"></i> Approver
+                                            </span>
+                                        }
+                                        @if (!user.PurchaseOrderAuthorise && !user.CanApprovePurchaseOrders)
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    </div>
                                 </td>
                                 <td>
                                     @if (user.Active)
                                     {
-                                        <span class="badge bg-success">Active</span>
+                                        <span class="badge bg-success">
+                                            <i class="bi bi-check-circle"></i> Active
+                                        </span>
                                     }
                                     else
                                     {
-                                        <span class="badge bg-danger">Inactive</span>
+                                        <span class="badge bg-danger">
+                                            <i class="bi bi-x-circle"></i> Inactive
+                                        </span>
                                     }
                                 </td>
                                 <td>
                                     <div class="btn-group btn-group-sm" role="group">
-                                        <a asp-action="Details" asp-route-id="@user.Id" 
+                                        <a asp-action="Details" asp-route-id="@user.Id"
                                            class="btn btn-info" title="Details">
                                             <i class="bi bi-eye"></i>
                                         </a>
-                                        <a asp-action="Edit" asp-route-id="@user.Id" 
+                                        <a asp-action="Edit" asp-route-id="@user.Id"
                                            class="btn btn-warning" title="Edit">
                                             <i class="bi bi-pencil"></i>
                                         </a>
-                                        <a asp-action="ChangePassword" asp-route-id="@user.Id" 
+                                        <a asp-action="ChangePassword" asp-route-id="@user.Id"
                                            class="btn btn-primary" title="Change Password">
                                             <i class="bi bi-key"></i>
                                         </a>
-                                        <a asp-action="Delete" asp-route-id="@user.Id" 
+                                        <a asp-action="Delete" asp-route-id="@user.Id"
                                            class="btn btn-danger" title="Delete">
                                             <i class="bi bi-trash"></i>
                                         </a>
@@ -96,12 +128,13 @@
                 </table>
             </div>
         }
+        else
+        {
+            <div class="alert alert-info text-center py-5">
+                <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+                <h5>No Users Found</h5>
+                <p class="mb-0">Create your first user to get started.</p>
+            </div>
+        }
     </div>
 </div>
-
-@if (!Model.Any())
-{
-    <div class="alert alert-info mt-4">
-        <i class="bi bi-info-circle"></i> No users found. Click "Add New User" to create one.
-    </div>
-}

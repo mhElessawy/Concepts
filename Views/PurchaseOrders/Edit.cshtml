@@ -1,0 +1,649 @@
+@model PurchaseOrderHeader
+
+@{
+    ViewData["Title"] = "Edit Purchase Order";
+}
+
+<div class="page-header">
+    <h2><i class="bi bi-pencil-square"></i> Edit Purchase Order</h2>
+</div>
+
+<form asp-action="Edit" method="post" id="purchaseOrderForm">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="CreatedDate" />
+    <input type="hidden" id="detailsJson" name="detailsJson" />
+
+    <!-- Hidden fields for Status (Keep as Pending if already pending) -->
+    <input type="hidden" asp-for="PurchaseStatus" value="0" />
+    <input type="hidden" asp-for="Approved" value="0" />
+
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+    <!-- Header Information Card -->
+    <div class="card mb-3">
+        <div class="card-header bg-warning text-dark">
+            <h5 class="mb-0"><i class="bi bi-file-text"></i> Order Information</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label asp-for="PurchaseCode" class="form-label">
+                        Purchase Code <span class="text-danger">*</span>
+                    </label>
+                    <input asp-for="PurchaseCode" class="form-control" readonly
+                           style="background-color: #e9ecef;" />
+                    <span asp-validation-for="PurchaseCode" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="PurchaseNo" class="form-label">Purchase No</label>
+                    <input asp-for="PurchaseNo" class="form-control" placeholder="e.g., PUR-001" />
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="PurchaseDate" class="form-label">
+                        Purchase Date <span class="text-danger">*</span>
+                    </label>
+                    <input asp-for="PurchaseDate" type="date" class="form-control" />
+                    <span asp-validation-for="PurchaseDate" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="PurchaseTime" class="form-label">Purchase Time</label>
+                    <input asp-for="PurchaseTime" type="time" class="form-control" />
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="DepartmentId" class="form-label">
+                        Department <span class="text-danger">*</span>
+                    </label>
+                    <select asp-for="DepartmentId" class="form-select" asp-items="ViewBag.Departments">
+                        <option value="">-- Select Department --</option>
+                    </select>
+                    <span asp-validation-for="DepartmentId" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="UserId" class="form-label">
+                        Ordered By <span class="text-danger">*</span>
+                    </label>
+                    <select asp-for="UserId" class="form-select" asp-items="ViewBag.Users">
+                        <option value="">-- Select User --</option>
+                    </select>
+                    <span asp-validation-for="UserId" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="VenderId" class="form-label">
+                        Vendor <span class="text-danger">*</span>
+                    </label>
+                    <select asp-for="VenderId" class="form-select" asp-items="ViewBag.Vendors">
+                        <option value="">-- Select Vendor --</option>
+                    </select>
+                    <span asp-validation-for="VenderId" class="text-danger"></span>
+                </div>
+
+                <!-- Status: Always Pending (Readonly) -->
+                <div class="col-md-6">
+                    <label class="form-label">Order Status</label>
+                    <input type="text" class="form-control" value="Pending" readonly
+                           style="background-color: #fff3cd; font-weight: 600;" />
+                    <small class="text-muted">Status remains Pending until approved</small>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-check form-switch mt-4">
+                        <input asp-for="Active" class="form-check-input" type="checkbox" />
+                        <label asp-for="Active" class="form-check-label">Active</label>
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <label asp-for="AdditionalNotes" class="form-label">Additional Notes</label>
+                    <textarea asp-for="AdditionalNotes" class="form-control" rows="2"
+                              placeholder="Enter any additional notes"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details Card -->
+    <div class="card mb-3">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="bi bi-list-ul"></i> Order Items</h5>
+        </div>
+        <div class="card-body">
+            <!-- Add Item Form - Section Style -->
+            <div class="border rounded p-3 mb-3" style="background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);">
+                <h6 class="mb-3 text-success">
+                    <i class="bi bi-plus-circle-fill"></i> Add Item to Order
+                </h6>
+
+                <!-- Section 1: Item Selection -->
+                <div class="card mb-2 border-info">
+                    <div class="card-header bg-info bg-opacity-10 py-2">
+                        <strong><i class="bi bi-box"></i> Item Selection</strong>
+                    </div>
+                    <div class="card-body p-2">
+                        <div class="row g-2">
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold">Category</label>
+                                <select id="categoryId" class="form-select">
+                                    <option value="">-- Select Category --</option>
+                                    @if (ViewBag.Categories != null)
+                                    {
+                                        foreach (var cat in ViewBag.Categories)
+                                        {
+                                            <option value="@cat.Id">@cat.Name</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold">
+                                    Sub Category <span class="text-danger">*</span>
+                                </label>
+                                <select id="subCategoryId" class="form-select">
+                                    <option value="">-- Select Category First --</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold">
+                                    Item <span class="text-danger">*</span>
+                                </label>
+                                <select id="itemId" class="form-select">
+                                    <option value="">-- Select Sub Category First --</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Financial Details -->
+                <div class="card mb-2 border-warning">
+                    <div class="card-header bg-warning bg-opacity-10 py-2">
+                        <strong><i class="bi bi-cash-stack"></i> Financial Details</strong>
+                    </div>
+                    <div class="card-body p-2">
+                        <div class="row g-2">
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold">Available Quantity</label>
+                                <input type="number" id="avQuantity" class="form-control text-end"
+                                       step="0.001" readonly style="background-color: #e9ecef; font-weight: 600;" />
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold">Available Money</label>
+                                <input type="number" id="avMoney" class="form-control text-end"
+                                       step="0.001" readonly style="background-color: #e9ecef; font-weight: 600;" />
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold">
+                                    Price <span class="text-danger">*</span>
+                                </label>
+                                <input type="number" id="price" class="form-control text-end"
+                                       step="0.001" min="0" onchange="calculateTotalPrice()"
+                                       placeholder="0.000" />
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold">
+                                    Quantity <span class="text-danger">*</span>
+                                </label>
+                                <input type="number" id="quantity" class="form-control text-end"
+                                       step="0.001" min="0" onchange="calculateTotalPrice()"
+                                       placeholder="0.000" />
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold">Total Price</label>
+                                <input type="number" id="totalPrice" class="form-control text-end fw-bold"
+                                       step="0.001" readonly
+                                       style="background-color: #fff3cd; font-size: 1.1rem; color: #856404;" />
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold">Discount</label>
+                                <input type="number" id="discount" class="form-control text-end"
+                                       step="0.001" min="0" value="0" onchange="calculateNetPrice()"
+                                       placeholder="0.000" />
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold">Net Price</label>
+                                <input type="number" id="netPrice" class="form-control text-end fw-bold"
+                                       step="0.001" readonly
+                                       style="background-color: #d1ecf1; font-size: 1.1rem; color: #0c5460;" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3: Unit & Additional Info -->
+                <div class="card mb-2 border-secondary">
+                    <div class="card-header bg-secondary bg-opacity-10 py-2">
+                        <strong><i class="bi bi-rulers"></i> Unit & Additional Information</strong>
+                    </div>
+                    <div class="card-body p-2">
+                        <div class="row g-2">
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold">UOM (Unit of Measure)</label>
+                                <select id="uomId" class="form-select">
+                                    <option value="">-- Select UOM --</option>
+                                    @if (ViewBag.UOMs != null)
+                                    {
+                                        foreach (var uom in ViewBag.UOMs)
+                                        {
+                                            <option value="@uom.Id">@uom.UOMName</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold">
+                                    Sub Unit <span class="text-danger">*</span>
+                                </label>
+                                <select id="subUnitId" class="form-select">
+                                    <option value="">-- Select UOM First --</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-2">
+                                <label class="form-label small fw-bold">Pack Size</label>
+                                <input type="number" id="packSize" class="form-control text-center"
+                                       min="0" placeholder="0" style="font-size: 1rem;" />
+                            </div>
+
+                            <div class="col-md-2">
+                                <label class="form-label small fw-bold">Free Quantity</label>
+                                <input type="number" id="freeQuantity" class="form-control text-center"
+                                       min="0" value="0" placeholder="0" style="font-size: 1rem;" />
+                            </div>
+
+                            <div class="col-md-2">
+                                <label class="form-label small fw-bold">Value/Unit</label>
+                                <input type="number" id="valueOrUnit" class="form-control text-end"
+                                       step="0.001" min="0" value="0" placeholder="0.000" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="text-end mt-2">
+                    <button type="button" class="btn btn-success" onclick="addDetailRow()">
+                        <i class="bi bi-plus-circle"></i> Add to Order
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="clearInputs()">
+                        <i class="bi bi-x-circle"></i> Clear All
+                    </button>
+                </div>
+            </div>
+
+            <!-- Details Table -->
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" id="detailsTable">
+                    <thead class="table-dark">
+                        <tr>
+                            <th width="3%">#</th>
+                            <th width="18%">Item</th>
+                            <th width="8%">Av.Qty</th>
+                            <th width="8%">Price</th>
+                            <th width="8%">Qty</th>
+                            <th width="10%">Total</th>
+                            <th width="8%">Discount</th>
+                            <th width="10%">Net Price</th>
+                            <th width="10%">Unit</th>
+                            <th width="6%">Pack</th>
+                            <th width="6%">Free</th>
+                            <th width="5%">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr id="noItemsRow">
+                            <td colspan="12" class="text-center text-muted py-5">
+                                <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary"></i>
+                                <p class="mb-0">No items added yet.</p>
+                                <small>Use the form above to add items to your order.</small>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr class="table-success fw-bold">
+                            <td colspan="7" class="text-end fs-5">Grand Total:</td>
+                            <td colspan="5" class="text-start">
+                                <span id="grandTotalDisplay" class="fs-4 text-success">0.000</span>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="mb-4">
+        <button type="submit" class="btn btn-warning btn-lg">
+            <i class="bi bi-save"></i> Update Purchase Order
+        </button>
+        <a href="/PurchaseOrders" class="btn btn-secondary btn-lg">
+            <i class="bi bi-x-circle"></i> Cancel
+        </a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        let detailsArray = [];
+        let rowCounter = 0;
+
+        $(document).ready(function() {
+            // Load existing details from ViewBag
+            var existingDetails = '@Html.Raw(ViewBag.ExistingDetails)';
+
+            // Debug: Log the raw JSON string
+            console.log('Raw JSON String:', existingDetails);
+
+            if (existingDetails && existingDetails !== '') {
+                try {
+                    var details = JSON.parse(existingDetails);
+
+                    // Debug: Log parsed details
+                    console.log('Parsed Details:', details);
+                    console.log('Details Length:', details.length);
+
+                    if (details && details.length > 0) {
+                        console.log('First Detail:', details[0]);
+                        // Load existing items into the table
+                        loadExistingDetails(details);
+                    } else {
+                        console.warn('Details array is empty');
+                    }
+                } catch (e) {
+                    console.error('Error parsing existing details:', e);
+                    console.error('JSON String was:', existingDetails);
+                }
+            } else {
+                console.warn('No existing details found in ViewBag');
+            }
+
+            // Category dropdown
+            $('#categoryId').change(function() {
+                var categoryId = $(this).val();
+                var subCategoryDropdown = $('#subCategoryId');
+                if (categoryId) {
+                    $.ajax({
+                        url: '/PurchaseOrders/GetSubCategoriesByCategory',
+                        data: { categoryId: categoryId },
+                        success: function(data) {
+                            subCategoryDropdown.empty().append('<option value="">-- Select Sub Category --</option>');
+                            $.each(data, function(i, item) {
+                                subCategoryDropdown.append($('<option></option>').val(item.id).html(item.name));
+                            });
+                        }
+                    });
+                } else {
+                    subCategoryDropdown.empty().append('<option value="">-- Select Category First --</option>');
+                }
+                $('#itemId').empty().append('<option value="">-- Select Sub Category First --</option>');
+            });
+
+            // Sub Category dropdown
+            $('#subCategoryId').change(function() {
+                var subCategoryId = $(this).val();
+                var itemDropdown = $('#itemId');
+                if (subCategoryId) {
+                    $.ajax({
+                        url: '/PurchaseOrders/GetItemsBySubCategory',
+                        data: { subCategoryId: subCategoryId },
+                        success: function(data) {
+                            itemDropdown.empty().append('<option value="">-- Select Item --</option>');
+                            $.each(data, function(i, item) {
+                                itemDropdown.append($('<option></option>')
+                                    .val(item.id)
+                                    .attr('data-pack-size', item.packSize)
+                                    .attr('data-quantity', item.quantityInStore)
+                                    .attr('data-purchase-value', item.purchaseValue)
+                                    .html(item.code + ' - ' + item.name));
+                            });
+                        }
+                    });
+                } else {
+                    itemDropdown.empty().append('<option value="">-- Select Sub Category First --</option>');
+                }
+            });
+
+            // Item dropdown
+            $('#itemId').change(function() {
+                var itemId = $(this).val();
+                if (itemId) {
+                    $.ajax({
+                        url: '/PurchaseOrders/GetItemDetails',
+                        data: { itemId: itemId },
+                        success: function(data) {
+                            if (data) {
+                                $('#avQuantity').val(data.quantityInStore || 0);
+                                var avMoney = (data.quantityInStore || 0) * (data.purchaseValue || 0);
+                                $('#avMoney').val(avMoney.toFixed(3));
+                                $('#price').val(data.purchaseValue || 0);
+                                if (data.packSize && data.packSize !== 'null') {
+                                    $('#packSize').val(data.packSize);
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+
+            // UOM dropdown
+            $('#uomId').change(function() {
+                var uomId = $(this).val();
+                var subUOMDropdown = $('#subUnitId');
+                if (uomId) {
+                    $.ajax({
+                        url: '/PurchaseOrders/GetSubUOMsByUOM',
+                        data: { uomId: uomId },
+                        success: function(data) {
+                            subUOMDropdown.empty().append('<option value="">-- Select Sub Unit --</option>');
+                            $.each(data, function(i, item) {
+                                subUOMDropdown.append($('<option></option>').val(item.id).html(item.name));
+                            });
+                        }
+                    });
+                } else {
+                    subUOMDropdown.empty().append('<option value="">-- Select UOM First --</option>');
+                }
+            });
+        });
+
+        function loadExistingDetails(details) {
+            console.log('loadExistingDetails called with:', details);
+
+            $('#noItemsRow').hide();
+            detailsArray = [];
+
+            details.forEach(function(detail, index) {
+                console.log(`Processing detail ${index}:`, detail);
+
+                // Add to array - Use PascalCase from JSON ?
+                detailsArray.push({
+                    SubCategoryId: detail.SubCategoryId,
+                    ItemId: detail.ItemId,
+                    AvQuantity: detail.AvQuantity || 0,
+                    AvMoney: detail.AvMoney || 0,
+                    Price: detail.Price,
+                    Quantity: detail.Quantity,
+                    TotalPrice: detail.TotalPrice,
+                    Discount: detail.Discount || 0,
+                    NetPrice: detail.NetPrice,
+                    SubUnitId: detail.SubUnitId,
+                    PackSize: detail.PackSize || null,
+                    ValueOrUnit: detail.ValueOrUnit || 0,
+                    freeQuantity: detail.FreeQuantity || 0
+                });
+
+                // Add to table - Use PascalCase from JSON ?
+                var itemName = detail.Item ? (detail.Item.ItemCode + ' - ' + detail.Item.ItemName) : 'Item';
+                var subUnitName = detail.SubUOM ? detail.SubUOM.SubUOMName : '';
+
+                console.log(`Item Name: ${itemName}, SubUnit: ${subUnitName}`);
+
+                var newRow = `
+                    <tr data-index="${rowCounter}">
+                        <td class="text-center">${rowCounter + 1}</td>
+                        <td>${itemName}</td>
+                        <td class="text-end">${detail.AvQuantity.toFixed(3)}</td>
+                        <td class="text-end">${detail.Price.toFixed(3)}</td>
+                        <td class="text-end">${detail.Quantity.toFixed(3)}</td>
+                        <td class="text-end">${detail.TotalPrice.toFixed(3)}</td>
+                        <td class="text-end text-danger">${detail.Discount.toFixed(3)}</td>
+                        <td class="text-end fw-bold text-success">${detail.NetPrice.toFixed(3)}</td>
+                        <td>${subUnitName}</td>
+                        <td class="text-center">${detail.PackSize || '-'}</td>
+                        <td class="text-center">${detail.FreeQuantity > 0 ? '<span class="badge bg-success">+' + detail.FreeQuantity + '</span>' : '-'}</td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-danger btn-sm" onclick="removeDetailRow(${rowCounter})">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+
+                $('#detailsTable tbody').append(newRow);
+                rowCounter++;
+            });
+
+            console.log('Total rows added:', rowCounter);
+            console.log('detailsArray:', detailsArray);
+
+            updateGrandTotal();
+        }
+
+        function calculateTotalPrice() {
+            var price = parseFloat($('#price').val()) || 0;
+            var quantity = parseFloat($('#quantity').val()) || 0;
+            var totalPrice = price * quantity;
+            $('#totalPrice').val(totalPrice.toFixed(3));
+            calculateNetPrice();
+        }
+
+        function calculateNetPrice() {
+            var totalPrice = parseFloat($('#totalPrice').val()) || 0;
+            var discount = parseFloat($('#discount').val()) || 0;
+            var netPrice = totalPrice - discount;
+            $('#netPrice').val(netPrice.toFixed(3));
+        }
+
+        function addDetailRow() {
+            var subCategoryId = $('#subCategoryId').val();
+            var itemId = $('#itemId').val();
+            var itemName = $('#itemId option:selected').text();
+            var price = $('#price').val();
+            var quantity = $('#quantity').val();
+            var subUnitId = $('#subUnitId').val();
+            var subUnitName = $('#subUnitId option:selected').text();
+
+            if (!subCategoryId || !itemId || !price || !quantity || !subUnitId) {
+                alert('Please fill all required fields');
+                return;
+            }
+
+            var detail = {
+                SubCategoryId: parseInt(subCategoryId),
+                ItemId: parseInt(itemId),
+                AvQuantity: parseFloat($('#avQuantity').val()) || 0,
+                AvMoney: parseFloat($('#avMoney').val()) || 0,
+                Price: parseFloat(price),
+                Quantity: parseFloat(quantity),
+                TotalPrice: parseFloat($('#totalPrice').val()) || 0,
+                Discount: parseFloat($('#discount').val()) || 0,
+                NetPrice: parseFloat($('#netPrice').val()) || 0,
+                SubUnitId: parseInt(subUnitId),
+                PackSize: $('#packSize').val() ? parseInt($('#packSize').val()) : null,
+                ValueOrUnit: parseFloat($('#valueOrUnit').val()) || 0,
+                freeQuantity: parseInt($('#freeQuantity').val()) || 0
+            };
+
+            detailsArray.push(detail);
+            $('#noItemsRow').hide();
+
+            var newRow = `
+                <tr data-index="${rowCounter}">
+                    <td class="text-center">${rowCounter + 1}</td>
+                    <td>${itemName}</td>
+                    <td class="text-end">${detail.AvQuantity.toFixed(3)}</td>
+                    <td class="text-end">${detail.Price.toFixed(3)}</td>
+                    <td class="text-end">${detail.Quantity.toFixed(3)}</td>
+                    <td class="text-end">${detail.TotalPrice.toFixed(3)}</td>
+                    <td class="text-end text-danger">${detail.Discount.toFixed(3)}</td>
+                    <td class="text-end fw-bold text-success">${detail.NetPrice.toFixed(3)}</td>
+                    <td>${subUnitName}</td>
+                    <td class="text-center">${detail.PackSize || '-'}</td>
+                    <td class="text-center">${detail.freeQuantity > 0 ? '<span class="badge bg-success">+' + detail.freeQuantity + '</span>' : '-'}</td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removeDetailRow(${rowCounter})">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+
+            $('#detailsTable tbody').append(newRow);
+            rowCounter++;
+            updateGrandTotal();
+            clearInputs();
+        }
+
+        function removeDetailRow(index) {
+            $(`tr[data-index="${index}"]`).remove();
+            var actualIndex = -1;
+            $('tr[data-index]').each(function(i) {
+                if (parseInt($(this).attr('data-index')) === index) {
+                    actualIndex = i;
+                    return false;
+                }
+            });
+            if (actualIndex >= 0) {
+                detailsArray.splice(actualIndex, 1);
+            }
+            if (detailsArray.length === 0) {
+                $('#noItemsRow').show();
+            }
+            updateGrandTotal();
+        }
+
+        function updateGrandTotal() {
+            var grandTotal = 0;
+            detailsArray.forEach(function(item) {
+                grandTotal += item.NetPrice;
+            });
+            $('#grandTotalDisplay').text(grandTotal.toFixed(3));
+        }
+
+        function clearInputs() {
+            $('#categoryId').val('');
+            $('#subCategoryId').empty().append('<option value="">-- Select Category First --</option>');
+            $('#itemId').empty().append('<option value="">-- Select Sub Category First --</option>');
+            $('#avQuantity, #avMoney, #price, #quantity, #totalPrice, #discount, #netPrice').val('');
+            $('#uomId').val('');
+            $('#subUnitId').empty().append('<option value="">-- Select UOM First --</option>');
+            $('#packSize, #freeQuantity, #valueOrUnit').val('');
+        }
+
+        $('#purchaseOrderForm').submit(function() {
+            if (detailsArray.length === 0) {
+                alert('Please add at least one item');
+                return false;
+            }
+            $('#detailsJson').val(JSON.stringify(detailsArray));
+            return true;
+        });
+    </script>
+}

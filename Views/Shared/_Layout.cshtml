@@ -207,6 +207,15 @@
             margin: 8px 0;
         }
 
+        .dropdown-header {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--primary-color);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 0.5rem 1rem;
+        }
+
         .navbar-nav .dropdown-menu {
             margin-top: 8px;
         }
@@ -259,19 +268,61 @@
                         </a>
                     </li>
 
-                    <!-- Items -->
-                    <li class="nav-item">
-                        <a class="nav-link" href="/Items">
-                            <i class="bi bi-box"></i> Items
-                        </a>
-                    </li>
-
-                    <!-- Categories -->
+                    <!-- Store Management -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-tags"></i> Categories
+                            <i class="bi bi-box-seam"></i> Store
                         </a>
                         <ul class="dropdown-menu">
+                            <li><h6 class="dropdown-header">Inventory</h6></li>
+                            <li>
+                                <a class="dropdown-item" href="/Items">
+                                    <i class="bi bi-box"></i> Store Items
+                                </a>
+                            </li>
+
+                            <li><hr class="dropdown-divider"></li>
+
+                            <li><h6 class="dropdown-header">Purchase Requests</h6></li>
+                            <li>
+                                <a class="dropdown-item" href="/PurchaseRequests">
+                                    <i class="bi bi-cart-plus"></i> All Requests
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/PurchaseRequests/Create">
+                                    <i class="bi bi-plus-circle"></i> New Request
+                                </a>
+                            </li>
+
+                            <li><hr class="dropdown-divider"></li>
+
+                            <li><h6 class="dropdown-header">Purchase Orders</h6></li>
+                            <li>
+                                <a class="dropdown-item" href="/PurchaseOrders">
+                                    <i class="bi bi-cart-check"></i> All Orders
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/PurchaseOrders/Create">
+                                    <i class="bi bi-plus-circle"></i> New Order
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/PurchaseOrders/PendingApproval">
+                                    <i class="bi bi-clipboard-check"></i> Pending Approval
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <!-- Definitions -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-gear"></i> Definitions
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><h6 class="dropdown-header">Categories</h6></li>
                             <li>
                                 <a class="dropdown-item" href="/Categories">
                                     <i class="bi bi-tag"></i> Main Categories
@@ -282,18 +333,13 @@
                                     <i class="bi bi-tags"></i> Sub Categories
                                 </a>
                             </li>
-                        </ul>
-                    </li>
 
-                    <!-- Units -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-rulers"></i> Units
-                        </a>
-                        <ul class="dropdown-menu">
+                            <li><hr class="dropdown-divider"></li>
+
+                            <li><h6 class="dropdown-header">Units of Measure</h6></li>
                             <li>
                                 <a class="dropdown-item" href="/UOM">
-                                    <i class="bi bi-rulers"></i> Units of Measure
+                                    <i class="bi bi-rulers"></i> Main Units
                                 </a>
                             </li>
                             <li>
@@ -301,53 +347,30 @@
                                     <i class="bi bi-arrow-down-up"></i> Sub Units
                                 </a>
                             </li>
-                        </ul>
-                    </li>
 
-                    <!-- Banks -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-bank"></i> Banks
-                        </a>
-                        <ul class="dropdown-menu">
+                            <li><hr class="dropdown-divider"></li>
+
+                            <li><h6 class="dropdown-header">Locations</h6></li>
                             <li>
-                                <a class="dropdown-item" href="/Banks">
-                                    <i class="bi bi-list-ul"></i> All Banks
+                                <a class="dropdown-item" href="/Countries">
+                                    <i class="bi bi-globe"></i> Countries
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="/Banks/Create">
-                                    <i class="bi bi-plus-circle"></i> Add New Bank
+                                <a class="dropdown-item" href="/Cities">
+                                    <i class="bi bi-pin-map"></i> Cities
                                 </a>
                             </li>
                         </ul>
                     </li>
 
-                    <!-- Vendors -->
+                    <!-- Administration -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-building"></i> Vendors
+                            <i class="bi bi-shield-lock"></i> Administration
                         </a>
                         <ul class="dropdown-menu">
-                            <li>
-                                <a class="dropdown-item" href="/Vendors">
-                                    <i class="bi bi-list-ul"></i> All Vendors
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="/Vendors/Create">
-                                    <i class="bi bi-plus-circle"></i> Add New Vendor
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-
-                    <!-- HR -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-people"></i> HR
-                        </a>
-                        <ul class="dropdown-menu">
+                            <li><h6 class="dropdown-header">Human Resources</h6></li>
                             <li>
                                 <a class="dropdown-item" href="/Departments">
                                     <i class="bi bi-diagram-3"></i> Departments
@@ -358,29 +381,23 @@
                                     <i class="bi bi-briefcase"></i> Job Titles
                                 </a>
                             </li>
-                            <li><hr class="dropdown-divider"></li>
                             <li>
                                 <a class="dropdown-item" href="/Users">
                                     <i class="bi bi-person-badge"></i> Users
                                 </a>
                             </li>
-                        </ul>
-                    </li>
 
-                    <!-- Locations -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-geo-alt"></i> Locations
-                        </a>
-                        <ul class="dropdown-menu">
+                            <li><hr class="dropdown-divider"></li>
+
+                            <li><h6 class="dropdown-header">Partners</h6></li>
                             <li>
-                                <a class="dropdown-item" href="/Countries">
-                                    <i class="bi bi-globe"></i> Countries
+                                <a class="dropdown-item" href="/Banks">
+                                    <i class="bi bi-bank"></i> Banks
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="/Cities">
-                                    <i class="bi bi-pin-map"></i> Cities
+                                <a class="dropdown-item" href="/Vendors">
+                                    <i class="bi bi-building"></i> Vendors
                                 </a>
                             </li>
                         </ul>

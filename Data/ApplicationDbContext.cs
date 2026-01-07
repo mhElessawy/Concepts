@@ -24,7 +24,11 @@ namespace Concept.Data
         public DbSet<DefBank> DefBanks { get; set; }
         public DbSet<Vender> Venders { get; set; }
         public DbSet<DeffLocation> DeffLocations { get; set; }
+        public DbSet<PurchaseRequestHeader> PurchaseRequestHeaders { get; set; }
+        public DbSet<PurchaseRequestDetails> PurchaseRequestDetails { get; set; }
 
+        public DbSet<PurchaseOrderHeader> PurchaseOrderHeaders { get; set; }
+        public DbSet<PurchaseOrderDetails> PurchaseOrderDetails { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

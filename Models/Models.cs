@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Routing.Constraints;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -53,7 +54,7 @@ namespace Concept.Models
         [ForeignKey("CountryId")]
         public virtual DeffCountry? Country { get; set; }
 
-    
+
     }
     public class DeffCategory
     {
@@ -173,7 +174,7 @@ namespace Concept.Models
     }
     public class DeffJobTitle
     {
-       
+
         [Key]
         public int Id { get; set; }
 
@@ -190,8 +191,8 @@ namespace Concept.Models
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public DateTime ModifiedDate { get; set; } = DateTime.Now;
 
-        public virtual ICollection<UserInfo> Users { get; set; } = new List<UserInfo>();
-        
+        public virtual ICollection<UserInfo>? Users { get; set; } = new List<UserInfo>();
+
     }
     public class UserInfo
     {
@@ -222,19 +223,22 @@ namespace Concept.Models
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public DateTime ModifiedDate { get; set; } = DateTime.Now;
 
+        public bool CanApprovePurchaseOrders { get; set; } = false;
+
         // Navigation Properties
         [ForeignKey("JobTitleId")]
         public virtual DeffJobTitle JobTitle { get; set; }
 
         [ForeignKey("DepartmentId")]
-        public virtual DeffDepartment? Department { get; set; }
+        public virtual DeffDepartment Department { get; set; }
 
         [ForeignKey("LocationId")]
-        public virtual DeffLocation? Location { get; set; }
-
+        public virtual DeffLocation Location { get; set; }
 
         public virtual ICollection<StoreItem> Items { get; set; } = new List<StoreItem>();
-    
+
+
+
     }
     public class StoreItem
     {
@@ -250,7 +254,7 @@ namespace Concept.Models
         public string ItemName { get; set; }
 
         [Required]
-       public string ShortItemName { get; set; }
+        public string ShortItemName { get; set; }
 
         public int? SubCategoryId { get; set; }
 
@@ -282,7 +286,7 @@ namespace Concept.Models
         public double? MinCity { get; set; }
 
 
-        
+
         public int? UserId { get; set; }
         public bool Active { get; set; } = true;
 
@@ -292,7 +296,7 @@ namespace Concept.Models
         public string OperationWeight { get; set; }
         public string HSBarcode { get; set; }
 
-       
+
 
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public DateTime ModifiedDate { get; set; } = DateTime.Now;
@@ -312,7 +316,6 @@ namespace Concept.Models
         [ForeignKey("UserId")]
         public virtual UserInfo? User { get; set; }
     }
-
     public class Vender
     {
         [Key]
@@ -334,7 +337,7 @@ namespace Concept.Models
         public string Email { get; set; }
         public string ContactPerson { get; set; }
         public string PhoneNumber { get; set; }
-       
+
         public int? JobTitleId { get; set; }
         public int? BankId { get; set; }
         public string BankAccountNumber { get; set; } = string.Empty;
@@ -364,8 +367,7 @@ namespace Concept.Models
         [ForeignKey("BankId")]
         public virtual DefBank Bank { get; set; }
 
-    }   
-
+    }
     public class DefBank
     {
         [Key]
@@ -396,6 +398,237 @@ namespace Concept.Models
 
         public virtual ICollection<UserInfo> Users { get; set; } = new List<UserInfo>();
     }
+    public class PurchaseRequestHeader
+    {
+        [Key]
+        public int Id { get; set; }
+        public string RequestCode { get; set; }
+        public DateTime RequestDate { get; set; } = DateTime.Now;
+        public TimeOnly RequestTime { get; set; }
+
+        public string RequestNo { get; set; }
+        public int DepartmentId { get; set; }
+
+        public int UserId { get; set; }
+        public int RequestedStatus { get; set; } = 0;
+
+        public int VenderId { get; set; }
+
+        public string AdditionalNotes { get; set; }
+
+        public int Approved { get; set; } = 0;
+        public bool Active { get; set; } = true;
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime ModifiedDate { get; set; } = DateTime.Now;
+        // Navigation Properties    
+        [ForeignKey("DepartmentId")]
+        public virtual DeffDepartment Department { get; set; }
+        [ForeignKey("UserId")]
+        public virtual UserInfo? User { get; set; }
+
+        [ForeignKey("VenderId")]
+        public virtual Vender Vender { get; set; }
+    }
+    public class PurchaseRequestDetails
+    {
+        [Key]
+        public int Id { get; set; }
+        public int PurchaseRequestHeaderId { get; set; }
+
+        public int SubCategoryId { get; set; }
+        public int ItemId { get; set; }
+        public decimal Quantity { get; set; }
+        public int SubUnitId { get; set; }
+        public int? PackSize { get; set; }
+        public string Notes { get; set; }
+
+        // Navigation Properties
+
+        [ForeignKey("PurchaseRequestHeaderId")]
+        public virtual PurchaseRequestHeader PurchaseRequestHeader { get; set; }
+
+        [ForeignKey("SubCategoryId")]
+        public virtual DeffSubCategory SubCategory { get; set; }
+        [ForeignKey("ItemId")]
+        public virtual StoreItem Item { get; set; }
+        [ForeignKey("SubUnitId")]
+        public virtual DefSubUOM SubUOM { get; set; }
+
+    }
+    public class PurchaseOrderHeader
+    {
+        [Key]
+        public int Id { get; set; }
+        public string PurchaseCode { get; set; }
+        public DateTime PurchaseDate { get; set; } = DateTime.Now;
+        public TimeOnly PurchaseTime { get; set; }
+
+        public string PurchaseNo { get; set; }
+        public int DepartmentId { get; set; }
+
+        public int UserId { get; set; }
+        public int PurchaseStatus { get; set; } = 0;
+
+        public int VenderId { get; set; }
+
+        public string AdditionalNotes { get; set; }
+
+        public int Approved { get; set; } = 0;
+        public bool Active { get; set; } = true;
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime ModifiedDate { get; set; } = DateTime.Now;
+        // Navigation Properties    
+        [ForeignKey("DepartmentId")]
+        public virtual DeffDepartment Department { get; set; }
+        [ForeignKey("UserId")]
+        public virtual UserInfo? User { get; set; }
+
+        [ForeignKey("VenderId")]
+        public virtual Vender Vender { get; set; }
+    }
+    public class PurchaseOrderDetails
+    {
+        [Key]
+        public int Id { get; set; }
+        public int PurchaseOrderHeaderId { get; set; }
+
+        public int SubCategoryId { get; set; }
+        public int ItemId { get; set; }
+        public decimal AvQuantity { get; set; }
+        public decimal AvMoney { get; set; }
+        public decimal Price { get; set; }
+        public decimal Quantity { get; set; }
+        public decimal TotalPrice { get; set; }
+        public decimal Discount { get; set; }
+        public decimal NetPrice { get; set; }
+        public int SubUnitId { get; set; }
+        public int? PackSize { get; set; }
+        public decimal ValueOrUnit { get; set; }
+        public int freeQuantity { get; set; }
 
 
+
+        // Navigation Properties
+
+        [ForeignKey("PurchaseOrderHeaderId")]
+        public virtual PurchaseOrderHeader PurchaseOrderHeader { get; set; }
+
+
+        [ForeignKey("SubCategoryId")]
+        public virtual DeffSubCategory SubCategory { get; set; }
+        [ForeignKey("ItemId")]
+        public virtual StoreItem Item { get; set; }
+        [ForeignKey("SubUnitId")]
+        public virtual DefSubUOM SubUOM { get; set; }
+
+    }
+
+    public class Warehouse
+    {
+        [Key]
+        public int Id { get; set; }
+        [Required]
+        public string? WarehouseCode { get; set; }
+        [Required]
+        public string? WarehouseName { get; set; }
+        public bool Active { get; set; } = true;
+
+        public int AccountId { get; set; }
+
+        public int CostId { get; set; }
+
+        public string? Description { get; set; }
+
+        public int LocationId { get; set; }
+
+        public int UserId { get; set; }
+
+        public string? IVM { get; set; }
+
+        public int WarehouseType { get; set; }
+
+        public int CountryId { get; set; }
+
+        public string? ManagerName { get; set; }
+        public string? ManagerNumber { get; set; }
+
+        public string? AdditionalNote { get; set; }
+
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime ModifiedDate { get; set; } = DateTime.Now;
+
+        // Navigation Properties  
+        [ForeignKey("LocationId")]
+        public virtual DeffLocation? Location { get; set; }
+        [ForeignKey("UserId")]
+        public virtual UserInfo? User { get; set; }
+
+        [ForeignKey("CountryId")]
+        public virtual DeffCountry? Country { get; set; }
+
+    }
+    public class PurchaseRecievedHeader
+    {
+        [Key]
+        public int Id { get; set; }
+        public DateTime RecieveDate { get; set; } = DateTime.Now;
+        public TimeOnly RecieveTime { get; set; }
+        public string? RecieveNo { get; set; }
+        public int BatchNo { get; set; }
+        public int WarehouseId { get; set; }
+        public int VenderId { get; set; }
+        public int PurchaseOrderHeaderId { get; set; }
+
+        public int VenderInvoiceNo { get; set; }
+
+        public int PaymentTerms { get; set; }
+
+
+        public int UserId { get; set; }
+
+
+        public string? AdditionalNotes { get; set; }
+        public int Approved { get; set; } = 0;
+        public bool Active { get; set; } = true;
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime ModifiedDate { get; set; } = DateTime.Now;
+        // Navigation Properties    
+        [ForeignKey("WarehouseId")]
+        public virtual Warehouse? Warehouse { get; set; }
+
+        [ForeignKey("UserId")]
+        public virtual UserInfo? User { get; set; }
+        [ForeignKey("VenderId")]
+        public virtual Vender? Vender { get; set; }
+
+    }
+    public class PurchaseRecievedDetails
+    {
+        [Key]
+        public int Id { get; set; }
+        public int PurchaseRecievedHeaderId { get; set; }
+        public int SubCategoryId { get; set; }
+        public int ItemId { get; set; }
+        public decimal OrderQuantity { get; set; }
+        public decimal RecieveQuantity { get; set; }
+        public decimal PendingQuantity { get; set; }
+        public decimal FreeQuantity { get; set; }
+        public decimal TotalQuantity { get; set; }
+        public decimal UnitPrice { get; set; }
+        public decimal TotalPrice { get; set; }
+        public decimal Discount { get; set; }
+        public decimal NetPrice { get; set; }
+        public int SubUOMId { get; set; }
+        public int? PackSize { get; set; }
+        public decimal ValueOrUnit { get; set; }
+        public DateOnly ExpiredDate { get; set; }
+        // Navigation Properties
+        [ForeignKey("PurchaseRecievedHeaderId")]
+        public virtual PurchaseRecievedHeader? PurchaseRecievedHeader { get; set; }
+        [ForeignKey("SubUOMId")]
+        public virtual DefSubUOM? SubUOM { get; set; }
+        [ForeignKey("ItemId")]
+        public virtual StoreItem? StoreItem { get; set; }
+
+    }
 }

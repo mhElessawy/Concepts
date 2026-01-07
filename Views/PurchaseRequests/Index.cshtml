@@ -1,0 +1,120 @@
+﻿@model IEnumerable<PurchaseRequestHeader>
+
+@{
+    ViewData["Title"] = "Purchase Requests";
+}
+
+<div class="page-header">
+    <h2><i class="bi bi-cart-plus"></i> Purchase Requests Management</h2>
+    <a asp-action="Create" class="btn btn-success">
+        <i class="bi bi-plus-circle"></i> New Purchase Request
+    </a>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle"></i> @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle"></i> @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card">
+    <div class="card-body">
+        @if (Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Request Code</th>
+                            <th>Request No</th>
+                            <th>Date</th>
+                            <th>Department</th>
+                            <th>Requested By</th>
+                            <th>Vendor</th>
+                            <th>Status</th>
+                            <th>Approved</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td><strong>@item.RequestCode</strong></td>
+                                <td>@item.RequestNo</td>
+                                <td>@item.RequestDate.ToString("dd/MM/yyyy")</td>
+                                <td>@item.Department?.DepartmentName</td>
+                                <td>@item.User?.FullName</td>
+                                <td>@item.Vender?.VenderName</td>
+                                <td>
+                                    @switch (item.RequestedStatus)
+                                    {
+                                        case 0:
+                                            <span class="badge bg-warning">Pending</span>
+                                            break;
+                                        case 1:
+                                            <span class="badge bg-success">Approved</span>
+                                            break;
+                                        case 2:
+                                            <span class="badge bg-danger">Rejected</span>
+                                            break;
+                                    }
+                                </td>
+                                <td>
+                                    @switch (item.Approved)
+                                    {
+                                        case 0:
+                                            <span class="badge bg-secondary">Not Approved</span>
+                                            break;
+                                        case 1:
+                                            <span class="badge bg-success">
+                                                <i class="bi bi-check-circle"></i> Approved
+                                            </span>
+                                            break;
+                                        case 2:
+                                            <span class="badge bg-danger">
+                                                <i class="bi bi-x-circle"></i> Rejected
+                                            </span>
+                                            break;
+                                    }
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a asp-action="Details" asp-route-id="@item.Id"
+                                           class="btn btn-info" title="Details">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a asp-action="Edit" asp-route-id="@item.Id"
+                                           class="btn btn-warning" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.Id"
+                                           class="btn btn-danger" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> No purchase requests found. Click "New Purchase Request" to create one.
+            </div>
+        }
+    </div>
+</div>

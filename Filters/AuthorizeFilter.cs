@@ -15,7 +15,6 @@ namespace Concept.Filters
             {
                 return;
             }
-
             // Check if user is logged in
             var userId = context.HttpContext.Session.GetInt32("UserId");
             if (userId == null)
@@ -25,7 +24,6 @@ namespace Concept.Filters
                 return;
             }
         }
-
         public void OnActionExecuted(ActionExecutedContext context)
         {
             // Not needed

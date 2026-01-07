@@ -1,0 +1,365 @@
+﻿@model PurchaseRequestHeader
+
+@{
+    ViewData["Title"] = "Edit Purchase Request";
+}
+
+<div class="page-header">
+    <h2><i class="bi bi-pencil"></i> Edit Purchase Request</h2>
+</div>
+
+<form asp-action="Edit" method="post" id="purchaseRequestForm">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="CreatedDate" />
+    <input type="hidden" id="detailsJson" name="detailsJson" />
+
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+    <!-- Same as Create but with Edit action and data loading -->
+    <!-- Header Card - Same structure as Create -->
+    <div class="card mb-3">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-file-text"></i> Request Information</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label asp-for="RequestCode" class="form-label">Request Code <span class="text-danger">*</span></label>
+                    <input asp-for="RequestCode" class="form-control" />
+                    <span asp-validation-for="RequestCode" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="RequestNo" class="form-label">Request No</label>
+                    <input asp-for="RequestNo" class="form-control" />
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="RequestDate" class="form-label">Request Date <span class="text-danger">*</span></label>
+                    <input asp-for="RequestDate" type="date" class="form-control"
+                           value="@Model.RequestDate.ToString("yyyy-MM-dd")" />
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="RequestTime" class="form-label">Request Time</label>
+                    <input asp-for="RequestTime" type="time" class="form-control"
+                           value="@Model.RequestTime.ToString("HH\\:mm")" />
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="DepartmentId" class="form-label">Department <span class="text-danger">*</span></label>
+                    <select asp-for="DepartmentId" class="form-select" asp-items="ViewBag.Departments"></select>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="UserId" class="form-label">Requested By <span class="text-danger">*</span></label>
+                    <select asp-for="UserId" class="form-select" asp-items="ViewBag.Users"></select>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="VenderId" class="form-label">Vendor <span class="text-danger">*</span></label>
+                    <select asp-for="VenderId" class="form-select" asp-items="ViewBag.Vendors"></select>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="RequestedStatus" class="form-label">Status</label>
+                    <select asp-for="RequestedStatus" class="form-select" asp-items="ViewBag.StatusOptions"></select>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="Approved" class="form-label">Approval Status</label>
+                    <select asp-for="Approved" class="form-select" asp-items="ViewBag.ApprovedOptions"></select>
+                </div>
+
+                <div class="col-md-12">
+                    <label asp-for="AdditionalNotes" class="form-label">Additional Notes</label>
+                    <textarea asp-for="AdditionalNotes" class="form-control" rows="2"></textarea>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-check form-switch mt-3">
+                        <input asp-for="Active" class="form-check-input" type="checkbox" />
+                        <label asp-for="Active" class="form-check-label">Active</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details Card - Same as Create.cshtml structure -->
+    <div class="card mb-3">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="bi bi-list-ul"></i> Request Items</h5>
+        </div>
+        <div class="card-body">
+            <!-- Add Item Form - Same as Create -->
+            <div class="row g-3 mb-3 p-3 border rounded bg-light">
+                <!-- Same dropdowns as Create.cshtml -->
+                <div class="col-md-2">
+                    <label class="form-label">Category</label>
+                    <select id="categoryId" class="form-select">
+                        <option value="">Select Category</option>
+                        @if (ViewBag.Categories != null)
+                        {
+                            foreach (var cat in ViewBag.Categories)
+                            {
+                                <option value="@cat.Id">@cat.CategoryName</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">Sub Category</label>
+                    <select id="subCategoryId" class="form-select">
+                        <option value="">Select Category First</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">Item</label>
+                    <select id="itemId" class="form-select">
+                        <option value="">Select Sub Category First</option>
+                    </select>
+                </div>
+
+                <div class="col-md-1">
+                    <label class="form-label">Quantity</label>
+                    <input type="number" id="quantity" class="form-control" step="0.001" min="0" />
+                </div>
+
+                <div class="col-md-1">
+                    <label class="form-label">UOM</label>
+                    <select id="uomId" class="form-select">
+                        <option value="">Select UOM</option>
+                        @if (ViewBag.UOMs != null)
+                        {
+                            foreach (var uom in ViewBag.UOMs)
+                            {
+                                <option value="@uom.Id">@uom.UOMName</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">Sub Unit</label>
+                    <select id="subUnitId" class="form-select">
+                        <option value="">Select UOM First</option>
+                    </select>
+                </div>
+
+                <div class="col-md-1">
+                    <label class="form-label">Pack Size</label>
+                    <input type="number" id="packSize" class="form-control" min="0" />
+                </div>
+
+                <div class="col-md-1">
+                    <label class="form-label">&nbsp;</label>
+                    <button type="button" class="btn btn-primary w-100" onclick="addDetailRow()">
+                        <i class="bi bi-plus"></i> Add
+                    </button>
+                </div>
+            </div>
+
+            <!-- Details Table - Same as Create -->
+            <div class="table-responsive">
+                <table class="table table-bordered" id="detailsTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th width="15%">Sub Category</th>
+                            <th width="20%">Item</th>
+                            <th width="10%">Quantity</th>
+                            <th width="15%">Sub Unit</th>
+                            <th width="10%">Pack Size</th>
+                            <th width="25%">Notes</th>
+                            <th width="5%">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr id="noItemsRow">
+                            <td colspan="7" class="text-center text-muted">
+                                No items added yet.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="mb-4">
+        <button type="submit" class="btn btn-primary btn-lg">
+            <i class="bi bi-save"></i> Update Purchase Request
+        </button>
+        <a href="/PurchaseRequests" class="btn btn-secondary btn-lg">
+            <i class="bi bi-x-circle"></i> Cancel
+        </a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        // Same JavaScript as Create.cshtml
+        let detailsArray = [];
+        let rowCounter = 0;
+
+        $(document).ready(function() {
+            // Load existing details
+            var existingDetailsJson = '@Html.Raw(ViewBag.ExistingDetails)';
+            if (existingDetailsJson && existingDetailsJson !== '') {
+                try {
+                    detailsArray = JSON.parse(existingDetailsJson);
+                    // Display existing rows
+                    // Note: You'll need to fetch item names via AJAX or include them
+                    console.log('Loaded existing details:', detailsArray);
+                } catch (e) {
+                    console.error('Error parsing existing details:', e);
+                }
+            }
+
+            // Same cascading dropdown code as Create.cshtml
+            $('#categoryId').change(function() {
+                var categoryId = $(this).val();
+                var subCategoryDropdown = $('#subCategoryId');
+                if (categoryId) {
+                    $.ajax({
+                        url: '/PurchaseRequests/GetSubCategoriesByCategory',
+                        data: { categoryId: categoryId },
+                        success: function(data) {
+                            subCategoryDropdown.empty().append('<option value="">-- Select Sub Category --</option>');
+                            $.each(data, function(i, item) {
+                                subCategoryDropdown.append($('<option></option>').val(item.id).html(item.name));
+                            });
+                        }
+                    });
+                }
+            });
+
+            $('#subCategoryId').change(function() {
+                var subCategoryId = $(this).val();
+                var itemDropdown = $('#itemId');
+                if (subCategoryId) {
+                    $.ajax({
+                        url: '/PurchaseRequests/GetItemsBySubCategory',
+                        data: { subCategoryId: subCategoryId },
+                        success: function(data) {
+                            itemDropdown.empty().append('<option value="">-- Select Item --</option>');
+                            $.each(data, function(i, item) {
+                                itemDropdown.append($('<option></option>').val(item.id).attr('data-pack-size', item.packSize).html(item.code + ' - ' + item.name));
+                            });
+                        }
+                    });
+                }
+            });
+
+            $('#itemId').change(function() {
+                var selectedOption = $(this).find('option:selected');
+                var packSize = selectedOption.attr('data-pack-size');
+                if (packSize && packSize !== 'null') {
+                    $('#packSize').val(packSize);
+                }
+            });
+
+            $('#uomId').change(function() {
+                var uomId = $(this).val();
+                var subUOMDropdown = $('#subUnitId');
+                if (uomId) {
+                    $.ajax({
+                        url: '/PurchaseRequests/GetSubUOMsByUOM',
+                        data: { uomId: uomId },
+                        success: function(data) {
+                            subUOMDropdown.empty().append('<option value="">-- Select Sub Unit --</option>');
+                            $.each(data, function(i, item) {
+                                subUOMDropdown.append($('<option></option>').val(item.id).html(item.name));
+                            });
+                        }
+                    });
+                }
+            });
+        });
+
+        // Same functions as Create.cshtml
+        function addDetailRow() {
+            var subCategoryId = $('#subCategoryId').val();
+            var subCategoryName = $('#subCategoryId option:selected').text();
+            var itemId = $('#itemId').val();
+            var itemName = $('#itemId option:selected').text();
+            var quantity = $('#quantity').val();
+            var subUnitId = $('#subUnitId').val();
+            var subUnitName = $('#subUnitId option:selected').text();
+            var packSize = $('#packSize').val();
+
+            if (!subCategoryId || !itemId || !quantity || !subUnitId) {
+                alert('Please fill all required fields');
+                return;
+            }
+
+            detailsArray.push({
+                SubCategoryId: parseInt(subCategoryId),
+                ItemId: parseInt(itemId),
+                Quantity: parseFloat(quantity),
+                SubUnitId: parseInt(subUnitId),
+                PackSize: packSize ? parseInt(packSize) : null,
+                Notes: ''
+            });
+
+            $('#noItemsRow').hide();
+
+            var newRow = `
+                <tr data-index="${rowCounter}">
+                    <td>${subCategoryName}</td>
+                    <td>${itemName}</td>
+                    <td>${quantity}</td>
+                    <td>${subUnitName}</td>
+                    <td>${packSize || 'N/A'}</td>
+                    <td><input type="text" class="form-control form-control-sm" onchange="updateNotes(${rowCounter}, this.value)" /></td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removeDetailRow(${rowCounter})">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+
+            $('#detailsTable tbody').append(newRow);
+            rowCounter++;
+
+            // Clear inputs
+            $('#categoryId').val('');
+            $('#subCategoryId').empty().append('<option value="">Select Category First</option>');
+            $('#itemId').empty().append('<option value="">Select Sub Category First</option>');
+            $('#quantity').val('');
+            $('#uomId').val('');
+            $('#subUnitId').empty().append('<option value="">Select UOM First</option>');
+            $('#packSize').val('');
+        }
+
+        function removeDetailRow(index) {
+            $(`tr[data-index="${index}"]`).remove();
+            detailsArray = detailsArray.filter((item, i) => i !== index);
+            if (detailsArray.length === 0) {
+                $('#noItemsRow').show();
+            }
+        }
+
+        function updateNotes(index, notes) {
+            if (detailsArray[index]) {
+                detailsArray[index].Notes = notes;
+            }
+        }
+
+        $('#purchaseRequestForm').submit(function() {
+            if (detailsArray.length === 0) {
+                alert('Please add at least one item');
+                return false;
+            }
+            $('#detailsJson').val(JSON.stringify(detailsArray));
+            return true;
+        });
+    </script>
+}

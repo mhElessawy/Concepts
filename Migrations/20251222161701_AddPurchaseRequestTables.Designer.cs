@@ -4,6 +4,7 @@ using Concept.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Concept.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251222161701_AddPurchaseRequestTables")]
+    partial class AddPurchaseRequestTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -399,130 +402,6 @@ namespace Concept.Migrations
                     b.ToTable("Deff_SubCategory", (string)null);
                 });
 
-            modelBuilder.Entity("Concept.Models.PurchaseOrderDetails", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("AvMoney")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("AvQuantity")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("Discount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("ItemId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("NetPrice")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int?>("PackSize")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("PurchaseOrderHeaderId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Quantity")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("SubCategoryId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SubUnitId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("TotalPrice")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("ValueOrUnit")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("freeQuantity")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ItemId");
-
-                    b.HasIndex("PurchaseOrderHeaderId");
-
-                    b.HasIndex("SubCategoryId");
-
-                    b.HasIndex("SubUnitId");
-
-                    b.ToTable("PurchaseOrderDetails");
-                });
-
-            modelBuilder.Entity("Concept.Models.PurchaseOrderHeader", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("Active")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("AdditionalNotes")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Approved")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("DepartmentId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("ModifiedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("PurchaseCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("PurchaseDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("PurchaseNo")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("PurchaseStatus")
-                        .HasColumnType("int");
-
-                    b.Property<TimeOnly>("PurchaseTime")
-                        .HasColumnType("time");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("VenderId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DepartmentId");
-
-                    b.HasIndex("UserId");
-
-                    b.HasIndex("VenderId");
-
-                    b.ToTable("PurchaseOrderHeaders");
-                });
-
             modelBuilder.Entity("Concept.Models.PurchaseRequestDetails", b =>
                 {
                     b.Property<int>("Id")
@@ -740,9 +619,6 @@ namespace Concept.Migrations
                     b.Property<bool>("Active")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("CanApprovePurchaseOrders")
-                        .HasColumnType("bit");
-
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
@@ -925,68 +801,6 @@ namespace Concept.Migrations
                         .IsRequired();
 
                     b.Navigation("Category");
-                });
-
-            modelBuilder.Entity("Concept.Models.PurchaseOrderDetails", b =>
-                {
-                    b.HasOne("Concept.Models.StoreItem", "Item")
-                        .WithMany()
-                        .HasForeignKey("ItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Concept.Models.PurchaseOrderHeader", "PurchaseOrderHeader")
-                        .WithMany()
-                        .HasForeignKey("PurchaseOrderHeaderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Concept.Models.DeffSubCategory", "SubCategory")
-                        .WithMany()
-                        .HasForeignKey("SubCategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Concept.Models.DefSubUOM", "SubUOM")
-                        .WithMany()
-                        .HasForeignKey("SubUnitId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Item");
-
-                    b.Navigation("PurchaseOrderHeader");
-
-                    b.Navigation("SubCategory");
-
-                    b.Navigation("SubUOM");
-                });
-
-            modelBuilder.Entity("Concept.Models.PurchaseOrderHeader", b =>
-                {
-                    b.HasOne("Concept.Models.DeffDepartment", "Department")
-                        .WithMany()
-                        .HasForeignKey("DepartmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Concept.Models.UserInfo", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Concept.Models.Vender", "Vender")
-                        .WithMany()
-                        .HasForeignKey("VenderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Department");
-
-                    b.Navigation("User");
-
-                    b.Navigation("Vender");
                 });
 
             modelBuilder.Entity("Concept.Models.PurchaseRequestDetails", b =>

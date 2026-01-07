@@ -1,0 +1,201 @@
+﻿@model PurchaseRequestHeader
+
+@{
+    ViewData["Title"] = "Purchase Request Details";
+    var details = ViewBag.Details as List<PurchaseRequestDetails>;
+}
+
+<div class="page-header">
+    <h2><i class="bi bi-file-text"></i> Purchase Request Details</h2>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <!-- Header Information -->
+        <div class="card mb-3">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-info-circle"></i> Request Information - @Model.RequestCode
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <dl class="row">
+                            <dt class="col-sm-4">Request Code:</dt>
+                            <dd class="col-sm-8">
+                                <span class="badge bg-primary">@Model.RequestCode</span>
+                            </dd>
+
+                            <dt class="col-sm-4">Request No:</dt>
+                            <dd class="col-sm-8">@Model.RequestNo</dd>
+
+                            <dt class="col-sm-4">Request Date:</dt>
+                            <dd class="col-sm-8">
+                                @Model.RequestDate.ToString("dd/MM/yyyy")
+                            </dd>
+
+                            <dt class="col-sm-4">Request Time:</dt>
+                            <dd class="col-sm-8">@Model.RequestTime.ToString("hh\\:mm")</dd>
+
+                            <dt class="col-sm-4">Department:</dt>
+                            <dd class="col-sm-8">
+                                <span class="badge bg-info">@Model.Department?.DepartmentName</span>
+                            </dd>
+
+                            <dt class="col-sm-4">Requested By:</dt>
+                            <dd class="col-sm-8">
+                                <strong>@Model.User?.FullName</strong>
+                                <small class="text-muted">(@Model.User?.UserCode)</small>
+                            </dd>
+                        </dl>
+                    </div>
+
+                    <div class="col-md-6">
+                        <dl class="row">
+                            <dt class="col-sm-4">Vendor:</dt>
+                            <dd class="col-sm-8">
+                                <strong>@Model.Vender?.VenderName</strong>
+                            </dd>
+
+                            <dt class="col-sm-4">Status:</dt>
+                            <dd class="col-sm-8">
+                                @switch (Model.RequestedStatus)
+                                {
+                                    case 0:
+                                        <span class="badge bg-warning">Pending</span>
+                                        break;
+                                    case 1:
+                                        <span class="badge bg-success">Approved</span>
+                                        break;
+                                    case 2:
+                                        <span class="badge bg-danger">Rejected</span>
+                                        break;
+                                }
+                            </dd>
+
+                            <dt class="col-sm-4">Approval Status:</dt>
+                            <dd class="col-sm-8">
+                                @switch (Model.Approved)
+                                {
+                                    case 0:
+                                        <span class="badge bg-secondary">Not Approved</span>
+                                        break;
+                                    case 1:
+                                        <span class="badge bg-success">
+                                            <i class="bi bi-check-circle"></i> Approved
+                                        </span>
+                                        break;
+                                    case 2:
+                                        <span class="badge bg-danger">
+                                            <i class="bi bi-x-circle"></i> Rejected
+                                        </span>
+                                        break;
+                                }
+                            </dd>
+
+                            <dt class="col-sm-4">Active:</dt>
+                            <dd class="col-sm-8">
+                                @if (Model.Active)
+                                {
+                                    <span class="badge bg-success">Yes</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">No</span>
+                                }
+                            </dd>
+
+                            <dt class="col-sm-4">Created:</dt>
+                            <dd class="col-sm-8">
+                                <small>@Model.CreatedDate.ToString("dd/MM/yyyy HH:mm")</small>
+                            </dd>
+                        </dl>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.AdditionalNotes))
+                    {
+                        <div class="col-md-12 mt-3">
+                            <div class="alert alert-info">
+                                <strong><i class="bi bi-sticky"></i> Additional Notes:</strong><br>
+                                @Model.AdditionalNotes
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Request Items -->
+        <div class="card mb-3">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-list-ul"></i> Request Items
+                    <span class="badge bg-light text-dark">@details?.Count items</span>
+                </h5>
+            </div>
+            <div class="card-body">
+                @if (details != null && details.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th width="5%">#</th>
+                                    <th width="15%">Category</th>
+                                    <th width="15%">Sub Category</th>
+                                    <th width="20%">Item</th>
+                                    <th width="10%">Quantity</th>
+                                    <th width="10%">Unit</th>
+                                    <th width="10%">Pack Size</th>
+                                    <th width="15%">Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    int counter = 1;
+                                }
+                                @foreach (var detail in details)
+                                {
+                                    <tr>
+                                        <td class="text-center">@counter</td>
+                                        <td>@detail.SubCategory?.Category?.Name</td>
+                                        <td>@detail.SubCategory?.Name</td>
+                                        <td>
+                                            <strong>@detail.Item?.ItemName</strong><br>
+                                            <small class="text-muted">@detail.Item?.ItemCode</small>
+                                        </td>
+                                        <td class="text-end">@detail.Quantity.ToString("N3")</td>
+                                        <td>
+                                            @detail.SubUOM?.SubUOMName
+                                            <small class="text-muted">(@detail.SubUOM?.UOM?.UOMName)</small>
+                                        </td>
+                                        <td class="text-center">@(detail.PackSize?.ToString() ?? "N/A")</td>
+                                        <td>@(detail.Notes ?? "")</td>
+                                    </tr>
+                                    counter++;
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle"></i> No items found for this purchase request.
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="mb-4">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
+                <i class="bi bi-pencil"></i> Edit
+            </a>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Back to List
+            </a>
+        </div>
+    </div>
+</div>

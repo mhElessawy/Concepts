@@ -51,9 +51,9 @@
                                 Password <span class="text-danger">*</span>
                             </label>
                             <div class="input-group">
-                                <input asp-for="UserPassword" class="form-control" type="password" 
+                                <input asp-for="UserPassword" class="form-control" type="password"
                                        placeholder="Enter password" id="userPassword" />
-                                <button class="btn btn-outline-secondary" type="button" 
+                                <button class="btn btn-outline-secondary" type="button"
                                         onclick="togglePassword()">
                                     <i class="bi bi-eye" id="toggleIcon"></i>
                                 </button>
@@ -82,6 +82,16 @@
                         </div>
                     </div>
 
+                    <!-- Permissions Section -->
+                    <div class="row">
+                        <div class="col-md-12 mb-2">
+                            <hr />
+                            <h6 class="text-primary">
+                                <i class="bi bi-shield-lock"></i> Permissions
+                            </h6>
+                        </div>
+                    </div>
+
                     <div class="row">
                         <!-- Purchase Order Authorise -->
                         <div class="col-md-6 mb-3">
@@ -96,6 +106,28 @@
                             </small>
                         </div>
 
+                        <!-- Can Approve Purchase Orders - NEW -->
+                        <div class="col-md-6 mb-3">
+                            <div class="card border-warning">
+                                <div class="card-body p-2">
+                                    <div class="form-check form-switch">
+                                        <input asp-for="CanApprovePurchaseOrders" class="form-check-input"
+                                               type="checkbox" style="width: 2.5em; height: 1.25em;" />
+                                        <label asp-for="CanApprovePurchaseOrders" class="form-check-label fw-bold">
+                                            <i class="bi bi-clipboard-check text-warning"></i>
+                                            Can Approve Purchase Orders
+                                        </label>
+                                    </div>
+                                    <small class="text-muted">
+                                        <i class="bi bi-info-circle"></i>
+                                        Grants access to approve/reject purchase orders
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
                         <!-- Active -->
                         <div class="col-md-6 mb-3">
                             <div class="form-check form-switch">
@@ -121,12 +153,12 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-    
+
     <script>
         function togglePassword() {
             const passwordInput = document.getElementById('userPassword');
             const toggleIcon = document.getElementById('toggleIcon');
-            
+
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
                 toggleIcon.classList.remove('bi-eye');

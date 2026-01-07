@@ -1,0 +1,214 @@
+@model IEnumerable<PurchaseOrderHeader>
+
+@{
+    ViewData["Title"] = "Purchase Orders";
+    var canApprove = ViewBag.CanApprove ?? false;
+    var filter = ViewBag.Filter ?? "all";
+    var pendingCount = ViewBag.PendingCount ?? 0;
+}
+
+<div class="page-header">
+    <h2><i class="bi bi-cart-check"></i> Purchase Orders Management</h2>
+    <div>
+        @if (canApprove && pendingCount > 0)
+        {
+            <a asp-action="PendingApproval" class="btn btn-warning">
+                <i class="bi bi-clipboard-check"></i> Pending Approval
+                <span class="badge bg-white text-warning">@pendingCount</span>
+            </a>
+        }
+        <a asp-action="Create" class="btn btn-success">
+            <i class="bi bi-plus-circle"></i> New Purchase Order
+        </a>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle"></i> @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle"></i> @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<!-- Filter Tabs -->
+<div class="card mb-3">
+    <div class="card-body">
+        <ul class="nav nav-pills" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link @(filter == "all" ? "active" : "")"
+                   href="/PurchaseOrders?filter=all">
+                    <i class="bi bi-list-ul"></i> All Orders
+                    <span class="badge bg-primary">@ViewBag.AllCount</span>
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link @(filter == "pending" ? "active" : "")"
+                   href="/PurchaseOrders?filter=pending">
+                    <i class="bi bi-hourglass-split"></i> Not Approved
+                    <span class="badge bg-warning">@ViewBag.NotApprovedCount</span>
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link @(filter == "approved" ? "active" : "")"
+                   href="/PurchaseOrders?filter=approved">
+                    <i class="bi bi-check-circle"></i> Approved
+                    <span class="badge bg-success">@ViewBag.ApprovedCount</span>
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link @(filter == "rejected" ? "active" : "")"
+                   href="/PurchaseOrders?filter=rejected">
+                    <i class="bi bi-x-circle"></i> Rejected
+                    <span class="badge bg-danger">@ViewBag.RejectedCount</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        @if (Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Purchase Code</th>
+                            <th>Purchase No</th>
+                            <th>Date</th>
+                            <th>Department</th>
+                            <th>Ordered By</th>
+                            <th>Vendor</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <strong class="text-primary">@item.PurchaseCode</strong>
+                                </td>
+                                <td>@item.PurchaseNo</td>
+                                <td>@item.PurchaseDate.ToString("dd/MM/yyyy")</td>
+                                <td>
+                                    <span class="badge bg-info">@item.Department?.DepartmentName</span>
+                                </td>
+                                <td>@item.User?.FullName</td>
+                                <td>@item.Vender?.VenderName</td>
+                                <td>
+                                    @switch (item.Approved)
+                                    {
+                                        case 0:
+                                            <span class="badge bg-warning text-dark">
+                                                <i class="bi bi-hourglass-split"></i> Pending Approval
+                                            </span>
+                                            break;
+                                        case 1:
+                                            <span class="badge bg-success">
+                                                <i class="bi bi-check-circle-fill"></i> Approved
+                                            </span>
+                                            break;
+                                        case 2:
+                                            <span class="badge bg-danger">
+                                                <i class="bi bi-x-circle-fill"></i> Rejected
+                                            </span>
+                                            break;
+                                    }
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <!-- View Details -->
+                                        <a asp-action="Details" asp-route-id="@item.Id"
+                                           class="btn btn-info" title="View Details">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+
+                                        <!-- Quick Approve (if canApprove and pending) -->
+                                        @if (canApprove && item.Approved == 0)
+                                        {
+                                            <a asp-action="ApprovalDetails" asp-route-id="@item.Id"
+                                               class="btn btn-success" title="Review & Approve">
+                                                <i class="bi bi-clipboard-check"></i>
+                                            </a>
+                                        }
+
+                                        <!-- Edit (only if not approved/rejected) -->
+                                        @if (item.Approved == 0)
+                                        {
+                                            <a asp-action="Edit" asp-route-id="@item.Id"
+                                               class="btn btn-warning" title="Edit">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                        }
+
+                                        <!-- Delete -->
+                                        <a asp-action="Delete" asp-route-id="@item.Id"
+                                           class="btn btn-danger" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info text-center py-5">
+                <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+                <h5>No Orders Found</h5>
+                <p class="mb-0">
+                    @switch (filter)
+                    {
+                        case "pending":
+                            <span>No pending orders at the moment.</span>
+                            break;
+                        case "approved":
+                            <span>No approved orders yet.</span>
+                            break;
+                        case "rejected":
+                            <span>No rejected orders.</span>
+                            break;
+                        default:
+                            <span>No purchase orders found. Create your first order!</span>
+                            break;
+                    }
+                </p>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .nav-pills .nav-link {
+        color: #495057;
+        margin-right: 0.5rem;
+    }
+
+        .nav-pills .nav-link:hover {
+            background-color: #e9ecef;
+        }
+
+        .nav-pills .nav-link.active {
+            background-color: #0d6efd;
+            color: white;
+        }
+
+        .nav-pills .nav-link .badge {
+            margin-left: 0.5rem;
+        }
+</style>
