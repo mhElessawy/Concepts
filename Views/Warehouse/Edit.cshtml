@@ -1,0 +1,206 @@
+@model Warehouse
+
+@{
+    ViewData["Title"] = "Edit Warehouse";
+}
+
+<div class="page-header">
+    <h2><i class="bi bi-pencil"></i> Edit Warehouse - @Model.WarehouseCode</h2>
+</div>
+
+<form asp-action="Edit" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="WarehouseCode" />
+    <input type="hidden" asp-for="CreatedDate" />
+
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+    <!-- Basic Information Card -->
+    <div class="card mb-3">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-info-circle"></i> Basic Information</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Warehouse Code</label>
+                    <input type="text" class="form-control" value="@Model.WarehouseCode" readonly
+                           style="background-color: #d1ecf1; font-weight: 600;" />
+                    <small class="text-muted">Code cannot be changed</small>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="WarehouseName" class="form-label">
+                        Warehouse Name <span class="text-danger">*</span>
+                    </label>
+                    <input asp-for="WarehouseName" class="form-control" />
+                    <span asp-validation-for="WarehouseName" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="WarehouseType" class="form-label">
+                        Warehouse Type <span class="text-danger">*</span>
+                    </label>
+                    <select asp-for="WarehouseType" class="form-select">
+                        <option value="0">Standard</option>
+                        <option value="1">Cold Storage</option>
+                        <option value="2">Distribution Center</option>
+                        <option value="3">Transit Hub</option>
+                        <option value="4">Returns Center</option>
+                    </select>
+                    <span asp-validation-for="WarehouseType" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-12">
+                    <label asp-for="Description" class="form-label">Description</label>
+                    <textarea asp-for="Description" class="form-control" rows="2"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Location Information Card -->
+    <div class="card mb-3">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0"><i class="bi bi-geo-alt"></i> Location Information</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="CountryId" class="form-label">
+                        Country <span class="text-danger">*</span>
+                    </label>
+                    <select asp-for="CountryId" class="form-select" asp-items="ViewBag.Countries"></select>
+                    <span asp-validation-for="CountryId" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="LocationId" class="form-label">
+                        Location <span class="text-danger">*</span>
+                    </label>
+                    <select asp-for="LocationId" class="form-select" asp-items="ViewBag.Locations"></select>
+                    <span asp-validation-for="LocationId" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Management Information Card -->
+    <div class="card mb-3">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="bi bi-person-badge"></i> Management Information</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label asp-for="UserId" class="form-label">
+                        Assigned User <span class="text-danger">*</span>
+                    </label>
+                    <select asp-for="UserId" class="form-select" asp-items="ViewBag.Users"></select>
+                    <span asp-validation-for="UserId" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="ManagerName" class="form-label">Manager Name</label>
+                    <input asp-for="ManagerName" class="form-control" />
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="ManagerNumber" class="form-label">Manager Phone Number</label>
+                    <input asp-for="ManagerNumber" class="form-control" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Financial & Technical Information Card -->
+    <div class="card mb-3">
+        <div class="card-header bg-warning text-dark">
+            <h5 class="mb-0"><i class="bi bi-calculator"></i> Financial & Technical Information</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label asp-for="AccountId" class="form-label">
+                        Account ID <span class="text-danger">*</span>
+                    </label>
+                    <input asp-for="AccountId" type="number" class="form-control" />
+                    <span asp-validation-for="AccountId" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="CostId" class="form-label">
+                        Cost Center ID <span class="text-danger">*</span>
+                    </label>
+                    <input asp-for="CostId" type="number" class="form-control" />
+                    <span asp-validation-for="CostId" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="IVM" class="form-label">
+                        IVM Code
+                        <small class="text-muted">(Inventory Management)</small>
+                    </label>
+                    <input asp-for="IVM" class="form-control" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Information Card -->
+    <div class="card mb-3">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0"><i class="bi bi-sticky"></i> Additional Information</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-12">
+                    <label asp-for="AdditionalNote" class="form-label">Additional Notes</label>
+                    <textarea asp-for="AdditionalNote" class="form-control" rows="3"></textarea>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="form-check form-switch">
+                        <input asp-for="Active" class="form-check-input" type="checkbox" />
+                        <label asp-for="Active" class="form-check-label">
+                            <strong>Active</strong>
+                            <small class="text-muted">(Uncheck to make warehouse inactive)</small>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between mb-4">
+        <a asp-action="Index" class="btn btn-secondary btn-lg">
+            <i class="bi bi-arrow-left"></i> Cancel
+        </a>
+        <button type="submit" class="btn btn-success btn-lg">
+            <i class="bi bi-check-circle"></i> Update Warehouse
+        </button>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #dee2e6;
+    }
+
+    .page-header h2 {
+        margin: 0;
+        color: #2c3e50;
+    }
+</style>

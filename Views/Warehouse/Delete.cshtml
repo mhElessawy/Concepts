@@ -1,0 +1,165 @@
+@model Warehouse
+
+@{
+    ViewData["Title"] = "Delete Warehouse";
+}
+
+<div class="page-header">
+    <h2><i class="bi bi-trash"></i> Delete Warehouse</h2>
+</div>
+
+<div class="alert alert-danger">
+    <h5><i class="bi bi-exclamation-triangle-fill"></i> Are you sure you want to delete this warehouse?</h5>
+    <p class="mb-0">This action will mark this warehouse as inactive. This cannot be undone.</p>
+</div>
+
+<!-- Warehouse Information Card -->
+<div class="card mb-3">
+    <div class="card-header bg-danger text-white">
+        <h5 class="mb-0"><i class="bi bi-building"></i> Warehouse Information</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <table class="table table-borderless">
+                    <tr>
+                        <th width="40%">Warehouse Code:</th>
+                        <td><strong class="text-primary fs-5">@Model.WarehouseCode</strong></td>
+                    </tr>
+                    <tr>
+                        <th>Warehouse Name:</th>
+                        <td><strong>@Model.WarehouseName</strong></td>
+                    </tr>
+                    <tr>
+                        <th>Warehouse Type:</th>
+                        <td>
+                            @switch (Model.WarehouseType)
+                            {
+                                case 0:
+                                    <span class="badge bg-secondary">Standard</span>
+                                    break;
+                                case 1:
+                                    <span class="badge bg-primary">Cold Storage</span>
+                                    break;
+                                case 2:
+                                    <span class="badge bg-warning text-dark">Distribution Center</span>
+                                    break;
+                                case 3:
+                                    <span class="badge bg-info">Transit Hub</span>
+                                    break;
+                                case 4:
+                                    <span class="badge bg-danger">Returns Center</span>
+                                    break;
+                                default:
+                                    <span class="badge bg-dark">Type @Model.WarehouseType</span>
+                                    break;
+                            }
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Location:</th>
+                        <td>
+                            <span class="badge bg-info">@Model.Location?.LocationName</span>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <table class="table table-borderless">
+                    <tr>
+                        <th width="40%">Country:</th>
+                        <td>@Model.Country?.Name</td>
+                    </tr>
+                    <tr>
+                        <th>Manager Name:</th>
+                        <td>@Model.ManagerName</td>
+                    </tr>
+                    <tr>
+                        <th>Manager Contact:</th>
+                        <td>
+                            @if (!string.IsNullOrEmpty(Model.ManagerNumber))
+                            {
+                                <i class="bi bi-telephone"></i> @Model.ManagerNumber
+                            }
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Assigned User:</th>
+                        <td>@Model.User?.FullName</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.Description))
+        {
+            <hr />
+            <div>
+                <strong>Description:</strong><br />
+                <p class="text-muted mb-0">@Model.Description</p>
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(Model.AdditionalNote))
+        {
+            <hr />
+            <div>
+                <strong>Additional Notes:</strong><br />
+                <p class="text-muted mb-0">@Model.AdditionalNote</p>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Financial Summary Card -->
+<div class="card mb-3">
+    <div class="card-header bg-warning text-dark">
+        <h5 class="mb-0"><i class="bi bi-calculator"></i> Financial Information</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>Account ID:</strong> @Model.AccountId</p>
+                <p><strong>Cost Center ID:</strong> @Model.CostId</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>IVM Code:</strong> @Model.IVM</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form asp-action="Delete" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+
+    <div class="d-flex justify-content-between mb-4">
+        <a asp-action="Index" class="btn btn-secondary btn-lg">
+            <i class="bi bi-arrow-left"></i> Cancel
+        </a>
+        <button type="submit" class="btn btn-danger btn-lg">
+            <i class="bi bi-trash-fill"></i> Confirm Delete
+        </button>
+    </div>
+</form>
+
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #dee2e6;
+    }
+
+    .page-header h2 {
+        margin: 0;
+        color: #dc3545;
+    }
+
+    .table-borderless th {
+        font-weight: 600;
+        color: #495057;
+    }
+</style>
