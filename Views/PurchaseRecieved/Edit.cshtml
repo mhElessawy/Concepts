@@ -1,0 +1,239 @@
+@model PurchaseRecievedHeader
+
+@{
+    ViewData["Title"] = "Edit Purchase Received";
+}
+
+<div class="page-header">
+    <h2><i class="bi bi-pencil"></i> Edit Purchase Received - @Model.RecieveNo</h2>
+</div>
+
+<form asp-action="Edit" method="post" id="purchaseReceivedForm">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="RecieveNo" />
+    <input type="hidden" asp-for="Approved" />
+    <input type="hidden" asp-for="Active" />
+    <input type="hidden" asp-for="CreatedDate" />
+    <input type="hidden" id="detailsJson" name="detailsJson" />
+
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+    <!-- Header Information Card -->
+    <div class="card mb-3">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-file-text"></i> Receive Information</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Receive No</label>
+                    <input type="text" class="form-control" value="@Model.RecieveNo" readonly
+                           style="background-color: #d1ecf1; font-weight: 600;" />
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="RecieveDate" class="form-label">
+                        Receive Date <span class="text-danger">*</span>
+                    </label>
+                    <input asp-for="RecieveDate" type="date" class="form-control" />
+                    <span asp-validation-for="RecieveDate" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="RecieveTime" class="form-label">Receive Time</label>
+                    <input asp-for="RecieveTime" type="time" class="form-control" />
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="BatchNo" class="form-label">Batch No</label>
+                    <input asp-for="BatchNo" type="number" class="form-control" />
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="WarehouseId" class="form-label">Warehouse</label>
+                    <select asp-for="WarehouseId" class="form-select" asp-items="ViewBag.Warehouses"></select>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="VenderId" class="form-label">Vendor</label>
+                    <select asp-for="VenderId" class="form-select" asp-items="ViewBag.Venders"></select>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="UserId" class="form-label">Received By</label>
+                    <select asp-for="UserId" class="form-select" asp-items="ViewBag.Users"></select>
+                </div>
+
+                <div class="col-md-12">
+                    <label asp-for="AdditionalNotes" class="form-label">Additional Notes</label>
+                    <textarea asp-for="AdditionalNotes" class="form-control" rows="2"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details Card -->
+    <div class="card mb-3">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="bi bi-list-ul"></i> Received Items</h5>
+        </div>
+        <div class="card-body">
+            <div class="border rounded p-3 mb-3" style="background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);">
+                <h6 class="mb-3 text-success">
+                    <i class="bi bi-plus-circle-fill"></i> Add Item
+                </h6>
+
+                <div class="row g-2">
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold">Item</label>
+                        <select id="itemId" class="form-select" asp-items="ViewBag.Items">
+                            <option value="">-- Select Item --</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label small fw-bold">Receive Qty</label>
+                        <input type="number" id="recieveQuantity" class="form-control" step="0.01" onchange="calculateTotal()" />
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label small fw-bold">Free Qty</label>
+                        <input type="number" id="freeQuantity" class="form-control" step="0.01" value="0" onchange="calculateTotal()" />
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label small fw-bold">Unit Price</label>
+                        <input type="number" id="unitPrice" class="form-control" step="0.01" onchange="calculatePrice()" />
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label small fw-bold">Discount</label>
+                        <input type="number" id="discount" class="form-control" step="0.01" value="0" onchange="calculatePrice()" />
+                    </div>
+
+                    <div class="col-md-12 mt-3">
+                        <button type="button" class="btn btn-success" onclick="addDetail()">
+                            <i class="bi bi-plus-circle"></i> Add to List
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-bordered" id="detailsTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Item</th>
+                            <th>Receive Qty</th>
+                            <th>Free Qty</th>
+                            <th>Unit Price</th>
+                            <th>Net Price</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="detailsBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between mb-4">
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Cancel
+        </a>
+        <button type="submit" class="btn btn-success btn-lg">
+            <i class="bi bi-check-circle"></i> Update Purchase Received
+        </button>
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        let details = @Html.Raw(ViewBag.ExistingDetails ?? "[]");
+
+        window.onload = function () {
+            updateTable();
+        };
+
+        function calculateTotal() {
+            const receive = parseFloat(document.getElementById('recieveQuantity').value) || 0;
+            const free = parseFloat(document.getElementById('freeQuantity').value) || 0;
+            calculatePrice();
+        }
+
+        function calculatePrice() {
+            const receive = parseFloat(document.getElementById('recieveQuantity').value) || 0;
+            const price = parseFloat(document.getElementById('unitPrice').value) || 0;
+            const total = receive * price;
+            const discount = parseFloat(document.getElementById('discount').value) || 0;
+        }
+
+        function addDetail() {
+            const itemId = document.getElementById('itemId').value;
+            const receiveQty = parseFloat(document.getElementById('recieveQuantity').value) || 0;
+            const freeQty = parseFloat(document.getElementById('freeQuantity').value) || 0;
+            const unitPrice = parseFloat(document.getElementById('unitPrice').value) || 0;
+            const discount = parseFloat(document.getElementById('discount').value) || 0;
+
+            if (!itemId || !receiveQty || !unitPrice) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            const totalPrice = receiveQty * unitPrice;
+            const netPrice = totalPrice - discount;
+
+            details.push({
+                ItemId: parseInt(itemId),
+                RecieveQuantity: receiveQty,
+                FreeQuantity: freeQty,
+                TotalQuantity: receiveQty + freeQty,
+                UnitPrice: unitPrice,
+                TotalPrice: totalPrice,
+                Discount: discount,
+                NetPrice: netPrice,
+                SubUOMId: 1,
+                OrderQuantity: 0,
+                PendingQuantity: 0,
+                ExpiredDate: null,
+                PackSize: 1,
+                ValueOrUnit: 1,
+                SubCategoryId: 1
+            });
+
+            updateTable();
+        }
+
+        function updateTable() {
+            const tbody = document.getElementById('detailsBody');
+            tbody.innerHTML = '';
+
+            details.forEach((detail, index) => {
+                const itemName = document.querySelector(`#itemId option[value="${detail.ItemId}"]`)?.text || '';
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${itemName}</td>
+                    <td>${detail.RecieveQuantity.toFixed(2)}</td>
+                    <td>${detail.FreeQuantity.toFixed(2)}</td>
+                    <td>${detail.UnitPrice.toFixed(2)}</td>
+                    <td>${detail.NetPrice.toFixed(2)}</td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="removeDetail(${index})">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                `;
+            });
+        }
+
+        function removeDetail(index) {
+            details.splice(index, 1);
+            updateTable();
+        }
+
+        document.getElementById('purchaseReceivedForm').addEventListener('submit', function (e) {
+            document.getElementById('detailsJson').value = JSON.stringify(details);
+        });
+    </script>
+}

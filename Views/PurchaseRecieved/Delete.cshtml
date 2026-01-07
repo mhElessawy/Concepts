@@ -1,0 +1,142 @@
+@model PurchaseRecievedHeader
+
+@{
+    ViewData["Title"] = "Delete Purchase Received";
+    var details = ViewBag.Details as List<PurchaseRecievedDetails>;
+}
+
+<div class="page-header">
+    <h2><i class="bi bi-trash"></i> Delete Purchase Received</h2>
+</div>
+
+<div class="alert alert-danger">
+    <h5><i class="bi bi-exclamation-triangle"></i> Are you sure you want to delete this?</h5>
+    <p>This action will mark this purchase received record as inactive. This cannot be undone.</p>
+</div>
+
+<!-- Header Information Card -->
+<div class="card mb-3">
+    <div class="card-header bg-danger text-white">
+        <h5 class="mb-0"><i class="bi bi-file-text"></i> Receive Information</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <table class="table table-borderless">
+                    <tr>
+                        <th width="40%">Receive No:</th>
+                        <td><strong class="text-primary">@Model.RecieveNo</strong></td>
+                    </tr>
+                    <tr>
+                        <th>Receive Date:</th>
+                        <td>@Model.RecieveDate.ToString("dd/MM/yyyy")</td>
+                    </tr>
+                    <tr>
+                        <th>Batch No:</th>
+                        <td>@Model.BatchNo</td>
+                    </tr>
+                    <tr>
+                        <th>Warehouse:</th>
+                        <td><span class="badge bg-info">@Model.Warehouse?.WarehouseName</span></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <table class="table table-borderless">
+                    <tr>
+                        <th width="40%">Vendor:</th>
+                        <td>@Model.Vender?.VenderName</td>
+                    </tr>
+                    <tr>
+                        <th>Received By:</th>
+                        <td>@Model.User?.FullName</td>
+                    </tr>
+                    <tr>
+                        <th>Status:</th>
+                        <td>
+                            @switch (Model.Approved)
+                            {
+                                case 0:
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                    break;
+                                case 1:
+                                    <span class="badge bg-success">Approved</span>
+                                    break;
+                                case 2:
+                                    <span class="badge bg-danger">Rejected</span>
+                                    break;
+                            }
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Items Summary -->
+<div class="card mb-3">
+    <div class="card-header bg-secondary text-white">
+        <h5 class="mb-0"><i class="bi bi-list-ul"></i> Items Summary</h5>
+    </div>
+    <div class="card-body">
+        @if (details != null && details.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-bordered table-sm">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Item</th>
+                            <th>Receive Qty</th>
+                            <th>Free Qty</th>
+                            <th>Total Qty</th>
+                            <th>Net Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in details)
+                        {
+                            <tr>
+                                <td>@item.StoreItem?.ItemName</td>
+                                <td class="text-end">@item.RecieveQuantity.ToString("N2")</td>
+                                <td class="text-end">@item.FreeQuantity.ToString("N2")</td>
+                                <td class="text-end">@item.TotalQuantity.ToString("N2")</td>
+                                <td class="text-end">@item.NetPrice.ToString("N2")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
+<form asp-action="Delete" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+
+    <div class="d-flex justify-content-between mb-4">
+        <a asp-action="Index" class="btn btn-secondary btn-lg">
+            <i class="bi bi-arrow-left"></i> Cancel
+        </a>
+        <button type="submit" class="btn btn-danger btn-lg">
+            <i class="bi bi-trash"></i> Confirm Delete
+        </button>
+    </div>
+</form>
+
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #dee2e6;
+    }
+
+    .page-header h2 {
+        margin: 0;
+        color: #dc3545;
+    }
+</style>
