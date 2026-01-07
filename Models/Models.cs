@@ -522,7 +522,6 @@ namespace Concept.Models
         public virtual DefSubUOM SubUOM { get; set; }
 
     }
-
     public class Warehouse
     {
         [Key]
