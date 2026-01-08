@@ -3,12 +3,20 @@
 @{
     ViewData["Title"] = "Purchase Received";
     var filter = ViewBag.Filter ?? "all";
+    var canApprove = ViewBag.CanApprove ?? false;
     var pendingCount = ViewBag.PendingCount ?? 0;
 }
 
 <div class="page-header">
     <h2><i class="bi bi-inbox"></i> Purchase Received Management</h2>
     <div>
+        @if (canApprove && pendingCount > 0)
+        {
+            <a asp-action="PendingApproval" class="btn btn-warning">
+                <i class="bi bi-clipboard-check"></i> Pending Approval
+                <span class="badge bg-white text-warning">@pendingCount</span>
+            </a>
+        }
         <a asp-action="Create" class="btn btn-success">
             <i class="bi bi-plus-circle"></i> New Purchase Received
         </a>
@@ -125,6 +133,14 @@
                                            class="btn btn-info" title="View Details">
                                             <i class="bi bi-eye"></i>
                                         </a>
+
+                                        @if (canApprove && item.Approved == 0)
+                                        {
+                                            <a asp-action="ApprovalDetails" asp-route-id="@item.Id"
+                                               class="btn btn-success" title="Review & Approve">
+                                                <i class="bi bi-clipboard-check"></i>
+                                            </a>
+                                        }
 
                                         @if (item.Approved == 0)
                                         {

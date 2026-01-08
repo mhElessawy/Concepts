@@ -16,6 +16,18 @@ namespace Concept.Controllers
             _context = context;
         }
 
+        // Check if user can approve
+        private bool CanApprove()
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+
+            if (userId == null || userId == 0)
+                return false;
+
+            var user = _context.UserInfos.Find(userId.Value);
+            return user != null && user.CanApprovePurchaseOrders && user.Active;
+        }
+
         // GET: PurchaseRecieved
         public async Task<IActionResult> Index(string filter = "all")
         {
@@ -45,9 +57,148 @@ namespace Concept.Controllers
             ViewBag.RejectedCount = await _context.PurchaseRecievedHeaders.CountAsync(p => p.Approved == 2);
 
             ViewBag.Filter = filter;
+            ViewBag.CanApprove = CanApprove();
             ViewBag.PendingCount = ViewBag.NotApprovedCount;
 
             return View(received);
+        }
+
+        // GET: PurchaseRecieved/PendingApproval
+        public async Task<IActionResult> PendingApproval()
+        {
+            if (!CanApprove())
+            {
+                TempData["ErrorMessage"] = "You don't have permission to access this page";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var pendingReceived = await _context.PurchaseRecievedHeaders
+                .Include(p => p.Warehouse)
+                .Include(p => p.User)
+                .Include(p => p.Vender)
+                .Where(p => p.Approved == 0 && p.Active)
+                .OrderByDescending(p => p.RecieveDate)
+                .ToListAsync();
+
+            return View(pendingReceived);
+        }
+
+        // GET: PurchaseRecieved/ApprovalDetails/5
+        public async Task<IActionResult> ApprovalDetails(int? id)
+        {
+            if (!CanApprove())
+            {
+                TempData["ErrorMessage"] = "You don't have permission to access this page";
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var header = await _context.PurchaseRecievedHeaders
+                .Include(p => p.Warehouse)
+                .Include(p => p.User)
+                .Include(p => p.Vender)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (header == null)
+            {
+                return NotFound();
+            }
+
+            var details = await _context.PurchaseRecievedDetails
+                .Include(d => d.SubUOM)
+                    .ThenInclude(su => su.UOM)
+                .Include(d => d.StoreItem)
+                .Where(d => d.PurchaseRecievedHeaderId == id)
+                .ToListAsync();
+
+            ViewBag.Details = details;
+            ViewBag.GrandTotal = details.Sum(d => d.NetPrice);
+
+            return View(header);
+        }
+
+        // POST: PurchaseRecieved/Approve/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Approve(int id, string approvalNotes)
+        {
+            if (!CanApprove())
+            {
+                TempData["ErrorMessage"] = "You don't have permission to approve purchase received";
+                return RedirectToAction(nameof(Index));
+            }
+
+            try
+            {
+                var received = await _context.PurchaseRecievedHeaders.FindAsync(id);
+                if (received == null)
+                {
+                    return NotFound();
+                }
+
+                received.Approved = 1;
+                received.ModifiedDate = DateTime.Now;
+
+                if (!string.IsNullOrEmpty(approvalNotes))
+                {
+                    received.AdditionalNotes = (received.AdditionalNotes ?? "") + "\n[Approval Notes]: " + approvalNotes;
+                }
+
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = $"Purchase Received {received.RecieveNo} has been approved successfully!";
+                return RedirectToAction(nameof(PendingApproval));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error approving purchase received: {ex.Message}");
+                TempData["ErrorMessage"] = "Error approving purchase received";
+                return RedirectToAction(nameof(PendingApproval));
+            }
+        }
+
+        // POST: PurchaseRecieved/Reject/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Reject(int id, string rejectionReason)
+        {
+            if (!CanApprove())
+            {
+                TempData["ErrorMessage"] = "You don't have permission to reject purchase received";
+                return RedirectToAction(nameof(Index));
+            }
+
+            try
+            {
+                var received = await _context.PurchaseRecievedHeaders.FindAsync(id);
+                if (received == null)
+                {
+                    return NotFound();
+                }
+
+                received.Approved = 2;
+                received.ModifiedDate = DateTime.Now;
+
+                if (!string.IsNullOrEmpty(rejectionReason))
+                {
+                    received.AdditionalNotes = (received.AdditionalNotes ?? "") + "\n[Rejection Reason]: " + rejectionReason;
+                }
+
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = $"Purchase Received {received.RecieveNo} has been rejected.";
+                return RedirectToAction(nameof(PendingApproval));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error rejecting purchase received: {ex.Message}");
+                TempData["ErrorMessage"] = "Error rejecting purchase received";
+                return RedirectToAction(nameof(PendingApproval));
+            }
         }
 
         // GET: PurchaseRecieved/Details/5
