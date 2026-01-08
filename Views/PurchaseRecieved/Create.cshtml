@@ -1,0 +1,742 @@
+﻿@model PurchaseRecievedHeader
+
+
+
+@{
+
+    ViewData["Title"] = "New Purchase Received";
+
+}
+
+
+
+<div class="page-header">
+
+    <h2><i class="bi bi-inbox"></i> New Purchase Received</h2>
+
+</div>
+
+
+
+<form asp-action="Create" method="post" id="purchaseReceivedForm">
+
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" id="detailsJson" name="detailsJson" />
+
+    <input type="hidden" asp-for="Approved" value="0" />
+
+
+
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+
+
+    <!-- Header Information Card -->
+
+    <div class="card mb-3">
+
+        <div class="card-header bg-primary text-white">
+
+            <h5 class="mb-0"><i class="bi bi-file-text"></i> Receive Information</h5>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="row g-3">
+
+                <div class="col-md-3">
+
+                    <label asp-for="RecieveNo" class="form-label">
+
+                        Receive No <span class="text-danger">*</span>
+
+                    </label>
+
+                    <input type="text" class="form-control" value="@ViewBag.NextRecieveNo" readonly
+                           style="background-color: #d1ecf1; font-weight: 600;" />
+
+                    <small class="text-muted">Auto-generated</small>
+
+                </div>
+
+
+
+                <div class="col-md-3">
+
+                    <label asp-for="RecieveDate" class="form-label">
+
+                        Receive Date <span class="text-danger">*</span>
+
+                    </label>
+
+                    <input asp-for="RecieveDate" type="date" class="form-control" value="@ViewBag.CurrentDate" />
+
+                    <span asp-validation-for="RecieveDate" class="text-danger"></span>
+
+                </div>
+
+
+
+                <div class="col-md-3">
+
+                    <label asp-for="RecieveTime" class="form-label">Receive Time</label>
+
+                    <input asp-for="RecieveTime" type="time" class="form-control" value="@ViewBag.CurrentTime" />
+
+                </div>
+
+
+
+                <div class="col-md-3">
+
+                    <label asp-for="BatchNo" class="form-label">
+
+                        Batch No <span class="text-danger">*</span>
+
+                    </label>
+
+                    <input asp-for="BatchNo" type="number" class="form-control" />
+
+                    <span asp-validation-for="BatchNo" class="text-danger"></span>
+
+                </div>
+
+
+
+                <div class="col-md-4">
+
+                    <label asp-for="WarehouseId" class="form-label">
+
+                        Warehouse <span class="text-danger">*</span>
+
+                    </label>
+
+                    <select asp-for="WarehouseId" class="form-select" asp-items="ViewBag.Warehouses">
+
+                        <option value="">-- Select Warehouse --</option>
+
+                    </select>
+
+                    <span asp-validation-for="WarehouseId" class="text-danger"></span>
+
+                </div>
+
+
+
+                <div class="col-md-4">
+
+                    <label asp-for="VenderId" class="form-label">
+
+                        Vendor <span class="text-danger">*</span>
+
+                    </label>
+
+                    <select asp-for="VenderId" class="form-select" asp-items="ViewBag.Venders">
+
+                        <option value="">-- Select Vendor --</option>
+
+                    </select>
+
+                    <span asp-validation-for="VenderId" class="text-danger"></span>
+
+                </div>
+
+
+
+                <div class="col-md-4">
+
+                    <label asp-for="UserId" class="form-label">
+
+                        Received By <span class="text-danger">*</span>
+
+                    </label>
+
+                    <select asp-for="UserId" class="form-select" asp-items="ViewBag.Users">
+
+                        <option value="">-- Select User --</option>
+
+                    </select>
+
+                    <span asp-validation-for="UserId" class="text-danger"></span>
+
+                </div>
+
+
+
+                <div class="col-md-4">
+
+                    <label asp-for="PurchaseOrderHeaderId" class="form-label">Purchase Order</label>
+
+                    <select asp-for="PurchaseOrderHeaderId" class="form-select" asp-items="ViewBag.PurchaseOrders" id="purchaseOrderSelect">
+
+                        <option value="0">-- Select Purchase Order (Optional) --</option>
+
+                    </select>
+
+                </div>
+
+
+
+                <div class="col-md-4">
+
+                    <label asp-for="VenderInvoiceNo" class="form-label">Vendor Invoice No</label>
+
+                    <input asp-for="VenderInvoiceNo" type="number" class="form-control" />
+
+                </div>
+
+
+
+                <div class="col-md-4">
+
+                    <label asp-for="PaymentTerms" class="form-label">Payment Terms (Days)</label>
+
+                    <input asp-for="PaymentTerms" type="number" class="form-control" />
+
+                </div>
+
+
+
+                <div class="col-md-12">
+
+                    <label asp-for="AdditionalNotes" class="form-label">Additional Notes</label>
+
+                    <textarea asp-for="AdditionalNotes" class="form-control" rows="2"></textarea>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Details Card -->
+
+    <div class="card mb-3">
+
+        <div class="card-header bg-success text-white">
+
+            <h5 class="mb-0"><i class="bi bi-list-ul"></i> Received Items</h5>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="border rounded p-3 mb-3" style="background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);">
+
+                <h6 class="mb-3 text-success">
+
+                    <i class="bi bi-plus-circle-fill"></i> Add Item
+
+                </h6>
+
+
+
+                <div class="row g-2">
+
+                    <div class="col-md-3">
+
+                        <label class="form-label small fw-bold">Item <span class="text-danger">*</span></label>
+
+                        <select id="itemId" class="form-select" asp-items="ViewBag.Items">
+
+                            <option value="">-- Select Item --</option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <div class="col-md-2">
+
+                        <label class="form-label small fw-bold">Order Qty</label>
+
+                        <input type="number" id="orderQuantity" class="form-control" step="0.01" />
+
+                    </div>
+
+
+
+                    <div class="col-md-2">
+
+                        <label class="form-label small fw-bold">Receive Qty <span class="text-danger">*</span></label>
+
+                        <input type="number" id="recieveQuantity" class="form-control" step="0.01" onchange="calculateTotal()" />
+
+                    </div>
+
+
+
+                    <div class="col-md-2">
+
+                        <label class="form-label small fw-bold">Free Qty</label>
+
+                        <input type="number" id="freeQuantity" class="form-control" step="0.01" value="0" onchange="calculateTotal()" />
+
+                    </div>
+
+
+
+                    <div class="col-md-2">
+
+                        <label class="form-label small fw-bold">Total Qty</label>
+
+                        <input type="number" id="totalQuantity" class="form-control" step="0.01" readonly style="background-color: #e9ecef;" />
+
+                    </div>
+
+
+
+                    <div class="col-md-2">
+
+                        <label class="form-label small fw-bold">Unit Price <span class="text-danger">*</span></label>
+
+                        <input type="number" id="unitPrice" class="form-control" step="0.01" onchange="calculatePrice()" />
+
+                    </div>
+
+
+
+                    <div class="col-md-2">
+
+                        <label class="form-label small fw-bold">Total Price</label>
+
+                        <input type="number" id="totalPrice" class="form-control" step="0.01" readonly style="background-color: #fff3cd;" />
+
+                    </div>
+
+
+
+                    <div class="col-md-2">
+
+                        <label class="form-label small fw-bold">Discount</label>
+
+                        <input type="number" id="discount" class="form-control" step="0.01" value="0" onchange="calculatePrice()" />
+
+                    </div>
+
+
+
+                    <div class="col-md-2">
+
+                        <label class="form-label small fw-bold">Net Price</label>
+
+                        <input type="number" id="netPrice" class="form-control" step="0.01" readonly style="background-color: #d1ecf1;" />
+
+                    </div>
+
+
+
+                    <div class="col-md-2">
+
+                        <label class="form-label small fw-bold">Sub UOM <span class="text-danger">*</span></label>
+
+                        <select id="subUOMId" class="form-select" asp-items="ViewBag.SubUOMs">
+
+                            <option value="">-- Select UOM --</option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <div class="col-md-2">
+
+                        <label class="form-label small fw-bold">Expired Date</label>
+
+                        <input type="date" id="expiredDate" class="form-control" />
+
+                    </div>
+
+
+
+                    <div class="col-md-12 mt-3">
+
+                        <button type="button" class="btn btn-success" onclick="addDetail()">
+
+                            <i class="bi bi-plus-circle"></i> Add to List
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- Details Table -->
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover" id="detailsTable">
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th>Item</th>
+
+                            <th>Order Qty</th>
+
+                            <th>Receive Qty</th>
+
+                            <th>Free Qty</th>
+
+                            <th>Total Qty</th>
+
+                            <th>Unit Price</th>
+
+                            <th>Total Price</th>
+
+                            <th>Discount</th>
+
+                            <th>Net Price</th>
+
+                            <th>Actions</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="detailsBody">
+
+                        <tr id="noDetailsRow">
+
+                            <td colspan="10" class="text-center text-muted">No items added yet</td>
+
+                        </tr>
+
+                    </tbody>
+
+                    <tfoot class="table-light">
+
+                        <tr>
+
+                            <th colspan="6" class="text-end">Grand Total:</th>
+
+                            <th id="grandTotalPrice">0.00</th>
+
+                            <th id="grandTotalDiscount">0.00</th>
+
+                            <th id="grandNetPrice">0.00</th>
+
+                            <th></th>
+
+                        </tr>
+
+                    </tfoot>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="d-flex justify-content-between mb-4">
+
+        <a asp-action="Index" class="btn btn-secondary">
+
+            <i class="bi bi-arrow-left"></i> Cancel
+
+        </a>
+
+        <button type="submit" class="btn btn-success btn-lg">
+
+            <i class="bi bi-check-circle"></i> Save Purchase Received
+
+        </button>
+
+    </div>
+
+</form>
+
+
+
+@section Scripts {
+
+    <script>
+
+        let details = [];
+
+
+
+        function calculateTotal() {
+
+            const receive = parseFloat(document.getElementById('recieveQuantity').value) || 0;
+
+            const free = parseFloat(document.getElementById('freeQuantity').value) || 0;
+
+            document.getElementById('totalQuantity').value = (receive + free).toFixed(2);
+
+            calculatePrice();
+
+        }
+
+
+
+        function calculatePrice() {
+
+            const receive = parseFloat(document.getElementById('recieveQuantity').value) || 0;
+
+            const price = parseFloat(document.getElementById('unitPrice').value) || 0;
+
+            const total = receive * price;
+
+            document.getElementById('totalPrice').value = total.toFixed(2);
+
+
+
+            const discount = parseFloat(document.getElementById('discount').value) || 0;
+
+            document.getElementById('netPrice').value = (total - discount).toFixed(2);
+
+        }
+
+
+
+        function addDetail() {
+
+            const itemId = document.getElementById('itemId').value;
+
+            const itemText = document.getElementById('itemId').selectedOptions[0]?.text;
+
+            const orderQty = parseFloat(document.getElementById('orderQuantity').value) || 0;
+
+            const receiveQty = parseFloat(document.getElementById('recieveQuantity').value) || 0;
+
+            const freeQty = parseFloat(document.getElementById('freeQuantity').value) || 0;
+
+            const totalQty = parseFloat(document.getElementById('totalQuantity').value) || 0;
+
+            const unitPrice = parseFloat(document.getElementById('unitPrice').value) || 0;
+
+            const totalPrice = parseFloat(document.getElementById('totalPrice').value) || 0;
+
+            const discount = parseFloat(document.getElementById('discount').value) || 0;
+
+            const netPrice = parseFloat(document.getElementById('netPrice').value) || 0;
+
+            const subUOMId = document.getElementById('subUOMId').value;
+
+            const expiredDate = document.getElementById('expiredDate').value;
+
+
+
+            if (!itemId || !receiveQty || !unitPrice || !subUOMId) {
+
+                alert('Please fill in all required fields');
+
+                return;
+
+            }
+
+
+
+            const detail = {
+
+                ItemId: parseInt(itemId),
+
+                OrderQuantity: orderQty,
+
+                RecieveQuantity: receiveQty,
+
+                PendingQuantity: orderQty - receiveQty,
+
+                FreeQuantity: freeQty,
+
+                TotalQuantity: totalQty,
+
+                UnitPrice: unitPrice,
+
+                TotalPrice: totalPrice,
+
+                Discount: discount,
+
+                NetPrice: netPrice,
+
+                SubUOMId: parseInt(subUOMId),
+
+                ExpiredDate: expiredDate || null,
+
+                PackSize: 1,
+
+                ValueOrUnit: 1,
+
+                SubCategoryId: 1
+
+            };
+
+
+
+            details.push(detail);
+
+            updateTable();
+
+            clearForm();
+
+        }
+
+
+
+        function updateTable() {
+
+            const tbody = document.getElementById('detailsBody');
+
+            const noRow = document.getElementById('noDetailsRow');
+
+
+
+            if (details.length === 0) {
+
+                noRow.style.display = '';
+
+                return;
+
+            }
+
+
+
+            noRow.style.display = 'none';
+
+            tbody.innerHTML = '';
+
+
+
+            let totalPriceSum = 0;
+
+            let totalDiscountSum = 0;
+
+            let totalNetSum = 0;
+
+
+
+            details.forEach((detail, index) => {
+
+                const itemName = document.querySelector(`#itemId option[value="${detail.ItemId}"]`)?.text || '';
+
+
+
+                const row = tbody.insertRow();
+
+                row.innerHTML = `
+
+                    <td>${itemName}</td>
+
+                    <td>${detail.OrderQuantity.toFixed(2)}</td>
+
+                    <td>${detail.RecieveQuantity.toFixed(2)}</td>
+
+                    <td>${detail.FreeQuantity.toFixed(2)}</td>
+
+                    <td>${detail.TotalQuantity.toFixed(2)}</td>
+
+                    <td>${detail.UnitPrice.toFixed(2)}</td>
+
+                    <td>${detail.TotalPrice.toFixed(2)}</td>
+
+                    <td>${detail.Discount.toFixed(2)}</td>
+
+                    <td>${detail.NetPrice.toFixed(2)}</td>
+
+                    <td>
+
+                        <button type="button" class="btn btn-sm btn-danger" onclick="removeDetail(${index})">
+
+                            <i class="bi bi-trash"></i>
+
+                        </button>
+
+                    </td>
+
+                `;
+
+
+
+                totalPriceSum += detail.TotalPrice;
+
+                totalDiscountSum += detail.Discount;
+
+                totalNetSum += detail.NetPrice;
+
+            });
+
+
+
+            document.getElementById('grandTotalPrice').textContent = totalPriceSum.toFixed(2);
+
+            document.getElementById('grandTotalDiscount').textContent = totalDiscountSum.toFixed(2);
+
+            document.getElementById('grandNetPrice').textContent = totalNetSum.toFixed(2);
+
+        }
+
+
+
+        function removeDetail(index) {
+
+            details.splice(index, 1);
+
+            updateTable();
+
+        }
+
+
+
+        function clearForm() {
+
+            document.getElementById('itemId').value = '';
+
+            document.getElementById('orderQuantity').value = '';
+
+            document.getElementById('recieveQuantity').value = '';
+
+            document.getElementById('freeQuantity').value = '0';
+
+            document.getElementById('totalQuantity').value = '';
+
+            document.getElementById('unitPrice').value = '';
+
+            document.getElementById('totalPrice').value = '';
+
+            document.getElementById('discount').value = '0';
+
+            document.getElementById('netPrice').value = '';
+
+            document.getElementById('expiredDate').value = '';
+
+        }
+
+
+
+        document.getElementById('purchaseReceivedForm').addEventListener('submit', function (e) {
+
+            if (details.length === 0) {
+
+                e.preventDefault();
+
+                alert('Please add at least one item');
+
+                return;
+
+            }
+
+            document.getElementById('detailsJson').value = JSON.stringify(details);
+
+        });
+
+    </script>
+
+}

@@ -29,6 +29,11 @@ namespace Concept.Data
 
         public DbSet<PurchaseOrderHeader> PurchaseOrderHeaders { get; set; }
         public DbSet<PurchaseOrderDetails> PurchaseOrderDetails { get; set; }
+
+        public DbSet<Warehouse> Warehouses { get; set; }
+        public DbSet<PurchaseRecievedHeader> PurchaseRecievedHeaders { get; set; }
+        public DbSet<PurchaseRecievedDetails> PurchaseRecievedDetails { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -140,8 +145,174 @@ namespace Concept.Data
                 .WithMany()
                 .HasForeignKey(u => u.LocationId)
                 .OnDelete(DeleteBehavior.SetNull);
-        }
 
-    
+            // Warehouse Configuration
+
+            modelBuilder.Entity<Warehouse>().ToTable("Warehouse");
+
+            modelBuilder.Entity<Warehouse>().HasIndex(w => w.WarehouseCode).IsUnique();
+
+
+
+            modelBuilder.Entity<Warehouse>()
+
+                .HasOne(w => w.Location)
+
+                .WithMany()
+
+                .HasForeignKey(w => w.LocationId)
+
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+
+            modelBuilder.Entity<Warehouse>()
+
+                .HasOne(w => w.Country)
+
+                .WithMany()
+
+                .HasForeignKey(w => w.CountryId)
+
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+
+            modelBuilder.Entity<Warehouse>()
+
+                .HasOne(w => w.User)
+
+                .WithMany()
+
+                .HasForeignKey(w => w.UserId)
+
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+
+            // Purchase Received Header Configuration
+
+            modelBuilder.Entity<PurchaseRecievedHeader>().ToTable("PurchaseRecieved_Header");
+
+            modelBuilder.Entity<PurchaseRecievedHeader>().HasIndex(p => p.RecieveNo);
+
+
+
+            modelBuilder.Entity<PurchaseRecievedHeader>()
+
+                .HasOne(p => p.Warehouse)
+
+                .WithMany()
+
+                .HasForeignKey(p => p.WarehouseId)
+
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+            modelBuilder.Entity<PurchaseRecievedHeader>()
+
+                .HasOne(p => p.Vender)
+
+                .WithMany()
+
+                .HasForeignKey(p => p.VenderId)
+
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+
+            modelBuilder.Entity<PurchaseRecievedHeader>()
+
+                .HasOne(p => p.User)
+
+                .WithMany()
+
+                .HasForeignKey(p => p.UserId)
+
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+
+            // Purchase Received Details Configuration
+
+            modelBuilder.Entity<PurchaseRecievedDetails>().ToTable("PurchaseRecieved_Details");
+            modelBuilder.Entity<PurchaseRecievedDetails>()
+
+                .HasOne(p => p.PurchaseRecievedHeader)
+
+                .WithMany()
+
+                .HasForeignKey(p => p.PurchaseRecievedHeaderId)
+
+                .OnDelete(DeleteBehavior.Cascade);
+
+
+
+            modelBuilder.Entity<PurchaseRecievedDetails>()
+
+                .HasOne(p => p.SubUOM)
+
+                .WithMany()
+
+                .HasForeignKey(p => p.SubUOMId)
+
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+
+            modelBuilder.Entity<PurchaseRecievedDetails>()
+
+                .HasOne(p => p.StoreItem)
+
+                .WithMany()
+
+                .HasForeignKey(p => p.ItemId)
+
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+
+            // Configure decimal precision
+
+            modelBuilder.Entity<PurchaseRecievedDetails>()
+
+                .Property(p => p.OrderQuantity).HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<PurchaseRecievedDetails>()
+
+                .Property(p => p.RecieveQuantity).HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<PurchaseRecievedDetails>()
+
+                .Property(p => p.PendingQuantity).HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<PurchaseRecievedDetails>()
+
+                .Property(p => p.FreeQuantity).HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<PurchaseRecievedDetails>()
+
+                .Property(p => p.TotalQuantity).HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<PurchaseRecievedDetails>()
+
+                .Property(p => p.UnitPrice).HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<PurchaseRecievedDetails>()
+
+                .Property(p => p.TotalPrice).HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<PurchaseRecievedDetails>()
+
+                .Property(p => p.Discount).HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<PurchaseRecievedDetails>()
+
+                .Property(p => p.NetPrice).HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<PurchaseRecievedDetails>()
+
+                .Property(p => p.ValueOrUnit).HasColumnType("decimal(18,2)");
+        }
     }
 }
