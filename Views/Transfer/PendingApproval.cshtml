@@ -1,0 +1,295 @@
+@model IEnumerable<Concept.Models.StoreTransferHeader>
+
+@{
+    ViewData["Title"] = "Pending Approvals - Store Transfers";
+}
+
+<div class="container-fluid">
+    <div class="page-header">
+        <div>
+            <h2>
+                <i class="bi bi-clipboard-check"></i> Pending Transfer Approvals
+                <span class="badge bg-warning text-dark ms-2">@ViewBag.PendingCount</span>
+            </h2>
+            <p class="text-muted mb-0">Review and approve pending store transfers</p>
+        </div>
+        <div>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-list"></i> All Transfers
+            </a>
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> New Transfer
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (Model.Any())
+    {
+        <div class="row">
+            @foreach (var transfer in Model)
+            {
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+                            <span>
+                                <i class="bi bi-arrow-left-right"></i>
+                                <strong>@transfer.TransferCode</strong>
+                            </span>
+                            <span class="badge bg-light text-dark">
+                                No. @transfer.TransferNo
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <small class="text-muted d-block mb-1">Transfer Type</small>
+                                @switch (transfer.TransferType)
+                                {
+                                    case 1:
+                                        <span class="badge bg-info">
+                                            <i class="bi bi-building"></i> Warehouse to Warehouse
+                                        </span>
+                                        break;
+                                    case 2:
+                                        <span class="badge bg-primary">
+                                            <i class="bi bi-building-fill-check"></i> Warehouse to Department
+                                        </span>
+                                        break;
+                                    case 3:
+                                        <span class="badge bg-warning text-dark">
+                                            <i class="bi bi-diagram-3"></i> Department to Warehouse
+                                        </span>
+                                        break;
+                                    case 4:
+                                        <span class="badge bg-secondary">
+                                            <i class="bi bi-diagram-3-fill"></i> Department to Department
+                                        </span>
+                                        break;
+                                }
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <small class="text-muted d-block">From</small>
+                                        <strong class="text-primary">
+                                            @if (transfer.TransferType == 1 || transfer.TransferType == 2)
+                                            {
+                                                <i class="bi bi-building"></i>
+                                                @(transfer.FromWarehouse?.WarehouseName ?? "N/A")
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-diagram-3"></i>
+                                                @(transfer.FromDepartment?.DepartmentName ?? "N/A")
+                                            }
+                                        </strong>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted d-block">To</small>
+                                        <strong class="text-success">
+                                            @if (transfer.TransferType == 1 || transfer.TransferType == 3)
+                                            {
+                                                <i class="bi bi-building"></i>
+                                                @(transfer.ToWarehouse?.WarehouseName ?? "N/A")
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-diagram-3"></i>
+                                                @(transfer.ToDepartment?.DepartmentName ?? "N/A")
+                                            }
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <small class="text-muted d-block">Date</small>
+                                        <span>
+                                            <i class="bi bi-calendar3"></i>
+                                            @transfer.TransferDate.ToString("dd/MM/yyyy")
+                                        </span>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted d-block">Time</small>
+                                        <span>
+                                            <i class="bi bi-clock"></i>
+                                            @transfer.TransferTime.ToString("hh\\:mm")
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <small class="text-muted d-block">Created By</small>
+                                <span>
+                                    <i class="bi bi-person"></i>
+                                    @(transfer.User?.FullName ?? "N/A")
+                                </span>
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(transfer.AdditionalNotes))
+                            {
+                                <div class="mb-3">
+                                    <small class="text-muted d-block">Notes</small>
+                                    <p class="text-muted small mb-0">
+                                        @(transfer.AdditionalNotes.Length > 100
+                                            ? transfer.AdditionalNotes.Substring(0, 100) + "..."
+                                            : transfer.AdditionalNotes)
+                                    </p>
+                                </div>
+                            }
+                        </div>
+                        <div class="card-footer bg-light">
+                            <div class="d-grid gap-2">
+                                <a asp-action="Details" asp-route-id="@transfer.Id" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye"></i> View Details
+                                </a>
+                                <div class="btn-group" role="group">
+                                    <form asp-action="Approve" asp-route-id="@transfer.Id" method="post" class="d-inline w-50"
+                                          onsubmit="return confirm('Are you sure you want to APPROVE this transfer?');">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm btn-success w-100">
+                                            <i class="bi bi-check-circle"></i> Approve
+                                        </button>
+                                    </form>
+                                    <form asp-action="Reject" asp-route-id="@transfer.Id" method="post" class="d-inline w-50"
+                                          onsubmit="return confirm('Are you sure you want to REJECT this transfer?');">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm btn-danger w-100">
+                                            <i class="bi bi-x-circle"></i> Reject
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="card text-center py-5">
+            <div class="card-body">
+                <i class="bi bi-clipboard-check" style="font-size: 5rem; color: #dee2e6;"></i>
+                <h3 class="mt-3 text-muted">No Pending Approvals</h3>
+                <p class="text-muted">All transfers have been reviewed. Great job!</p>
+                <div class="mt-4">
+                    <a asp-action="Index" class="btn btn-primary">
+                        <i class="bi bi-list"></i> View All Transfers
+                    </a>
+                    <a asp-action="Create" class="btn btn-success">
+                        <i class="bi bi-plus-circle"></i> Create New Transfer
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (Model.Any())
+    {
+        <div class="card mt-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-info-circle"></i> Approval Guidelines
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h6><i class="bi bi-check-circle text-success"></i> Before Approving</h6>
+                        <ul class="small">
+                            <li>Verify transfer type is correct</li>
+                            <li>Check source and destination</li>
+                            <li>Review all items and quantities</li>
+                            <li>Ensure stock availability</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-4">
+                        <h6><i class="bi bi-exclamation-triangle text-warning"></i> Important Notes</h6>
+                        <ul class="small">
+                            <li>Approved transfers cannot be edited</li>
+                            <li>Stock levels will be updated automatically</li>
+                            <li>Transfer history is maintained</li>
+                            <li>All changes are logged</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-4">
+                        <h6><i class="bi bi-x-circle text-danger"></i> Rejection Reasons</h6>
+                        <ul class="small">
+                            <li>Insufficient stock available</li>
+                            <li>Incorrect transfer information</li>
+                            <li>Unauthorized transfer request</li>
+                            <li>Policy violations</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function () {
+            $('.alert').fadeOut('slow');
+        }, 5000);
+
+        // Add confirmation tooltips
+        $(document).ready(function () {
+            $('[data-bs-toggle="tooltip"]').tooltip();
+        });
+    </script>
+}
+
+<style>
+    .card {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important;
+    }
+
+    .card-header {
+        font-weight: 600;
+    }
+
+    .badge {
+        font-size: 0.85em;
+    }
+
+    .page-header {
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 3px solid #f8f9fa;
+    }
+
+    .btn-group form {
+        margin: 0;
+    }
+
+    .card-footer {
+        border-top: 1px solid rgba(0,0,0,0.125);
+    }
+</style>

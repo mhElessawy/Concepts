@@ -69,6 +69,29 @@ namespace Concept.Controllers
             return View(transfers);
         }
 
+        // GET: Transfer/PendingApproval
+        public async Task<IActionResult> PendingApproval()
+        {
+            if (!IsUserLoggedIn())
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var pendingTransfers = await _context.StoreTransferHeaders
+                .Include(t => t.FromWarehouse)
+                .Include(t => t.FromDepartment)
+                .Include(t => t.ToWarehouse)
+                .Include(t => t.ToDepartment)
+                .Include(t => t.User)
+                .Where(t => t.TransferStatus == 0 && t.Active)
+                .OrderByDescending(t => t.TransferDate)
+                .ToListAsync();
+
+            ViewBag.PendingCount = pendingTransfers.Count;
+
+            return View(pendingTransfers);
+        }
+
         // GET: Transfer/Create
         public IActionResult Create()
         {
