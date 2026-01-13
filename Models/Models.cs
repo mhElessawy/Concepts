@@ -648,28 +648,23 @@ namespace Concept.Models
         public DateTime TransferDate { get; set; } = DateTime.Now;
         public TimeOnly TransferTime { get; set; }
 
-        public int? FromWarehouseId { get; set; }
+        public int FromWarehouseId { get; set; } = 0;
 
-        public int? FromDepartmentId { get; set; }
+        public int FromDepartmentId { get; set; } = 0;
 
-        public int? ToWarehouseId { get; set; }
+        public int ToWarehouseId { get; set; } = 0;
 
-        public int? ToDepartmentId { get; set; }
+        public int ToDepartmentId { get; set; } = 0;
 
         public int UserId { get; set; }
         public string? AdditionalNotes { get; set; }
         public bool Active { get; set; } = true;
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public DateTime ModifiedDate { get; set; } = DateTime.Now;
-        // Navigation Properties    
-        [ForeignKey("FromWarehouseId")]
+        // Navigation Properties (No Foreign Key Constraints for From/To fields)
         public virtual Warehouse? FromWarehouse { get; set; }
-        [ForeignKey("FromDepartmentId")]
         public virtual DeffDepartment? FromDepartment { get; set; }
-
-        [ForeignKey("ToWarehouseId")]
         public virtual Warehouse? ToWarehouse { get; set; }
-        [ForeignKey("ToDepartmentId")]
         public virtual DeffDepartment? ToDepartment { get; set; }
 
         [ForeignKey("UserId")]

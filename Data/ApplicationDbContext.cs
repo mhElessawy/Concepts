@@ -321,29 +321,8 @@ namespace Concept.Data
             modelBuilder.Entity<StoreTransferHeader>().ToTable("StoreTransfer_Header");
             modelBuilder.Entity<StoreTransferHeader>().HasIndex(t => t.TransferNo);
 
-            modelBuilder.Entity<StoreTransferHeader>()
-                .HasOne(t => t.FromWarehouse)
-                .WithMany()
-                .HasForeignKey(t => t.FromWarehouseId)
-                .OnDelete(DeleteBehavior.NoAction);
-
-            modelBuilder.Entity<StoreTransferHeader>()
-                .HasOne(t => t.FromDepartment)
-                .WithMany()
-                .HasForeignKey(t => t.FromDepartmentId)
-                .OnDelete(DeleteBehavior.NoAction);
-
-            modelBuilder.Entity<StoreTransferHeader>()
-                .HasOne(t => t.ToWarehouse)
-                .WithMany()
-                .HasForeignKey(t => t.ToWarehouseId)
-                .OnDelete(DeleteBehavior.NoAction);
-
-            modelBuilder.Entity<StoreTransferHeader>()
-                .HasOne(t => t.ToDepartment)
-                .WithMany()
-                .HasForeignKey(t => t.ToDepartmentId)
-                .OnDelete(DeleteBehavior.NoAction);
+            // No Foreign Key Constraints for From/To fields to allow 0 values
+            // FromWarehouseId, FromDepartmentId, ToWarehouseId, ToDepartmentId can be 0
 
             modelBuilder.Entity<StoreTransferHeader>()
                 .HasOne(t => t.User)

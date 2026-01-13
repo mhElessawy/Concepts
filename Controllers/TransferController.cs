@@ -132,11 +132,7 @@ namespace Concept.Controllers
                 header.TransferNo = nextNumber;
                 header.TransferCode = $"TR-{DateTime.Now.Year}-{nextNumber.ToString().PadLeft(6, '0')}";
 
-                // Set null values for 0 or empty foreign keys
-                if (header.FromWarehouseId == 0) header.FromWarehouseId = null;
-                if (header.FromDepartmentId == 0) header.FromDepartmentId = null;
-                if (header.ToWarehouseId == 0) header.ToWarehouseId = null;
-                if (header.ToDepartmentId == 0) header.ToDepartmentId = null;
+                // From/To fields can now be 0 (no validation needed)
 
                 // Add header
                 _context.StoreTransferHeaders.Add(header);
@@ -287,11 +283,7 @@ namespace Concept.Controllers
                 existingHeader.AdditionalNotes = header.AdditionalNotes;
                 existingHeader.ModifiedDate = DateTime.Now;
 
-                // Set null values for 0 or empty foreign keys
-                if (existingHeader.FromWarehouseId == 0) existingHeader.FromWarehouseId = null;
-                if (existingHeader.FromDepartmentId == 0) existingHeader.FromDepartmentId = null;
-                if (existingHeader.ToWarehouseId == 0) existingHeader.ToWarehouseId = null;
-                if (existingHeader.ToDepartmentId == 0) existingHeader.ToDepartmentId = null;
+                // From/To fields can now be 0 (no validation needed)
 
                 // Delete existing details
                 var existingDetails = await _context.StoreTransferDetails
