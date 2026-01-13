@@ -38,10 +38,6 @@ namespace Concept.Controllers
             }
 
             var query = _context.StoreTransferHeaders
-                .Include(t => t.FromWarehouse)
-                .Include(t => t.FromDepartment)
-                .Include(t => t.ToWarehouse)
-                .Include(t => t.ToDepartment)
                 .Include(t => t.User)
                 .AsQueryable();
 
@@ -78,10 +74,6 @@ namespace Concept.Controllers
             }
 
             var pendingTransfers = await _context.StoreTransferHeaders
-                .Include(t => t.FromWarehouse)
-                .Include(t => t.FromDepartment)
-                .Include(t => t.ToWarehouse)
-                .Include(t => t.ToDepartment)
                 .Include(t => t.User)
                 .Where(t => t.TransferStatus == 0 && t.Active)
                 .OrderByDescending(t => t.TransferDate)
@@ -178,10 +170,6 @@ namespace Concept.Controllers
             }
 
             var header = await _context.StoreTransferHeaders
-                .Include(t => t.FromWarehouse)
-                .Include(t => t.FromDepartment)
-                .Include(t => t.ToWarehouse)
-                .Include(t => t.ToDepartment)
                 .Include(t => t.User)
                 .FirstOrDefaultAsync(t => t.Id == id);
 
