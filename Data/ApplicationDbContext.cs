@@ -325,31 +325,31 @@ namespace Concept.Data
                 .HasOne(t => t.FromWarehouse)
                 .WithMany()
                 .HasForeignKey(t => t.FromWarehouseId)
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<StoreTransferHeader>()
                 .HasOne(t => t.FromDepartment)
                 .WithMany()
                 .HasForeignKey(t => t.FromDepartmentId)
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<StoreTransferHeader>()
                 .HasOne(t => t.ToWarehouse)
                 .WithMany()
                 .HasForeignKey(t => t.ToWarehouseId)
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<StoreTransferHeader>()
                 .HasOne(t => t.ToDepartment)
                 .WithMany()
                 .HasForeignKey(t => t.ToDepartmentId)
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<StoreTransferHeader>()
                 .HasOne(t => t.User)
                 .WithMany()
                 .HasForeignKey(t => t.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.NoAction);
 
             // Store Transfer Details Configuration
             modelBuilder.Entity<StoreTransferDetails>().ToTable("StoreTransfer_Details");
