@@ -325,25 +325,25 @@ namespace Concept.Data
                 .HasOne(t => t.FromWarehouse)
                 .WithMany()
                 .HasForeignKey(t => t.FromWarehouseId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<StoreTransferHeader>()
                 .HasOne(t => t.FromDepartment)
                 .WithMany()
                 .HasForeignKey(t => t.FromDepartmentId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<StoreTransferHeader>()
                 .HasOne(t => t.ToWarehouse)
                 .WithMany()
                 .HasForeignKey(t => t.ToWarehouseId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<StoreTransferHeader>()
                 .HasOne(t => t.ToDepartment)
                 .WithMany()
                 .HasForeignKey(t => t.ToDepartmentId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<StoreTransferHeader>()
                 .HasOne(t => t.User)
@@ -361,6 +361,12 @@ namespace Concept.Data
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<StoreTransferDetails>()
+                .HasOne(t => t.Category)
+                .WithMany()
+                .HasForeignKey(t => t.CategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<StoreTransferDetails>()
                 .HasOne(t => t.SubCategory)
                 .WithMany()
                 .HasForeignKey(t => t.SubCategoryId)
@@ -370,6 +376,12 @@ namespace Concept.Data
                 .HasOne(t => t.Item)
                 .WithMany()
                 .HasForeignKey(t => t.ItemId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<StoreTransferDetails>()
+                .HasOne(t => t.UOM)
+                .WithMany()
+                .HasForeignKey(t => t.UOMId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<StoreTransferDetails>()

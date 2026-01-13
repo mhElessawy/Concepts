@@ -189,8 +189,10 @@ namespace Concept.Controllers
             }
 
             var details = await _context.StoreTransferDetails
+                .Include(d => d.Category)
                 .Include(d => d.SubCategory)
                 .Include(d => d.Item)
+                .Include(d => d.UOM)
                 .Include(d => d.SubUOM)
                 .Where(d => d.StoreTransferHeaderId == id)
                 .ToListAsync();
@@ -511,11 +513,112 @@ namespace Concept.Controllers
                 {
                     su.Id,
                     su.SubUOMName,
-                    UOMName = su.UOM.UOMName
+                    UOMName = su.UOM.UOMName,
+                    UOMId = su.UOMId
                 })
                 .ToListAsync();
 
             return Json(subUOMs);
+        }
+
+        // GET: Transfer/GetCategories
+        [HttpGet]
+        public async Task<JsonResult> GetCategories()
+        {
+            var categories = await _context.DeffCategories
+                .Where(c => c.Active)
+                .Select(c => new { c.Id, c.Name })
+                .ToListAsync();
+
+            return Json(categories);
+        }
+
+        // GET: Transfer/GetSubCategoriesByCategory/5
+        [HttpGet]
+        public async Task<JsonResult> GetSubCategoriesByCategory(int categoryId)
+        {
+            var subCategories = await _context.DeffSubCategories
+                .Where(sc => sc.CategoryId == categoryId && sc.Active)
+                .Select(sc => new { sc.Id, sc.Name })
+                .ToListAsync();
+
+            return Json(subCategories);
+        }
+
+        // GET: Transfer/GetUOMs
+        [HttpGet]
+        public async Task<JsonResult> GetUOMs()
+        {
+            var uoms = await _context.DefUOMs
+                .Where(u => u.Active)
+                .Select(u => new { u.Id, u.UOMName })
+                .ToListAsync();
+
+            return Json(uoms);
+        }
+
+        // GET: Transfer/GetSubUOMsByUOM/5
+        [HttpGet]
+        public async Task<JsonResult> GetSubUOMsByUOM(int uomId)
+        {
+            var subUOMs = await _context.DefSubUOMs
+                .Where(su => su.UOMId == uomId && su.Active)
+                .Select(su => new { su.Id, su.SubUOMName })
+                .ToListAsync();
+
+            return Json(subUOMs);
+        }
+
+        // GET: Transfer/GetBatchesByItem/5
+        [HttpGet]
+        public async Task<JsonResult> GetBatchesByItem(int itemId)
+        {
+            var batches = await _context.PurchaseRecievedDetails
+                .Where(p => p.ItemId == itemId)
+                .Select(p => new
+                {
+                    BatchNo = p.PurchaseRecievedHeader.BatchNo.ToString(),
+                    ReceivedDate = p.PurchaseRecievedHeader.RecieveDate,
+                    ExpiredDate = p.ExpiredDate,
+                    AvailableQuantity = p.RecieveQuantity
+                })
+                .Distinct()
+                .OrderByDescending(b => b.ReceivedDate)
+                .ToListAsync();
+
+            return Json(batches);
+        }
+
+        // GET: Transfer/GetItemFullDetails/5
+        [HttpGet]
+        public async Task<JsonResult> GetItemFullDetails(int itemId)
+        {
+            var item = await _context.StoreItems
+                .Where(i => i.Id == itemId)
+                .Include(i => i.SubUOM)
+                .ThenInclude(su => su.UOM)
+                .Include(i => i.SubCategory)
+                .ThenInclude(sc => sc.Category)
+                .Select(i => new
+                {
+                    i.Id,
+                    i.ItemCode,
+                    i.ItemName,
+                    CategoryId = i.SubCategory.CategoryId,
+                    CategoryName = i.SubCategory.Category.Name,
+                    SubCategoryId = i.SubCategoryId ?? 0,
+                    SubCategoryName = i.SubCategory != null ? i.SubCategory.Name : "",
+                    UOMId = i.SubUOM != null ? i.SubUOM.UOMId : 0,
+                    UOMName = i.SubUOM != null && i.SubUOM.UOM != null ? i.SubUOM.UOM.UOMName : "",
+                    SubUOMId = i.SubUOMId ?? 0,
+                    SubUOMName = i.SubUOM != null ? i.SubUOM.SubUOMName : "",
+                    i.PackSize,
+                    i.QuantityInStore,
+                    i.PurchaseValue
+                })
+                .FirstOrDefaultAsync();
+
+            return Json(item);
         }
 
         // Helper method to load dropdown data
@@ -533,10 +636,22 @@ namespace Concept.Controllers
                 "DepartmentName"
             );
 
+            ViewBag.Categories = new SelectList(
+                _context.DeffCategories.Where(c => c.Active).ToList(),
+                "Id",
+                "Name"
+            );
+
             ViewBag.SubCategories = new SelectList(
                 _context.DeffSubCategories.Where(sc => sc.Active).ToList(),
                 "Id",
                 "Name"
+            );
+
+            ViewBag.UOMs = new SelectList(
+                _context.DefUOMs.Where(u => u.Active).ToList(),
+                "Id",
+                "UOMName"
             );
 
             ViewBag.SubUOMs = new SelectList(

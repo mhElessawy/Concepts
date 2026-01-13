@@ -647,14 +647,14 @@ namespace Concept.Models
 
         public DateTime TransferDate { get; set; } = DateTime.Now;
         public TimeOnly TransferTime { get; set; }
-        
-        public int FromWarehouseId { get; set; }
-        
-        public int FromDepartmentId { get; set; }
 
-        public int ToWarehouseId { get; set; }
+        public int? FromWarehouseId { get; set; }
 
-        public int ToDepartmentId { get; set; }
+        public int? FromDepartmentId { get; set; }
+
+        public int? ToWarehouseId { get; set; }
+
+        public int? ToDepartmentId { get; set; }
 
         public int UserId { get; set; }
         public string? AdditionalNotes { get; set; }
@@ -682,8 +682,10 @@ namespace Concept.Models
         public int Id { get; set; }
 
         public int StoreTransferHeaderId { get; set; }
+        public int CategoryId { get; set; }
         public int SubCategoryId { get; set; }
         public int ItemId { get; set; }
+        public int UOMId { get; set; }
 
         public string BatchNo  { get; set; }
         public decimal Quantity { get; set; }
@@ -701,10 +703,17 @@ namespace Concept.Models
         [ForeignKey("StoreTransferHeaderId")]
         public virtual StoreTransferHeader? storeTransferHeader { get; set; }
 
+        [ForeignKey("CategoryId")]
+        public virtual DeffCategory Category { get; set; }
+
         [ForeignKey("SubCategoryId")]
         public virtual DeffSubCategory SubCategory { get; set; }
+
         [ForeignKey("ItemId")]
         public virtual StoreItem Item { get; set; }
+
+        [ForeignKey("UOMId")]
+        public virtual DefUOM UOM { get; set; }
 
         [ForeignKey("SubUOMId")]
         public virtual DefSubUOM? SubUOM { get; set; }
