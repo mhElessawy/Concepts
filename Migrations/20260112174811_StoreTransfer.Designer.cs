@@ -4,6 +4,7 @@ using Concept.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Concept.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260112174811_StoreTransfer")]
+    partial class StoreTransfer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -862,145 +865,6 @@ namespace Concept.Migrations
                     b.ToTable("Store_Item", (string)null);
                 });
 
-            modelBuilder.Entity("Concept.Models.StoreTransferDetails", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("BatchNo")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("CostType")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateOnly>("ExpiredDate")
-                        .HasColumnType("date");
-
-                    b.Property<int>("ItemId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("PackSize")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("PriceType")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("Quantity")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("Remark")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("StoreTransferHeaderId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SubCategoryId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SubUOMId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("TotalType")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("ValueOrUnit")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ItemId");
-
-                    b.HasIndex("StoreTransferHeaderId");
-
-                    b.HasIndex("SubCategoryId");
-
-                    b.HasIndex("SubUOMId");
-
-                    b.ToTable("StoreTransfer_Details", (string)null);
-                });
-
-            modelBuilder.Entity("Concept.Models.StoreTransferHeader", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("Active")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("AdditionalNotes")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("AprovedBy")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("FromDepartmentId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("FromWarehouseId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("ModifiedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("RequestedBy")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ToDepartmentId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ToWarehouseId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("TransferCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("TransferDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("TransferNo")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TransferStatus")
-                        .HasColumnType("int");
-
-                    b.Property<TimeOnly>("TransferTime")
-                        .HasColumnType("time");
-
-                    b.Property<int>("TransferType")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FromDepartmentId");
-
-                    b.HasIndex("FromWarehouseId");
-
-                    b.HasIndex("ToDepartmentId");
-
-                    b.HasIndex("ToWarehouseId");
-
-                    b.HasIndex("TransferNo");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("StoreTransfer_Header", (string)null);
-                });
-
             modelBuilder.Entity("Concept.Models.UserInfo", b =>
                 {
                     b.Property<int>("Id")
@@ -1475,84 +1339,6 @@ namespace Concept.Migrations
                     b.Navigation("SubCategory");
 
                     b.Navigation("SubUOM");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Concept.Models.StoreTransferDetails", b =>
-                {
-                    b.HasOne("Concept.Models.StoreItem", "Item")
-                        .WithMany()
-                        .HasForeignKey("ItemId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Concept.Models.StoreTransferHeader", "storeTransferHeader")
-                        .WithMany()
-                        .HasForeignKey("StoreTransferHeaderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Concept.Models.DeffSubCategory", "SubCategory")
-                        .WithMany()
-                        .HasForeignKey("SubCategoryId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Concept.Models.DefSubUOM", "SubUOM")
-                        .WithMany()
-                        .HasForeignKey("SubUOMId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Item");
-
-                    b.Navigation("SubCategory");
-
-                    b.Navigation("SubUOM");
-
-                    b.Navigation("storeTransferHeader");
-                });
-
-            modelBuilder.Entity("Concept.Models.StoreTransferHeader", b =>
-                {
-                    b.HasOne("Concept.Models.DeffDepartment", "FromDepartment")
-                        .WithMany()
-                        .HasForeignKey("FromDepartmentId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Concept.Models.Warehouse", "FromWarehouse")
-                        .WithMany()
-                        .HasForeignKey("FromWarehouseId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Concept.Models.DeffDepartment", "ToDepartment")
-                        .WithMany()
-                        .HasForeignKey("ToDepartmentId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Concept.Models.Warehouse", "ToWarehouse")
-                        .WithMany()
-                        .HasForeignKey("ToWarehouseId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Concept.Models.UserInfo", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("FromDepartment");
-
-                    b.Navigation("FromWarehouse");
-
-                    b.Navigation("ToDepartment");
-
-                    b.Navigation("ToWarehouse");
 
                     b.Navigation("User");
                 });

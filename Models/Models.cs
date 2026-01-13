@@ -635,8 +635,8 @@ namespace Concept.Models
     {
         [Key]
         public int Id { get; set; }
-        public string TransferCode { get; set; }
-        public int TransferNo { get; set; }
+        public string? TransferCode { get; set; }
+        public int? TransferNo { get; set; }
         public int TransferType { get; set; }
 
         public int RequestedBy{ get; set; }
@@ -648,13 +648,13 @@ namespace Concept.Models
         public DateTime TransferDate { get; set; } = DateTime.Now;
         public TimeOnly TransferTime { get; set; }
         
-        public int FromWarehouseId { get; set; }
+        public int? FromWarehouseId { get; set; }
         
-        public int FromDepartmentId { get; set; }
+        public int? FromDepartmentId { get; set; }
 
-        public int ToWarehouseId { get; set; }
+        public int? ToWarehouseId { get; set; }
 
-        public int ToDepartmentId { get; set; }
+        public int? ToDepartmentId { get; set; }
 
         public int UserId { get; set; }
         public string? AdditionalNotes { get; set; }

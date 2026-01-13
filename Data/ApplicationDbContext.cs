@@ -33,7 +33,9 @@ namespace Concept.Data
         public DbSet<Warehouse> Warehouses { get; set; }
         public DbSet<PurchaseRecievedHeader> PurchaseRecievedHeaders { get; set; }
         public DbSet<PurchaseRecievedDetails> PurchaseRecievedDetails { get; set; }
+        public DbSet<StoreTransferHeader> StoreTransferHeaders { get; set; }
 
+        public DbSet<StoreTransferDetails> StoreTransferDetails { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -313,6 +315,233 @@ namespace Concept.Data
             modelBuilder.Entity<PurchaseRecievedDetails>()
 
                 .Property(p => p.ValueOrUnit).HasColumnType("decimal(18,2)");
+
+            // Store Transfer Header Configuration
+
+
+            modelBuilder.Entity<StoreTransferHeader>().ToTable("StoreTransfer_Header");
+
+
+            modelBuilder.Entity<StoreTransferHeader>().HasIndex(t => t.TransferNo);
+
+
+
+
+
+            modelBuilder.Entity<StoreTransferHeader>()
+
+
+                .HasOne(t => t.FromWarehouse)
+
+
+                .WithMany()
+
+
+                .HasForeignKey(t => t.FromWarehouseId)
+
+
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+
+
+
+            modelBuilder.Entity<StoreTransferHeader>()
+
+
+                .HasOne(t => t.FromDepartment)
+
+
+                .WithMany()
+
+
+                .HasForeignKey(t => t.FromDepartmentId)
+
+
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+
+
+
+            modelBuilder.Entity<StoreTransferHeader>()
+
+
+                .HasOne(t => t.ToWarehouse)
+
+
+                .WithMany()
+
+
+                .HasForeignKey(t => t.ToWarehouseId)
+
+
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+
+
+
+            modelBuilder.Entity<StoreTransferHeader>()
+
+
+                .HasOne(t => t.ToDepartment)
+
+
+                .WithMany()
+
+
+                .HasForeignKey(t => t.ToDepartmentId)
+
+
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+
+
+
+            modelBuilder.Entity<StoreTransferHeader>()
+
+
+                .HasOne(t => t.User)
+
+
+                .WithMany()
+
+
+                .HasForeignKey(t => t.UserId)
+
+
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+
+
+
+            // Store Transfer Details Configuration
+
+
+            modelBuilder.Entity<StoreTransferDetails>().ToTable("StoreTransfer_Details");
+
+
+
+
+
+            modelBuilder.Entity<StoreTransferDetails>()
+
+
+                .HasOne(t => t.storeTransferHeader)
+
+
+                .WithMany()
+
+
+                .HasForeignKey(t => t.StoreTransferHeaderId)
+
+
+                .OnDelete(DeleteBehavior.Cascade);
+
+
+
+
+
+            modelBuilder.Entity<StoreTransferDetails>()
+
+
+                .HasOne(t => t.SubCategory)
+
+
+                .WithMany()
+
+
+                .HasForeignKey(t => t.SubCategoryId)
+
+
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+
+
+
+            modelBuilder.Entity<StoreTransferDetails>()
+
+
+                .HasOne(t => t.Item)
+
+
+                .WithMany()
+
+
+                .HasForeignKey(t => t.ItemId)
+
+
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+
+
+
+            modelBuilder.Entity<StoreTransferDetails>()
+
+
+                .HasOne(t => t.SubUOM)
+
+
+                .WithMany()
+
+
+                .HasForeignKey(t => t.SubUOMId)
+
+
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+
+
+
+            // Configure decimal precision for Transfer Details
+
+
+            modelBuilder.Entity<StoreTransferDetails>()
+
+
+                .Property(t => t.Quantity).HasColumnType("decimal(18,2)");
+
+
+
+
+
+            modelBuilder.Entity<StoreTransferDetails>()
+
+
+                .Property(t => t.PriceType).HasColumnType("decimal(18,2)");
+
+
+
+
+
+            modelBuilder.Entity<StoreTransferDetails>()
+
+
+                .Property(t => t.CostType).HasColumnType("decimal(18,2)");
+
+
+
+
+
+            modelBuilder.Entity<StoreTransferDetails>()
+
+
+                .Property(t => t.TotalType).HasColumnType("decimal(18,2)");
+
+
+
+
+
+            modelBuilder.Entity<StoreTransferDetails>()
+
+
+                .Property(t => t.ValueOrUnit).HasColumnType("decimal(18,2)");
         }
     }
 }
