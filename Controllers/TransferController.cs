@@ -132,36 +132,11 @@ namespace Concept.Controllers
                 header.TransferNo = nextNumber;
                 header.TransferCode = $"TR-{DateTime.Now.Year}-{nextNumber.ToString().PadLeft(6, '0')}";
 
-                // Set null values for unused foreign keys based on TransferType
-                // 1 = Warehouse to Warehouse, 2 = Warehouse to Department
-                // 3 = Department to Warehouse, 4 = Department to Department
-                switch (header.TransferType)
-                {
-                    case 1: // Warehouse to Warehouse
-                        header.FromDepartmentId = null;
-                        header.ToDepartmentId = null;
-                        if (header.FromWarehouseId == 0) header.FromWarehouseId = null;
-                        if (header.ToWarehouseId == 0) header.ToWarehouseId = null;
-                        break;
-                    case 2: // Warehouse to Department
-                        header.FromDepartmentId = null;
-                        header.ToWarehouseId = null;
-                        if (header.FromWarehouseId == 0) header.FromWarehouseId = null;
-                        if (header.ToDepartmentId == 0) header.ToDepartmentId = null;
-                        break;
-                    case 3: // Department to Warehouse
-                        header.FromWarehouseId = null;
-                        header.ToDepartmentId = null;
-                        if (header.FromDepartmentId == 0) header.FromDepartmentId = null;
-                        if (header.ToWarehouseId == 0) header.ToWarehouseId = null;
-                        break;
-                    case 4: // Department to Department
-                        header.FromWarehouseId = null;
-                        header.ToWarehouseId = null;
-                        if (header.FromDepartmentId == 0) header.FromDepartmentId = null;
-                        if (header.ToDepartmentId == 0) header.ToDepartmentId = null;
-                        break;
-                }
+                // Set null values for 0 or empty foreign keys
+                if (header.FromWarehouseId == 0) header.FromWarehouseId = null;
+                if (header.FromDepartmentId == 0) header.FromDepartmentId = null;
+                if (header.ToWarehouseId == 0) header.ToWarehouseId = null;
+                if (header.ToDepartmentId == 0) header.ToDepartmentId = null;
 
                 // Add header
                 _context.StoreTransferHeaders.Add(header);
@@ -312,36 +287,11 @@ namespace Concept.Controllers
                 existingHeader.AdditionalNotes = header.AdditionalNotes;
                 existingHeader.ModifiedDate = DateTime.Now;
 
-                // Set null values for unused foreign keys based on TransferType
-                // 1 = Warehouse to Warehouse, 2 = Warehouse to Department
-                // 3 = Department to Warehouse, 4 = Department to Department
-                switch (existingHeader.TransferType)
-                {
-                    case 1: // Warehouse to Warehouse
-                        existingHeader.FromDepartmentId = null;
-                        existingHeader.ToDepartmentId = null;
-                        if (existingHeader.FromWarehouseId == 0) existingHeader.FromWarehouseId = null;
-                        if (existingHeader.ToWarehouseId == 0) existingHeader.ToWarehouseId = null;
-                        break;
-                    case 2: // Warehouse to Department
-                        existingHeader.FromDepartmentId = null;
-                        existingHeader.ToWarehouseId = null;
-                        if (existingHeader.FromWarehouseId == 0) existingHeader.FromWarehouseId = null;
-                        if (existingHeader.ToDepartmentId == 0) existingHeader.ToDepartmentId = null;
-                        break;
-                    case 3: // Department to Warehouse
-                        existingHeader.FromWarehouseId = null;
-                        existingHeader.ToDepartmentId = null;
-                        if (existingHeader.FromDepartmentId == 0) existingHeader.FromDepartmentId = null;
-                        if (existingHeader.ToWarehouseId == 0) existingHeader.ToWarehouseId = null;
-                        break;
-                    case 4: // Department to Department
-                        existingHeader.FromWarehouseId = null;
-                        existingHeader.ToWarehouseId = null;
-                        if (existingHeader.FromDepartmentId == 0) existingHeader.FromDepartmentId = null;
-                        if (existingHeader.ToDepartmentId == 0) existingHeader.ToDepartmentId = null;
-                        break;
-                }
+                // Set null values for 0 or empty foreign keys
+                if (existingHeader.FromWarehouseId == 0) existingHeader.FromWarehouseId = null;
+                if (existingHeader.FromDepartmentId == 0) existingHeader.FromDepartmentId = null;
+                if (existingHeader.ToWarehouseId == 0) existingHeader.ToWarehouseId = null;
+                if (existingHeader.ToDepartmentId == 0) existingHeader.ToDepartmentId = null;
 
                 // Delete existing details
                 var existingDetails = await _context.StoreTransferDetails

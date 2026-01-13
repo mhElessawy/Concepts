@@ -68,7 +68,7 @@
 
                 <div class="row" id="fromSection">
                     <div class="col-md-6 mb-3" id="fromWarehouseDiv" style="display:none;">
-                        <label class="form-label">From Warehouse <span class="text-danger">*</span></label>
+                        <label class="form-label">From Warehouse</label>
                         <select asp-for="FromWarehouseId" class="form-select" asp-items="ViewBag.Warehouses">
                             <option value="">-- Select Warehouse --</option>
                         </select>
@@ -76,7 +76,7 @@
                     </div>
 
                     <div class="col-md-6 mb-3" id="fromDepartmentDiv" style="display:none;">
-                        <label class="form-label">From Department <span class="text-danger">*</span></label>
+                        <label class="form-label">From Department</label>
                         <select asp-for="FromDepartmentId" class="form-select" asp-items="ViewBag.Departments">
                             <option value="">-- Select Department --</option>
                         </select>
@@ -84,7 +84,7 @@
                     </div>
 
                     <div class="col-md-6 mb-3" id="toWarehouseDiv" style="display:none;">
-                        <label class="form-label">To Warehouse <span class="text-danger">*</span></label>
+                        <label class="form-label">To Warehouse</label>
                         <select asp-for="ToWarehouseId" class="form-select" asp-items="ViewBag.Warehouses">
                             <option value="">-- Select Warehouse --</option>
                         </select>
@@ -92,7 +92,7 @@
                     </div>
 
                     <div class="col-md-6 mb-3" id="toDepartmentDiv" style="display:none;">
-                        <label class="form-label">To Department <span class="text-danger">*</span></label>
+                        <label class="form-label">To Department</label>
                         <select asp-for="ToDepartmentId" class="form-select" asp-items="ViewBag.Departments">
                             <option value="">-- Select Department --</option>
                         </select>
@@ -184,19 +184,15 @@
             switch (type) {
                 case 1: // Warehouse to Warehouse
                     $('#fromWarehouseDiv, #toWarehouseDiv').show();
-                    $('#FromWarehouseId, #ToWarehouseId').prop('required', true);
                     break;
                 case 2: // Warehouse to Department
                     $('#fromWarehouseDiv, #toDepartmentDiv').show();
-                    $('#FromWarehouseId, #ToDepartmentId').prop('required', true);
                     break;
                 case 3: // Department to Warehouse
                     $('#fromDepartmentDiv, #toWarehouseDiv').show();
-                    $('#FromDepartmentId, #ToWarehouseId').prop('required', true);
                     break;
                 case 4: // Department to Department
                     $('#fromDepartmentDiv, #toDepartmentDiv').show();
-                    $('#FromDepartmentId, #ToDepartmentId').prop('required', true);
                     break;
             }
         }
