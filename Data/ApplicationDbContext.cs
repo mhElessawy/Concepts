@@ -33,9 +33,10 @@ namespace Concept.Data
         public DbSet<Warehouse> Warehouses { get; set; }
         public DbSet<PurchaseRecievedHeader> PurchaseRecievedHeaders { get; set; }
         public DbSet<PurchaseRecievedDetails> PurchaseRecievedDetails { get; set; }
-        public DbSet<StoreTransferHeader> StoreTransferHeaders { get; set; }
 
+        public DbSet<StoreTransferHeader> StoreTransferHeaders { get; set; }
         public DbSet<StoreTransferDetails> StoreTransferDetails { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -149,398 +150,172 @@ namespace Concept.Data
                 .OnDelete(DeleteBehavior.SetNull);
 
             // Warehouse Configuration
-
             modelBuilder.Entity<Warehouse>().ToTable("Warehouse");
-
             modelBuilder.Entity<Warehouse>().HasIndex(w => w.WarehouseCode).IsUnique();
 
-
-
             modelBuilder.Entity<Warehouse>()
-
                 .HasOne(w => w.Location)
-
                 .WithMany()
-
                 .HasForeignKey(w => w.LocationId)
-
                 .OnDelete(DeleteBehavior.Restrict);
 
-
-
             modelBuilder.Entity<Warehouse>()
-
                 .HasOne(w => w.Country)
-
                 .WithMany()
-
                 .HasForeignKey(w => w.CountryId)
-
                 .OnDelete(DeleteBehavior.Restrict);
-
-
 
             modelBuilder.Entity<Warehouse>()
-
                 .HasOne(w => w.User)
-
                 .WithMany()
-
                 .HasForeignKey(w => w.UserId)
-
                 .OnDelete(DeleteBehavior.Restrict);
-
-
 
             // Purchase Received Header Configuration
-
             modelBuilder.Entity<PurchaseRecievedHeader>().ToTable("PurchaseRecieved_Header");
-
             modelBuilder.Entity<PurchaseRecievedHeader>().HasIndex(p => p.RecieveNo);
 
-
-
             modelBuilder.Entity<PurchaseRecievedHeader>()
-
                 .HasOne(p => p.Warehouse)
-
                 .WithMany()
-
                 .HasForeignKey(p => p.WarehouseId)
-
                 .OnDelete(DeleteBehavior.Restrict);
 
-
             modelBuilder.Entity<PurchaseRecievedHeader>()
-
                 .HasOne(p => p.Vender)
-
                 .WithMany()
-
                 .HasForeignKey(p => p.VenderId)
-
                 .OnDelete(DeleteBehavior.Restrict);
-
-
 
             modelBuilder.Entity<PurchaseRecievedHeader>()
-
                 .HasOne(p => p.User)
-
                 .WithMany()
-
                 .HasForeignKey(p => p.UserId)
-
                 .OnDelete(DeleteBehavior.Restrict);
-
-
 
             // Purchase Received Details Configuration
-
             modelBuilder.Entity<PurchaseRecievedDetails>().ToTable("PurchaseRecieved_Details");
             modelBuilder.Entity<PurchaseRecievedDetails>()
-
                 .HasOne(p => p.PurchaseRecievedHeader)
-
                 .WithMany()
-
                 .HasForeignKey(p => p.PurchaseRecievedHeaderId)
-
                 .OnDelete(DeleteBehavior.Cascade);
 
-
-
             modelBuilder.Entity<PurchaseRecievedDetails>()
-
                 .HasOne(p => p.SubUOM)
-
                 .WithMany()
-
                 .HasForeignKey(p => p.SubUOMId)
-
                 .OnDelete(DeleteBehavior.Restrict);
-
-
 
             modelBuilder.Entity<PurchaseRecievedDetails>()
-
                 .HasOne(p => p.StoreItem)
-
                 .WithMany()
-
                 .HasForeignKey(p => p.ItemId)
-
                 .OnDelete(DeleteBehavior.Restrict);
-
-
 
             // Configure decimal precision
-
             modelBuilder.Entity<PurchaseRecievedDetails>()
-
                 .Property(p => p.OrderQuantity).HasColumnType("decimal(18,2)");
 
             modelBuilder.Entity<PurchaseRecievedDetails>()
-
                 .Property(p => p.RecieveQuantity).HasColumnType("decimal(18,2)");
 
             modelBuilder.Entity<PurchaseRecievedDetails>()
-
                 .Property(p => p.PendingQuantity).HasColumnType("decimal(18,2)");
 
             modelBuilder.Entity<PurchaseRecievedDetails>()
-
                 .Property(p => p.FreeQuantity).HasColumnType("decimal(18,2)");
 
             modelBuilder.Entity<PurchaseRecievedDetails>()
-
                 .Property(p => p.TotalQuantity).HasColumnType("decimal(18,2)");
 
             modelBuilder.Entity<PurchaseRecievedDetails>()
-
                 .Property(p => p.UnitPrice).HasColumnType("decimal(18,2)");
 
             modelBuilder.Entity<PurchaseRecievedDetails>()
-
                 .Property(p => p.TotalPrice).HasColumnType("decimal(18,2)");
 
             modelBuilder.Entity<PurchaseRecievedDetails>()
-
                 .Property(p => p.Discount).HasColumnType("decimal(18,2)");
 
             modelBuilder.Entity<PurchaseRecievedDetails>()
-
                 .Property(p => p.NetPrice).HasColumnType("decimal(18,2)");
 
             modelBuilder.Entity<PurchaseRecievedDetails>()
-
                 .Property(p => p.ValueOrUnit).HasColumnType("decimal(18,2)");
 
             // Store Transfer Header Configuration
-
-
             modelBuilder.Entity<StoreTransferHeader>().ToTable("StoreTransfer_Header");
-
-
             modelBuilder.Entity<StoreTransferHeader>().HasIndex(t => t.TransferNo);
 
+            // No Foreign Key Constraints for From/To fields to allow 0 values
 
 
-
-
-            modelBuilder.Entity<StoreTransferHeader>()
-
-
-                .HasOne(t => t.FromWarehouse)
-
-
-                .WithMany()
-
-
-                .HasForeignKey(t => t.FromWarehouseId)
-
-
-                .OnDelete(DeleteBehavior.Restrict);
-
-
-
-
+            // FromWarehouseId, FromDepartmentId, ToWarehouseId, ToDepartmentId can be 0
 
             modelBuilder.Entity<StoreTransferHeader>()
-
-
-                .HasOne(t => t.FromDepartment)
-
-
-                .WithMany()
-
-
-                .HasForeignKey(t => t.FromDepartmentId)
-
-
-                .OnDelete(DeleteBehavior.Restrict);
-
-
-
-
-
-            modelBuilder.Entity<StoreTransferHeader>()
-
-
-                .HasOne(t => t.ToWarehouse)
-
-
-                .WithMany()
-
-
-                .HasForeignKey(t => t.ToWarehouseId)
-
-
-                .OnDelete(DeleteBehavior.Restrict);
-
-
-
-
-
-            modelBuilder.Entity<StoreTransferHeader>()
-
-
-                .HasOne(t => t.ToDepartment)
-
-
-                .WithMany()
-
-
-                .HasForeignKey(t => t.ToDepartmentId)
-
-
-                .OnDelete(DeleteBehavior.Restrict);
-
-
-
-
-
-            modelBuilder.Entity<StoreTransferHeader>()
-
-
+                .Ignore(t => t.FromWarehouse)
+                .Ignore(t => t.FromDepartment)
+                .Ignore(t => t.ToWarehouse)
+                .Ignore(t => t.ToDepartment)
                 .HasOne(t => t.User)
-
-
                 .WithMany()
-
-
                 .HasForeignKey(t => t.UserId)
-
-
-                .OnDelete(DeleteBehavior.Restrict);
-
-
-
-
+                .OnDelete(DeleteBehavior.NoAction);
 
             // Store Transfer Details Configuration
-
-
             modelBuilder.Entity<StoreTransferDetails>().ToTable("StoreTransfer_Details");
 
-
-
-
-
             modelBuilder.Entity<StoreTransferDetails>()
-
-
                 .HasOne(t => t.storeTransferHeader)
-
-
                 .WithMany()
-
-
                 .HasForeignKey(t => t.StoreTransferHeaderId)
-
-
                 .OnDelete(DeleteBehavior.Cascade);
 
-
-
-
+            modelBuilder.Entity<StoreTransferDetails>()
+                .HasOne(t => t.Category)
+                .WithMany()
+                .HasForeignKey(t => t.CategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<StoreTransferDetails>()
-
-
                 .HasOne(t => t.SubCategory)
-
-
                 .WithMany()
-
-
                 .HasForeignKey(t => t.SubCategoryId)
-
-
                 .OnDelete(DeleteBehavior.Restrict);
 
-
-
-
-
             modelBuilder.Entity<StoreTransferDetails>()
-
-
                 .HasOne(t => t.Item)
-
-
                 .WithMany()
-
-
                 .HasForeignKey(t => t.ItemId)
-
-
                 .OnDelete(DeleteBehavior.Restrict);
-
-
-
-
 
             modelBuilder.Entity<StoreTransferDetails>()
-
-
-                .HasOne(t => t.SubUOM)
-
-
+                .HasOne(t => t.UOM)
                 .WithMany()
-
-
-                .HasForeignKey(t => t.SubUOMId)
-
-
+                .HasForeignKey(t => t.UOMId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-
-
-
+            modelBuilder.Entity<StoreTransferDetails>()
+                .HasOne(t => t.SubUOM)
+                .WithMany()
+                .HasForeignKey(t => t.SubUOMId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Configure decimal precision for Transfer Details
-
-
             modelBuilder.Entity<StoreTransferDetails>()
-
-
                 .Property(t => t.Quantity).HasColumnType("decimal(18,2)");
 
-
-
-
-
             modelBuilder.Entity<StoreTransferDetails>()
-
-
                 .Property(t => t.PriceType).HasColumnType("decimal(18,2)");
 
-
-
-
-
             modelBuilder.Entity<StoreTransferDetails>()
-
-
                 .Property(t => t.CostType).HasColumnType("decimal(18,2)");
 
-
-
-
-
             modelBuilder.Entity<StoreTransferDetails>()
-
-
                 .Property(t => t.TotalType).HasColumnType("decimal(18,2)");
 
-
-
-
-
             modelBuilder.Entity<StoreTransferDetails>()
-
-
                 .Property(t => t.ValueOrUnit).HasColumnType("decimal(18,2)");
         }
     }

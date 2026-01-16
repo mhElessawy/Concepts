@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Concept.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251222161701_AddPurchaseRequestTables")]
-    partial class AddPurchaseRequestTables
+    [Migration("20260113145216_all")]
+    partial class all
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -402,6 +402,263 @@ namespace Concept.Migrations
                     b.ToTable("Deff_SubCategory", (string)null);
                 });
 
+            modelBuilder.Entity("Concept.Models.PurchaseOrderDetails", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("AvMoney")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("AvQuantity")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Discount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("ItemId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("NetPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("PackSize")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("PurchaseOrderHeaderId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Quantity")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("SubCategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SubUnitId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("ValueOrUnit")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("freeQuantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ItemId");
+
+                    b.HasIndex("PurchaseOrderHeaderId");
+
+                    b.HasIndex("SubCategoryId");
+
+                    b.HasIndex("SubUnitId");
+
+                    b.ToTable("PurchaseOrderDetails");
+                });
+
+            modelBuilder.Entity("Concept.Models.PurchaseOrderHeader", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("AdditionalNotes")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Approved")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DepartmentId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PurchaseCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("PurchaseDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PurchaseNo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PurchaseStatus")
+                        .HasColumnType("int");
+
+                    b.Property<TimeOnly>("PurchaseTime")
+                        .HasColumnType("time");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("VenderId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DepartmentId");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("VenderId");
+
+                    b.ToTable("PurchaseOrderHeaders");
+                });
+
+            modelBuilder.Entity("Concept.Models.PurchaseRecievedDetails", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Discount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateOnly>("ExpiredDate")
+                        .HasColumnType("date");
+
+                    b.Property<decimal>("FreeQuantity")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("ItemId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("NetPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("OrderQuantity")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("PackSize")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("PendingQuantity")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("PurchaseRecievedHeaderId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("RecieveQuantity")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("SubCategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SubUOMId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TotalQuantity")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("UnitPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("ValueOrUnit")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ItemId");
+
+                    b.HasIndex("PurchaseRecievedHeaderId");
+
+                    b.HasIndex("SubUOMId");
+
+                    b.ToTable("PurchaseRecieved_Details", (string)null);
+                });
+
+            modelBuilder.Entity("Concept.Models.PurchaseRecievedHeader", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("AdditionalNotes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Approved")
+                        .HasColumnType("int");
+
+                    b.Property<int>("BatchNo")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("PaymentTerms")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PurchaseOrderHeaderId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("RecieveDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RecieveNo")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<TimeOnly>("RecieveTime")
+                        .HasColumnType("time");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("VenderId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("VenderInvoiceNo")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WarehouseId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RecieveNo");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("VenderId");
+
+                    b.HasIndex("WarehouseId");
+
+                    b.ToTable("PurchaseRecieved_Header", (string)null);
+                });
+
             modelBuilder.Entity("Concept.Models.PurchaseRequestDetails", b =>
                 {
                     b.Property<int>("Id")
@@ -608,6 +865,146 @@ namespace Concept.Migrations
                     b.ToTable("Store_Item", (string)null);
                 });
 
+            modelBuilder.Entity("Concept.Models.StoreTransferDetails", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("BatchNo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("CostType")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateOnly>("ExpiredDate")
+                        .HasColumnType("date");
+
+                    b.Property<int>("ItemId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PackSize")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("PriceType")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Quantity")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Remark")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("StoreTransferHeaderId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SubCategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SubUOMId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TotalType")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("UOMId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("ValueOrUnit")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("ItemId");
+
+                    b.HasIndex("StoreTransferHeaderId");
+
+                    b.HasIndex("SubCategoryId");
+
+                    b.HasIndex("SubUOMId");
+
+                    b.HasIndex("UOMId");
+
+                    b.ToTable("StoreTransfer_Details", (string)null);
+                });
+
+            modelBuilder.Entity("Concept.Models.StoreTransferHeader", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("AdditionalNotes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("AprovedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("FromDepartmentId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FromWarehouseId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("RequestedBy")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ToDepartmentId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ToWarehouseId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TransferCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("TransferDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("TransferNo")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TransferStatus")
+                        .HasColumnType("int");
+
+                    b.Property<TimeOnly>("TransferTime")
+                        .HasColumnType("time");
+
+                    b.Property<int>("TransferType")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TransferNo");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("StoreTransfer_Header", (string)null);
+                });
+
             modelBuilder.Entity("Concept.Models.UserInfo", b =>
                 {
                     b.Property<int>("Id")
@@ -617,6 +1014,9 @@ namespace Concept.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("Active")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("CanApprovePurchaseOrders")
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("CreatedDate")
@@ -770,6 +1170,78 @@ namespace Concept.Migrations
                     b.ToTable("Vender", (string)null);
                 });
 
+            modelBuilder.Entity("Concept.Models.Warehouse", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AccountId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("AdditionalNote")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CostId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CountryId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IVM")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("LocationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ManagerName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ManagerNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("WarehouseCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("WarehouseName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("WarehouseType")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CountryId");
+
+                    b.HasIndex("LocationId");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("WarehouseCode")
+                        .IsUnique();
+
+                    b.ToTable("Warehouse", (string)null);
+                });
+
             modelBuilder.Entity("Concept.Models.DefSubUOM", b =>
                 {
                     b.HasOne("Concept.Models.DefUOM", "UOM")
@@ -801,6 +1273,122 @@ namespace Concept.Migrations
                         .IsRequired();
 
                     b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("Concept.Models.PurchaseOrderDetails", b =>
+                {
+                    b.HasOne("Concept.Models.StoreItem", "Item")
+                        .WithMany()
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Concept.Models.PurchaseOrderHeader", "PurchaseOrderHeader")
+                        .WithMany()
+                        .HasForeignKey("PurchaseOrderHeaderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Concept.Models.DeffSubCategory", "SubCategory")
+                        .WithMany()
+                        .HasForeignKey("SubCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Concept.Models.DefSubUOM", "SubUOM")
+                        .WithMany()
+                        .HasForeignKey("SubUnitId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Item");
+
+                    b.Navigation("PurchaseOrderHeader");
+
+                    b.Navigation("SubCategory");
+
+                    b.Navigation("SubUOM");
+                });
+
+            modelBuilder.Entity("Concept.Models.PurchaseOrderHeader", b =>
+                {
+                    b.HasOne("Concept.Models.DeffDepartment", "Department")
+                        .WithMany()
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Concept.Models.UserInfo", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Concept.Models.Vender", "Vender")
+                        .WithMany()
+                        .HasForeignKey("VenderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Department");
+
+                    b.Navigation("User");
+
+                    b.Navigation("Vender");
+                });
+
+            modelBuilder.Entity("Concept.Models.PurchaseRecievedDetails", b =>
+                {
+                    b.HasOne("Concept.Models.StoreItem", "StoreItem")
+                        .WithMany()
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Concept.Models.PurchaseRecievedHeader", "PurchaseRecievedHeader")
+                        .WithMany()
+                        .HasForeignKey("PurchaseRecievedHeaderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Concept.Models.DefSubUOM", "SubUOM")
+                        .WithMany()
+                        .HasForeignKey("SubUOMId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("PurchaseRecievedHeader");
+
+                    b.Navigation("StoreItem");
+
+                    b.Navigation("SubUOM");
+                });
+
+            modelBuilder.Entity("Concept.Models.PurchaseRecievedHeader", b =>
+                {
+                    b.HasOne("Concept.Models.UserInfo", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Concept.Models.Vender", "Vender")
+                        .WithMany()
+                        .HasForeignKey("VenderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Concept.Models.Warehouse", "Warehouse")
+                        .WithMany()
+                        .HasForeignKey("WarehouseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
+
+                    b.Navigation("Vender");
+
+                    b.Navigation("Warehouse");
                 });
 
             modelBuilder.Entity("Concept.Models.PurchaseRequestDetails", b =>
@@ -895,6 +1483,68 @@ namespace Concept.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Concept.Models.StoreTransferDetails", b =>
+                {
+                    b.HasOne("Concept.Models.DeffCategory", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Concept.Models.StoreItem", "Item")
+                        .WithMany()
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Concept.Models.StoreTransferHeader", "storeTransferHeader")
+                        .WithMany()
+                        .HasForeignKey("StoreTransferHeaderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Concept.Models.DeffSubCategory", "SubCategory")
+                        .WithMany()
+                        .HasForeignKey("SubCategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Concept.Models.DefSubUOM", "SubUOM")
+                        .WithMany()
+                        .HasForeignKey("SubUOMId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Concept.Models.DefUOM", "UOM")
+                        .WithMany()
+                        .HasForeignKey("UOMId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Item");
+
+                    b.Navigation("SubCategory");
+
+                    b.Navigation("SubUOM");
+
+                    b.Navigation("UOM");
+
+                    b.Navigation("storeTransferHeader");
+                });
+
+            modelBuilder.Entity("Concept.Models.StoreTransferHeader", b =>
+                {
+                    b.HasOne("Concept.Models.UserInfo", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Concept.Models.UserInfo", b =>
                 {
                     b.HasOne("Concept.Models.DeffDepartment", null)
@@ -949,6 +1599,33 @@ namespace Concept.Migrations
                     b.Navigation("City");
 
                     b.Navigation("JobTitle");
+                });
+
+            modelBuilder.Entity("Concept.Models.Warehouse", b =>
+                {
+                    b.HasOne("Concept.Models.DeffCountry", "Country")
+                        .WithMany()
+                        .HasForeignKey("CountryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Concept.Models.DeffLocation", "Location")
+                        .WithMany()
+                        .HasForeignKey("LocationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Concept.Models.UserInfo", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Country");
+
+                    b.Navigation("Location");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Concept.Models.DefSubUOM", b =>

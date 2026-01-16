@@ -874,6 +874,9 @@ namespace Concept.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("CostType")
                         .HasColumnType("decimal(18,2)");
 
@@ -908,10 +911,15 @@ namespace Concept.Migrations
                     b.Property<decimal>("TotalType")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int>("UOMId")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("ValueOrUnit")
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
 
                     b.HasIndex("ItemId");
 
@@ -920,6 +928,8 @@ namespace Concept.Migrations
                     b.HasIndex("SubCategoryId");
 
                     b.HasIndex("SubUOMId");
+
+                    b.HasIndex("UOMId");
 
                     b.ToTable("StoreTransfer_Details", (string)null);
                 });
@@ -963,13 +973,12 @@ namespace Concept.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("TransferCode")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("TransferDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("TransferNo")
+                    b.Property<int?>("TransferNo")
                         .HasColumnType("int");
 
                     b.Property<int>("TransferStatus")
@@ -985,14 +994,6 @@ namespace Concept.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("FromDepartmentId");
-
-                    b.HasIndex("FromWarehouseId");
-
-                    b.HasIndex("ToDepartmentId");
-
-                    b.HasIndex("ToWarehouseId");
 
                     b.HasIndex("TransferNo");
 
@@ -1481,6 +1482,12 @@ namespace Concept.Migrations
 
             modelBuilder.Entity("Concept.Models.StoreTransferDetails", b =>
                 {
+                    b.HasOne("Concept.Models.DeffCategory", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("Concept.Models.StoreItem", "Item")
                         .WithMany()
                         .HasForeignKey("ItemId")
@@ -1505,54 +1512,32 @@ namespace Concept.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Concept.Models.DefUOM", "UOM")
+                        .WithMany()
+                        .HasForeignKey("UOMId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
                     b.Navigation("Item");
 
                     b.Navigation("SubCategory");
 
                     b.Navigation("SubUOM");
 
+                    b.Navigation("UOM");
+
                     b.Navigation("storeTransferHeader");
                 });
 
             modelBuilder.Entity("Concept.Models.StoreTransferHeader", b =>
                 {
-                    b.HasOne("Concept.Models.DeffDepartment", "FromDepartment")
-                        .WithMany()
-                        .HasForeignKey("FromDepartmentId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Concept.Models.Warehouse", "FromWarehouse")
-                        .WithMany()
-                        .HasForeignKey("FromWarehouseId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Concept.Models.DeffDepartment", "ToDepartment")
-                        .WithMany()
-                        .HasForeignKey("ToDepartmentId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Concept.Models.Warehouse", "ToWarehouse")
-                        .WithMany()
-                        .HasForeignKey("ToWarehouseId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("Concept.Models.UserInfo", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
-
-                    b.Navigation("FromDepartment");
-
-                    b.Navigation("FromWarehouse");
-
-                    b.Navigation("ToDepartment");
-
-                    b.Navigation("ToWarehouse");
 
                     b.Navigation("User");
                 });

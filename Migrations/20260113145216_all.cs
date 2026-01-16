@@ -6,19 +6,22 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Concept.Migrations
 {
     /// <inheritdoc />
-    public partial class StoreTransferHeader : Migration
+    public partial class all : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            
+
+
             migrationBuilder.CreateTable(
                 name: "StoreTransfer_Header",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    TransferCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    TransferNo = table.Column<int>(type: "int", nullable: false),
+                    TransferCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TransferNo = table.Column<int>(type: "int", nullable: true),
                     TransferType = table.Column<int>(type: "int", nullable: false),
                     RequestedBy = table.Column<int>(type: "int", nullable: false),
                     AprovedBy = table.Column<int>(type: "int", nullable: false),
@@ -39,37 +42,13 @@ namespace Concept.Migrations
                 {
                     table.PrimaryKey("PK_StoreTransfer_Header", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_StoreTransfer_Header_Deff_Department_FromDepartmentId",
-                        column: x => x.FromDepartmentId,
-                        principalTable: "Deff_Department",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_StoreTransfer_Header_Deff_Department_ToDepartmentId",
-                        column: x => x.ToDepartmentId,
-                        principalTable: "Deff_Department",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
                         name: "FK_StoreTransfer_Header_UserInfo_UserId",
                         column: x => x.UserId,
                         principalTable: "UserInfo",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_StoreTransfer_Header_Warehouse_FromWarehouseId",
-                        column: x => x.FromWarehouseId,
-                        principalTable: "Warehouse",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_StoreTransfer_Header_Warehouse_ToWarehouseId",
-                        column: x => x.ToWarehouseId,
-                        principalTable: "Warehouse",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "Id");
                 });
 
+         
             migrationBuilder.CreateTable(
                 name: "StoreTransfer_Details",
                 columns: table => new
@@ -77,8 +56,10 @@ namespace Concept.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     StoreTransferHeaderId = table.Column<int>(type: "int", nullable: false),
+                    CategoryId = table.Column<int>(type: "int", nullable: false),
                     SubCategoryId = table.Column<int>(type: "int", nullable: false),
                     ItemId = table.Column<int>(type: "int", nullable: false),
+                    UOMId = table.Column<int>(type: "int", nullable: false),
                     BatchNo = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Quantity = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     PriceType = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
@@ -97,6 +78,18 @@ namespace Concept.Migrations
                         name: "FK_StoreTransfer_Details_Def_SubUOM_SubUOMId",
                         column: x => x.SubUOMId,
                         principalTable: "Def_SubUOM",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_StoreTransfer_Details_Def_UOM_UOMId",
+                        column: x => x.UOMId,
+                        principalTable: "Def_UOM",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_StoreTransfer_Details_Deff_Category_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "Deff_Category",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -119,6 +112,13 @@ namespace Concept.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
+
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StoreTransfer_Details_CategoryId",
+                table: "StoreTransfer_Details",
+                column: "CategoryId");
+
             migrationBuilder.CreateIndex(
                 name: "IX_StoreTransfer_Details_ItemId",
                 table: "StoreTransfer_Details",
@@ -140,24 +140,9 @@ namespace Concept.Migrations
                 column: "SubUOMId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_StoreTransfer_Header_FromDepartmentId",
-                table: "StoreTransfer_Header",
-                column: "FromDepartmentId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_StoreTransfer_Header_FromWarehouseId",
-                table: "StoreTransfer_Header",
-                column: "FromWarehouseId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_StoreTransfer_Header_ToDepartmentId",
-                table: "StoreTransfer_Header",
-                column: "ToDepartmentId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_StoreTransfer_Header_ToWarehouseId",
-                table: "StoreTransfer_Header",
-                column: "ToWarehouseId");
+                name: "IX_StoreTransfer_Details_UOMId",
+                table: "StoreTransfer_Details",
+                column: "UOMId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_StoreTransfer_Header_TransferNo",
@@ -168,16 +153,77 @@ namespace Concept.Migrations
                 name: "IX_StoreTransfer_Header_UserId",
                 table: "StoreTransfer_Header",
                 column: "UserId");
+
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "PurchaseOrderDetails");
+
+            migrationBuilder.DropTable(
+                name: "PurchaseRecieved_Details");
+
+            migrationBuilder.DropTable(
+                name: "PurchaseRequestDetails");
+
+            migrationBuilder.DropTable(
                 name: "StoreTransfer_Details");
 
             migrationBuilder.DropTable(
+                name: "PurchaseOrderHeaders");
+
+            migrationBuilder.DropTable(
+                name: "PurchaseRecieved_Header");
+
+            migrationBuilder.DropTable(
+                name: "PurchaseRequestHeaders");
+
+            migrationBuilder.DropTable(
                 name: "StoreTransfer_Header");
+
+            migrationBuilder.DropTable(
+                name: "Store_Item");
+
+            migrationBuilder.DropTable(
+                name: "Warehouse");
+
+            migrationBuilder.DropTable(
+                name: "Vender");
+
+            migrationBuilder.DropTable(
+                name: "Def_SubUOM");
+
+            migrationBuilder.DropTable(
+                name: "Deff_SubCategory");
+
+            migrationBuilder.DropTable(
+                name: "UserInfo");
+
+            migrationBuilder.DropTable(
+                name: "Def_Bank");
+
+            migrationBuilder.DropTable(
+                name: "Deff_City");
+
+            migrationBuilder.DropTable(
+                name: "Def_UOM");
+
+            migrationBuilder.DropTable(
+                name: "Deff_Category");
+
+            migrationBuilder.DropTable(
+                name: "Deff_Department");
+
+            migrationBuilder.DropTable(
+                name: "Deff_JobTitle");
+
+            migrationBuilder.DropTable(
+                name: "Deff_Location");
+
+            migrationBuilder.DropTable(
+                name: "Deff_Country");
         }
     }
 }

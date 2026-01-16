@@ -1,928 +1,432 @@
 ﻿@model Concept.Models.StoreTransferHeader
 
-
-
-
-
 @{
-
-
     ViewData["Title"] = "Create Transfer";
-
-
 }
 
-
-
-
-
 <div class="container-fluid">
-
-
     <div class="row mb-3">
-
-
         <div class="col-md-6">
-
-
             <h2>Create New Transfer</h2>
-
-
         </div>
-
-
         <div class="col-md-6 text-end">
-
-
             <a asp-action="Index" class="btn btn-secondary">
-
-
                 <i class="bi bi-arrow-left"></i> Back to List
-
-
             </a>
-
-
         </div>
-
-
     </div>
 
-
-
-
-
     <form id="transferForm" asp-action="Create" method="post">
-
-
         @Html.AntiForgeryToken()
-
-
         <input type="hidden" id="detailsJson" name="detailsJson" />
 
-
-
-
-
         <div class="card mb-3">
-
-
             <div class="card-header">
-
-
                 <h5>Transfer Information</h5>
-
-
             </div>
-
-
             <div class="card-body">
-
-
                 <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Transfer No</label>
+                        <input type="text" class="form-control" id="transferNoDisplay" value="Auto Generated" readonly />
+                        <small class="text-muted">Will be generated automatically</small>
+                    </div>
 
-
-                    <div class="col-md-6 mb-3">
-
-
+                    <div class="col-md-4 mb-3">
                         <label class="form-label">Transfer Type <span class="text-danger">*</span></label>
-
-
                         <select asp-for="TransferType" class="form-select" id="transferType" required>
-
-
                             <option value="">-- Select Transfer Type --</option>
-
-
                             <option value="1">Warehouse to Warehouse</option>
-
-
                             <option value="2">Warehouse to Department</option>
-
-
                             <option value="3">Department to Warehouse</option>
-
-
                             <option value="4">Department to Department</option>
-
-
                         </select>
-
-
                         <span asp-validation-for="TransferType" class="text-danger"></span>
-
-
                     </div>
 
-
-
-
-
-                    <div class="col-md-3 mb-3">
-
-
-                        <label class="form-label">Transfer Date <span class="text-danger">*</span></label>
-
-
-                        <input asp-for="TransferDate" type="date" class="form-control" required />
-
-
-                        <span asp-validation-for="TransferDate" class="text-danger"></span>
-
-
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Requested By</label>
+                        <select asp-for="RequestedBy" class="form-select" asp-items="ViewBag.Users">
+                            <option value="0">-- Select User --</option>
+                        </select>
                     </div>
-
-
-
-
-
-                    <div class="col-md-3 mb-3">
-
-
-                        <label class="form-label">Transfer Time <span class="text-danger">*</span></label>
-
-
-                        <input asp-for="TransferTime" type="time" class="form-control" required />
-
-
-                        <span asp-validation-for="TransferTime" class="text-danger"></span>
-
-
-                    </div>
-
-
                 </div>
 
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Transfer Date <span class="text-danger">*</span></label>
+                        <input asp-for="TransferDate" type="date" class="form-control" required />
+                        <span asp-validation-for="TransferDate" class="text-danger"></span>
+                    </div>
 
-
-
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Transfer Time <span class="text-danger">*</span></label>
+                        <input asp-for="TransferTime" type="time" class="form-control" required />
+                        <span asp-validation-for="TransferTime" class="text-danger"></span>
+                    </div>
+                </div>
 
                 <div class="row" id="fromSection">
-
-
                     <div class="col-md-6 mb-3" id="fromWarehouseDiv" style="display:none;">
-
-
                         <label class="form-label">From Warehouse <span class="text-danger">*</span></label>
-
-
                         <select asp-for="FromWarehouseId" class="form-select" asp-items="ViewBag.Warehouses">
-
-
                             <option value="">-- Select Warehouse --</option>
-
-
                         </select>
-
-
                         <span asp-validation-for="FromWarehouseId" class="text-danger"></span>
-
-
                     </div>
-
-
-
-
 
                     <div class="col-md-6 mb-3" id="fromDepartmentDiv" style="display:none;">
-
-
                         <label class="form-label">From Department <span class="text-danger">*</span></label>
-
-
                         <select asp-for="FromDepartmentId" class="form-select" asp-items="ViewBag.Departments">
-
-
                             <option value="">-- Select Department --</option>
-
-
                         </select>
-
-
                         <span asp-validation-for="FromDepartmentId" class="text-danger"></span>
-
-
                     </div>
-
-
-
-
 
                     <div class="col-md-6 mb-3" id="toWarehouseDiv" style="display:none;">
-
-
                         <label class="form-label">To Warehouse <span class="text-danger">*</span></label>
-
-
                         <select asp-for="ToWarehouseId" class="form-select" asp-items="ViewBag.Warehouses">
-
-
                             <option value="">-- Select Warehouse --</option>
-
-
                         </select>
-
-
                         <span asp-validation-for="ToWarehouseId" class="text-danger"></span>
-
-
                     </div>
-
-
-
-
 
                     <div class="col-md-6 mb-3" id="toDepartmentDiv" style="display:none;">
-
-
                         <label class="form-label">To Department <span class="text-danger">*</span></label>
-
-
                         <select asp-for="ToDepartmentId" class="form-select" asp-items="ViewBag.Departments">
-
-
                             <option value="">-- Select Department --</option>
-
-
                         </select>
-
-
                         <span asp-validation-for="ToDepartmentId" class="text-danger"></span>
-
-
                     </div>
-
-
                 </div>
-
-
-
-
 
                 <div class="row">
-
-
-                    <div class="col-md-6 mb-3">
-
-
-                        <label class="form-label">Requested By</label>
-
-
-                        <select asp-for="RequestedBy" class="form-select" asp-items="ViewBag.Users">
-
-
-                            <option value="0">-- Select User --</option>
-
-
-                        </select>
-
-
-                    </div>
-
-
-
-
-
-                    <div class="col-md-6 mb-3">
-
-
+                    <div class="col-md-12 mb-3">
                         <label class="form-label">Additional Notes</label>
-
-
                         <textarea asp-for="AdditionalNotes" class="form-control" rows="3"></textarea>
-
-
                     </div>
-
-
                 </div>
-
-
             </div>
-
-
         </div>
-
-
-
-
 
         <div class="card mb-3">
-
-
             <div class="card-header d-flex justify-content-between align-items-center">
-
-
                 <h5>Transfer Items</h5>
-
-
                 <button type="button" class="btn btn-sm btn-success" onclick="addItemRow()">
-
-
                     <i class="bi bi-plus-circle"></i> Add Item
-
-
                 </button>
-
-
             </div>
-
-
             <div class="card-body">
-
-
                 <div class="table-responsive">
-
-
-                    <table class="table table-bordered" id="itemsTable">
-
-
-                        <thead>
-
-
+                    <table class="table table-bordered table-sm" id="itemsTable">
+                        <thead class="table-light">
                             <tr>
-
-
-                                <th style="width: 15%;">Sub Category</th>
-
-
-                                <th style="width: 20%;">Item</th>
-
-
-                                <th style="width: 10%;">Batch No</th>
-
-
-                                <th style="width: 10%;">Quantity</th>
-
-
-                                <th style="width: 10%;">UOM</th>
-
-
-                                <th style="width: 10%;">Price</th>
-
-
-                                <th style="width: 10%;">Total</th>
-
-
-                                <th style="width: 10%;">Expired Date</th>
-
-
+                                <th style="width: 10%;">Category</th>
+                                <th style="width: 10%;">Sub Category</th>
+                                <th style="width: 15%;">Item</th>
+                                <th style="width: 8%;">Batch</th>
+                                <th style="width: 7%;">Quantity</th>
+                                <th style="width: 8%;">UOM</th>
+                                <th style="width: 8%;">SubUOM</th>
+                                <th style="width: 7%;">Pack Size</th>
+                                <th style="width: 7%;">Value/Unit</th>
+                                <th style="width: 7%;">Price</th>
+                                <th style="width: 8%;">Expired</th>
                                 <th style="width: 5%;">Actions</th>
-
-
                             </tr>
-
-
                         </thead>
-
-
                         <tbody id="itemsTableBody">
-
-
                             <!-- Items will be added here dynamically -->
-
-
                         </tbody>
-
-
                     </table>
-
-
                 </div>
-
-
             </div>
-
-
         </div>
-
-
-
-
 
         <div class="row">
-
-
             <div class="col-md-12 text-end">
-
-
                 <button type="submit" class="btn btn-primary">
-
-
                     <i class="bi bi-save"></i> Save Transfer
-
-
                 </button>
-
-
                 <a asp-action="Index" class="btn btn-secondary">Cancel</a>
-
-
             </div>
-
-
         </div>
-
-
     </form>
-
-
 </div>
 
-
-
-
-
 @section Scripts {
-
-
     <script>
-
-
         let itemCounter = 0;
-
-
-        let subCategories = [];
-
-
-        let items = {};
-
-
-        let subUOMs = [];
-
-
-
-
+        let categories = [];
+        let uoms = [];
 
         $(document).ready(function () {
-
-
             // Set default date and time
-
-
             $('#TransferDate').val(new Date().toISOString().split('T')[0]);
-
-
             $('#TransferTime').val(new Date().toTimeString().slice(0, 5));
 
-
-
-
-
             // Load data
-
-
-            loadSubCategories();
-
-
-            loadSubUOMs();
-
-
-
-
+            loadCategories();
+            loadUOMs();
 
             // Transfer type change handler
-
-
             $('#transferType').change(function () {
-
-
                 var type = parseInt($(this).val());
-
-
                 updateTransferFields(type);
-
-
             });
-
-
         });
 
-
-
-
-
         function updateTransferFields(type) {
-
-
             // Hide all fields first
-
-
             $('#fromWarehouseDiv, #fromDepartmentDiv, #toWarehouseDiv, #toDepartmentDiv').hide();
-
-
-            $('#FromWarehouseId, #FromDepartmentId, #ToWarehouseId, #ToDepartmentId').prop('required', false);
-
-
-
-
+            $('#FromWarehouseId, #FromDepartmentId, #ToWarehouseId, #ToDepartmentId').prop('required', false).val('');
 
             switch (type) {
-
-
                 case 1: // Warehouse to Warehouse
-
-
                     $('#fromWarehouseDiv, #toWarehouseDiv').show();
-
-
                     $('#FromWarehouseId, #ToWarehouseId').prop('required', true);
-
-
                     break;
-
-
                 case 2: // Warehouse to Department
-
-
                     $('#fromWarehouseDiv, #toDepartmentDiv').show();
-
-
                     $('#FromWarehouseId, #ToDepartmentId').prop('required', true);
-
-
                     break;
-
-
                 case 3: // Department to Warehouse
-
-
                     $('#fromDepartmentDiv, #toWarehouseDiv').show();
-
-
                     $('#FromDepartmentId, #ToWarehouseId').prop('required', true);
-
-
                     break;
-
-
                 case 4: // Department to Department
-
-
                     $('#fromDepartmentDiv, #toDepartmentDiv').show();
-
-
                     $('#FromDepartmentId, #ToDepartmentId').prop('required', true);
-
-
                     break;
-
-
             }
-
-
         }
 
-
-
-
-
-        function loadSubCategories() {
-
-
-            $.get('@Url.Action("GetSubCategories", "Transfer")', function (data) {
-
-
-                subCategories = data;
-
-
+        function loadCategories() {
+            $.get('@Url.Action("GetCategories", "Transfer")', function (data) {
+                categories = data;
             });
-
-
         }
 
-
-
-
-
-        function loadSubUOMs() {
-
-
-            $.get('@Url.Action("GetSubUOMs", "Transfer")', function (data) {
-
-
-                subUOMs = data;
-
-
+        function loadUOMs() {
+            $.get('@Url.Action("GetUOMs", "Transfer")', function (data) {
+                uoms = data;
             });
-
-
         }
-
-
-
-
 
         function addItemRow() {
-
-
             itemCounter++;
-
-
             let row = `
-
-
                 <tr id="row_${itemCounter}">
-
-
                     <td>
-
-
+                        <select class="form-select form-select-sm categorySelect" data-row="${itemCounter}" required>
+                            <option value="">Select</option>
+                            ${categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
+                        </select>
+                    </td>
+                    <td>
                         <select class="form-select form-select-sm subCategorySelect" data-row="${itemCounter}" required>
-
-
-                            <option value="">Select</option>
-
-
-                            ${subCategories.map(sc => `<option value="${sc.id}">${sc.name}</option>`).join('')}
-
-
+                            <option value="">Select Category First</option>
                         </select>
-
-
                     </td>
-
-
                     <td>
-
-
                         <select class="form-select form-select-sm itemSelect" data-row="${itemCounter}" required>
-
-
-                            <option value="">Select Sub Category First</option>
-
-
+                            <option value="">Select SubCategory First</option>
                         </select>
-
-
                     </td>
-
-
-                    <td><input type="text" class="form-control form-control-sm" id="batchNo_${itemCounter}" /></td>
-
-
+                    <td>
+                        <select class="form-select form-select-sm batchSelect" data-row="${itemCounter}" id="batch_${itemCounter}">
+                            <option value="">Select Item First</option>
+                        </select>
+                    </td>
                     <td><input type="number" step="0.01" class="form-control form-control-sm" id="quantity_${itemCounter}" onchange="calculateRowTotal(${itemCounter})" required /></td>
-
-
                     <td>
-
-
-                        <select class="form-select form-select-sm" id="subUOM_${itemCounter}" required>
-
-
+                        <select class="form-select form-select-sm uomSelect" data-row="${itemCounter}" required>
                             <option value="">Select</option>
-
-
-                            ${subUOMs.map(su => `<option value="${su.id}">${su.subUOMName}</option>`).join('')}
-
-
+                            ${uoms.map(u => `<option value="${u.id}">${u.uomName}</option>`).join('')}
                         </select>
-
-
                     </td>
-
-
-                    <td><input type="number" step="0.01" class="form-control form-control-sm" id="price_${itemCounter}" onchange="calculateRowTotal(${itemCounter})" required /></td>
-
-
-                    <td><input type="number" step="0.01" class="form-control form-control-sm" id="total_${itemCounter}" readonly /></td>
-
-
-                    <td><input type="date" class="form-control form-control-sm" id="expiredDate_${itemCounter}" /></td>
-
-
                     <td>
-
-
-                        <button type="button" class="btn btn-sm btn-danger" onclick="removeItemRow(${itemCounter})">
-
-
-                            <i class="bi bi-trash"></i>
-
-
-                        </button>
-
-
+                        <select class="form-select form-select-sm subUomSelect" data-row="${itemCounter}" id="subUOM_${itemCounter}" required>
+                            <option value="">Select UOM First</option>
+                        </select>
                     </td>
-
-
+                    <td><input type="number" class="form-control form-control-sm" id="packSize_${itemCounter}" readonly /></td>
+                    <td><input type="number" step="0.01" class="form-control form-control-sm" id="valueUnit_${itemCounter}" readonly /></td>
+                    <td><input type="number" step="0.01" class="form-control form-control-sm" id="price_${itemCounter}" onchange="calculateRowTotal(${itemCounter})" required /></td>
+                    <td><input type="date" class="form-control form-control-sm" id="expiredDate_${itemCounter}" /></td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="removeItemRow(${itemCounter})">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
                 </tr>
-
-
             `;
-
-
-
-
 
             $('#itemsTableBody').append(row);
 
-
-
-
-
-            // Attach change event to sub category
-
-
-            $(`select.subCategorySelect[data-row="${itemCounter}"]`).change(function () {
-
-
-                loadItems($(this).val(), itemCounter);
-
-
+            // Attach events
+            $(`.categorySelect[data-row="${itemCounter}"]`).change(function () {
+                loadSubCategories($(this).val(), itemCounter);
             });
 
+            $(`.subCategorySelect[data-row="${itemCounter}"]`).change(function () {
+                loadItems($(this).val(), itemCounter);
+            });
 
+            $(`.itemSelect[data-row="${itemCounter}"]`).change(function () {
+                loadItemDetails($(this).val(), itemCounter);
+                loadBatches($(this).val(), itemCounter);
+            });
+
+            $(`.uomSelect[data-row="${itemCounter}"]`).change(function () {
+                loadSubUOMs($(this).val(), itemCounter);
+            });
         }
 
+        function loadSubCategories(categoryId, rowId) {
+            if (!categoryId) return;
 
+            $.get(`@Url.Action("GetSubCategoriesByCategory", "Transfer")?categoryId=${categoryId}`, function (data) {
+                let subCategorySelect = $(`.subCategorySelect[data-row="${rowId}"]`);
+                subCategorySelect.empty();
+                subCategorySelect.append('<option value="">Select SubCategory</option>');
 
-
+                data.forEach(sc => {
+                    subCategorySelect.append(`<option value="${sc.id}">${sc.name}</option>`);
+                });
+            });
+        }
 
         function loadItems(subCategoryId, rowId) {
-
-
             if (!subCategoryId) return;
 
-
-
-
-
             $.get(`@Url.Action("GetItemsBySubCategory", "Transfer")?subCategoryId=${subCategoryId}`, function (data) {
-
-
                 let itemSelect = $(`.itemSelect[data-row="${rowId}"]`);
-
-
                 itemSelect.empty();
-
-
                 itemSelect.append('<option value="">Select Item</option>');
 
-
-
-
-
                 data.forEach(item => {
+                    itemSelect.append(`<option value="${item.id}">${item.itemName}</option>`);
+                });
+            });
+        }
 
+        function loadItemDetails(itemId, rowId) {
+            if (!itemId) return;
 
-                    itemSelect.append(`<option value="${item.id}" data-subuom="${item.subUOMId}">${item.itemName}</option>`);
+            $.get(`@Url.Action("GetItemFullDetails", "Transfer")?itemId=${itemId}`, function (data) {
+                if (data) {
+                    $(`#packSize_${rowId}`).val(data.packSize || 0);
+                    $(`#valueUnit_${rowId}`).val(data.purchaseValue || 0);
+                    $(`#price_${rowId}`).val(data.purchaseValue || 0);
 
+                    // Set UOM if available
+                    if (data.uomId) {
+                        $(`.uomSelect[data-row="${rowId}"]`).val(data.uomId).trigger('change');
+                    }
+                }
+            });
+        }
 
+        function loadBatches(itemId, rowId) {
+            if (!itemId) return;
+
+            $.get(`@Url.Action("GetBatchesByItem", "Transfer")?itemId=${itemId}`, function (data) {
+                let batchSelect = $(`#batch_${rowId}`);
+                batchSelect.empty();
+                batchSelect.append('<option value="">Select Batch</option>');
+
+                data.forEach(batch => {
+                    batchSelect.append(`<option value="${batch.batchNo}" data-expired="${batch.expiredDate}">Batch ${batch.batchNo} - Qty: ${batch.availableQuantity}</option>`);
                 });
 
-
+                // Set expired date when batch is selected
+                batchSelect.change(function () {
+                    let expired = $(this).find(':selected').data('expired');
+                    if (expired) {
+                        $(`#expiredDate_${rowId}`).val(expired);
+                    }
+                });
             });
-
-
         }
 
+        function loadSubUOMs(uomId, rowId) {
+            if (!uomId) return;
 
+            $.get(`@Url.Action("GetSubUOMsByUOM", "Transfer")?uomId=${uomId}`, function (data) {
+                let subUomSelect = $(`#subUOM_${rowId}`);
+                subUomSelect.empty();
+                subUomSelect.append('<option value="">Select SubUOM</option>');
 
-
+                data.forEach(su => {
+                    subUomSelect.append(`<option value="${su.id}">${su.subUOMName}</option>`);
+                });
+            });
+        }
 
         function calculateRowTotal(rowId) {
-
-
             let quantity = parseFloat($(`#quantity_${rowId}`).val()) || 0;
-
-
             let price = parseFloat($(`#price_${rowId}`).val()) || 0;
-
-
-            let total = quantity * price;
-
-
-            $(`#total_${rowId}`).val(total.toFixed(2));
-
-
+            // Total calculation can be shown elsewhere if needed
         }
-
-
-
-
 
         function removeItemRow(rowId) {
-
-
             $(`#row_${rowId}`).remove();
-
-
         }
 
-
-
-
-
         $('#transferForm').submit(function (e) {
-
-
             e.preventDefault();
 
-
-
-
-
             // Collect details
-
-
             let details = [];
-
-
             $('#itemsTableBody tr').each(function () {
-
-
                 let rowId = $(this).attr('id').split('_')[1];
-
-
+                let categoryId = $(this).find('.categorySelect').val();
                 let subCategoryId = $(this).find('.subCategorySelect').val();
-
-
                 let itemId = $(this).find('.itemSelect').val();
 
-
-
-
-
-                if (subCategoryId && itemId) {
-
-
+                if (categoryId && subCategoryId && itemId) {
                     details.push({
-
-
+                        CategoryId: parseInt(categoryId),
                         SubCategoryId: parseInt(subCategoryId),
-
-
                         ItemId: parseInt(itemId),
-
-
-                        BatchNo: $(`#batchNo_${rowId}`).val(),
-
-
+                        UOMId: parseInt($(this).find('.uomSelect').val()) || 0,
+                        BatchNo: $(`#batch_${rowId}`).val() || '',
                         Quantity: parseFloat($(`#quantity_${rowId}`).val()) || 0,
-
-
-                        SubUOMId: parseInt($(`#subUOM_${rowId}`).val()),
-
-
+                        SubUOMId: parseInt($(`#subUOM_${rowId}`).val()) || 0,
+                        PackSize: parseInt($(`#packSize_${rowId}`).val()) || 0,
+                        ValueOrUnit: parseFloat($(`#valueUnit_${rowId}`).val()) || 0,
                         PriceType: parseFloat($(`#price_${rowId}`).val()) || 0,
-
-
-                        TotalType: parseFloat($(`#total_${rowId}`).val()) || 0,
-
-
+                        TotalType: (parseFloat($(`#quantity_${rowId}`).val()) || 0) * (parseFloat($(`#price_${rowId}`).val()) || 0),
                         CostType: 0,
-
-
-                        PackSize: 0,
-
-
-                        ValueOrUnit: 0,
-
-
                         ExpiredDate: $(`#expiredDate_${rowId}`).val() || new Date().toISOString().split('T')[0],
-
-
                         Remark: ''
-
-
                     });
-
-
                 }
-
-
             });
 
-
-
-
-
             if (details.length === 0) {
-
-
                 alert('Please add at least one item');
-
-
                 return false;
-
-
             }
 
-
-
-
-
             $('#detailsJson').val(JSON.stringify(details));
-
-
             this.submit();
-
-
         });
-
-
     </script>
 
+    <style>
+        .table-sm td, .table-sm th {
+            padding: 0.25rem;
+            vertical-align: middle;
+        }
 
+        .form-select-sm, .form-control-sm {
+            font-size: 0.875rem;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+    </style>
 }
