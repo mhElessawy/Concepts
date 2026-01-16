@@ -702,6 +702,64 @@ namespace Concept.Models
       
     }
 
+    public class StoreReturnHeader 
+    {
+        [Key]
+        public int Id { get; set; }
+        public string? ReturnCode { get; set; }
+        public int? ReturnNo { get; set; }
+        public DateTime ReturnDate { get; set; } = DateTime.Now;
+        public TimeOnly ReturnTime { get; set; }
+        public int ReturnType { get; set; }
 
+        public int FromWarehouseId { get; set; } = 0;
+        public int FromDepartmentId { get; set; } = 0;
+
+        public int ToWarehouseId { get; set; } = 0;
+        public int ToDepartmentId { get; set; } = 0;
+        public int UserId { get; set; }
+        public string? AdditionalNotes { get; set; }
+        public bool Active { get; set; } = true;
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime ModifiedDate { get; set; } = DateTime.Now;
+       
+        // Navigation Properties (No Foreign Key Constraints for From/To fields)
+        [ForeignKey("UserId")]
+        public virtual UserInfo? User { get; set; }
+
+    }
+    public class StoreReturnDetails
+    {
+        [Key]
+        public int Id { get; set; }
+        public int StoreReturnHeaderId { get; set; }
+        public int CategoryId { get; set; }
+        public int SubCategoryId { get; set; }
+        public int ItemId { get; set; }
+        public int UOMId { get; set; }
+        public string BatchNo { get; set; }
+        public decimal Quantity { get; set; }
+        public decimal PriceType { get; set; }
+        public decimal CostType { get; set; }
+        public decimal TotalType { get; set; }
+        public int SubUOMId { get; set; }
+        public int? PackSize { get; set; }
+        public decimal ValueOrUnit { get; set; }
+        public DateOnly ExpiredDate { get; set; }
+        public String Remark { get; set; }
+        // Navigation Properties
+        [ForeignKey("StoreReturnHeaderId")]
+        public virtual StoreReturnHeader? storeReturnHeader { get; set; }
+        [ForeignKey("CategoryId")]
+        public virtual DeffCategory Category { get; set; }
+        [ForeignKey("SubCategoryId")]
+        public virtual DeffSubCategory SubCategory { get; set; }
+        [ForeignKey("ItemId")]
+        public virtual StoreItem Item { get; set; }
+        [ForeignKey("UOMId")]
+        public virtual DefUOM UOM { get; set; }
+        [ForeignKey("SubUOMId")]
+        public virtual DefSubUOM? SubUOM { get; set; }
+    }
 
 }
