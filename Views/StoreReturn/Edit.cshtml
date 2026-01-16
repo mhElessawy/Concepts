@@ -1,18 +1,18 @@
 @model Concept.Models.StoreReturnHeader
 
 @{
-    ViewData["Title"] = "تعديل إرجاع المخزون";
+    ViewData["Title"] = "Edit Store Return";
     var details = ViewBag.Details as List<Concept.Models.StoreReturnDetails>;
 }
 
 <div class="container-fluid">
     <div class="row mb-3">
         <div class="col-md-6">
-            <h2>تعديل إرجاع المخزون</h2>
+            <h2>Edit Store Return</h2>
         </div>
         <div class="col-md-6 text-end">
             <a asp-action="Index" class="btn btn-secondary">
-                <i class="bi bi-arrow-left"></i> العودة للقائمة
+                <i class="bi bi-arrow-left"></i> Back to List
             </a>
         </div>
     </div>
@@ -24,29 +24,29 @@
 
         <div class="card mb-3">
             <div class="card-header">
-                <h5>معلومات الإرجاع</h5>
+                <h5>Return Information</h5>
             </div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-4 mb-3">
-                        <label class="form-label">كود الإرجاع</label>
+                        <label class="form-label">Return Code</label>
                         <input asp-for="ReturnCode" class="form-control" readonly />
                     </div>
 
                     <div class="col-md-4 mb-3">
-                        <label class="form-label">نوع الإرجاع <span class="text-danger">*</span></label>
+                        <label class="form-label">Return Type <span class="text-danger">*</span></label>
                         <select asp-for="ReturnType" class="form-select" id="returnType" required>
-                            <option value="">-- اختر نوع الإرجاع --</option>
-                            <option value="1">مخزن إلى مخزن</option>
-                            <option value="2">مخزن إلى قسم</option>
-                            <option value="3">قسم إلى مخزن</option>
-                            <option value="4">قسم إلى قسم</option>
+                            <option value="">-- Select Return Type --</option>
+                            <option value="1">Warehouse to Warehouse</option>
+                            <option value="2">Warehouse to Department</option>
+                            <option value="3">Department to Warehouse</option>
+                            <option value="4">Department to Department</option>
                         </select>
                         <span asp-validation-for="ReturnType" class="text-danger"></span>
                     </div>
 
                     <div class="col-md-4 mb-3">
-                        <label class="form-label">تاريخ الإرجاع <span class="text-danger">*</span></label>
+                        <label class="form-label">Return Date <span class="text-danger">*</span></label>
                         <input asp-for="ReturnDate" type="date" class="form-control" required />
                         <span asp-validation-for="ReturnDate" class="text-danger"></span>
                     </div>
@@ -54,7 +54,7 @@
 
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">وقت الإرجاع <span class="text-danger">*</span></label>
+                        <label class="form-label">Return Time <span class="text-danger">*</span></label>
                         <input asp-for="ReturnTime" type="time" class="form-control" required />
                         <span asp-validation-for="ReturnTime" class="text-danger"></span>
                     </div>
@@ -62,33 +62,33 @@
 
                 <div class="row" id="fromSection">
                     <div class="col-md-6 mb-3" id="fromWarehouseDiv" style="display:none;">
-                        <label class="form-label">من مخزن <span class="text-danger">*</span></label>
+                        <label class="form-label">From Warehouse <span class="text-danger">*</span></label>
                         <select asp-for="FromWarehouseId" class="form-select" asp-items="ViewBag.Warehouses">
-                            <option value="">-- اختر المخزن --</option>
+                            <option value="">-- Select Warehouse --</option>
                         </select>
                         <span asp-validation-for="FromWarehouseId" class="text-danger"></span>
                     </div>
 
                     <div class="col-md-6 mb-3" id="fromDepartmentDiv" style="display:none;">
-                        <label class="form-label">من قسم <span class="text-danger">*</span></label>
+                        <label class="form-label">From Department <span class="text-danger">*</span></label>
                         <select asp-for="FromDepartmentId" class="form-select" asp-items="ViewBag.Departments">
-                            <option value="">-- اختر القسم --</option>
+                            <option value="">-- Select Department --</option>
                         </select>
                         <span asp-validation-for="FromDepartmentId" class="text-danger"></span>
                     </div>
 
                     <div class="col-md-6 mb-3" id="toWarehouseDiv" style="display:none;">
-                        <label class="form-label">إلى مخزن <span class="text-danger">*</span></label>
+                        <label class="form-label">To Warehouse <span class="text-danger">*</span></label>
                         <select asp-for="ToWarehouseId" class="form-select" asp-items="ViewBag.Warehouses">
-                            <option value="">-- اختر المخزن --</option>
+                            <option value="">-- Select Warehouse --</option>
                         </select>
                         <span asp-validation-for="ToWarehouseId" class="text-danger"></span>
                     </div>
 
                     <div class="col-md-6 mb-3" id="toDepartmentDiv" style="display:none;">
-                        <label class="form-label">إلى قسم <span class="text-danger">*</span></label>
+                        <label class="form-label">To Department <span class="text-danger">*</span></label>
                         <select asp-for="ToDepartmentId" class="form-select" asp-items="ViewBag.Departments">
-                            <option value="">-- اختر القسم --</option>
+                            <option value="">-- Select Department --</option>
                         </select>
                         <span asp-validation-for="ToDepartmentId" class="text-danger"></span>
                     </div>
@@ -96,7 +96,7 @@
 
                 <div class="row">
                     <div class="col-md-12 mb-3">
-                        <label class="form-label">ملاحظات إضافية</label>
+                        <label class="form-label">Additional Notes</label>
                         <textarea asp-for="AdditionalNotes" class="form-control" rows="3"></textarea>
                     </div>
                 </div>
@@ -105,9 +105,9 @@
 
         <div class="card mb-3">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h5>الأصناف المرتجعة</h5>
+                <h5>Return Items</h5>
                 <button type="button" class="btn btn-sm btn-success" onclick="addItemRow()">
-                    <i class="bi bi-plus-circle"></i> إضافة صنف
+                    <i class="bi bi-plus-circle"></i> Add Item
                 </button>
             </div>
             <div class="card-body">
@@ -115,18 +115,18 @@
                     <table class="table table-bordered table-sm" id="itemsTable">
                         <thead class="table-light">
                             <tr>
-                                <th style="width: 10%;">التصنيف</th>
-                                <th style="width: 10%;">التصنيف الفرعي</th>
-                                <th style="width: 15%;">الصنف</th>
-                                <th style="width: 8%;">رقم الدفعة</th>
-                                <th style="width: 7%;">الكمية</th>
-                                <th style="width: 8%;">الوحدة</th>
-                                <th style="width: 8%;">الوحدة الفرعية</th>
-                                <th style="width: 7%;">حجم العبوة</th>
-                                <th style="width: 7%;">القيمة/الوحدة</th>
-                                <th style="width: 7%;">السعر</th>
-                                <th style="width: 8%;">تاريخ الانتهاء</th>
-                                <th style="width: 5%;">الإجراءات</th>
+                                <th style="width: 10%;">Category</th>
+                                <th style="width: 10%;">Sub Category</th>
+                                <th style="width: 15%;">Item</th>
+                                <th style="width: 8%;">Batch</th>
+                                <th style="width: 7%;">Quantity</th>
+                                <th style="width: 8%;">UOM</th>
+                                <th style="width: 8%;">SubUOM</th>
+                                <th style="width: 7%;">Pack Size</th>
+                                <th style="width: 7%;">Value/Unit</th>
+                                <th style="width: 7%;">Price</th>
+                                <th style="width: 8%;">Expired</th>
+                                <th style="width: 5%;">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="itemsTableBody">
@@ -140,9 +140,9 @@
         <div class="row">
             <div class="col-md-12 text-end">
                 <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-save"></i> حفظ التعديلات
+                    <i class="bi bi-save"></i> Save Changes
                 </button>
-                <a asp-action="Index" class="btn btn-secondary">إلغاء</a>
+                <a asp-action="Index" class="btn btn-secondary">Cancel</a>
             </div>
         </div>
     </form>
@@ -231,35 +231,35 @@
                 <tr id="row_${itemCounter}">
                     <td>
                         <select class="form-select form-select-sm categorySelect" data-row="${itemCounter}" required>
-                            <option value="">اختر</option>
+                            <option value="">Select</option>
                             ${categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
                         </select>
                     </td>
                     <td>
                         <select class="form-select form-select-sm subCategorySelect" data-row="${itemCounter}" required>
-                            <option value="">اختر التصنيف أولاً</option>
+                            <option value="">Select Category First</option>
                         </select>
                     </td>
                     <td>
                         <select class="form-select form-select-sm itemSelect" data-row="${itemCounter}" required>
-                            <option value="">اختر التصنيف الفرعي أولاً</option>
+                            <option value="">Select SubCategory First</option>
                         </select>
                     </td>
                     <td>
                         <select class="form-select form-select-sm batchSelect" data-row="${itemCounter}" id="batch_${itemCounter}">
-                            <option value="">اختر الصنف أولاً</option>
+                            <option value="">Select Item First</option>
                         </select>
                     </td>
                     <td><input type="number" step="0.01" class="form-control form-control-sm" id="quantity_${itemCounter}" required /></td>
                     <td>
                         <select class="form-select form-select-sm uomSelect" data-row="${itemCounter}" required>
-                            <option value="">اختر</option>
+                            <option value="">Select</option>
                             ${uoms.map(u => `<option value="${u.id}">${u.uomName}</option>`).join('')}
                         </select>
                     </td>
                     <td>
                         <select class="form-select form-select-sm subUomSelect" data-row="${itemCounter}" id="subUOM_${itemCounter}" required>
-                            <option value="">اختر الوحدة أولاً</option>
+                            <option value="">Select UOM First</option>
                         </select>
                     </td>
                     <td><input type="number" class="form-control form-control-sm" id="packSize_${itemCounter}" readonly /></td>
@@ -360,7 +360,7 @@
                 let subCategorySelect = $(`.subCategorySelect[data-row="${rowId}"]`);
                 let currentVal = subCategorySelect.val();
                 subCategorySelect.empty();
-                subCategorySelect.append('<option value="">اختر التصنيف الفرعي</option>');
+                subCategorySelect.append('<option value="">Select SubCategory</option>');
 
                 data.forEach(sc => {
                     subCategorySelect.append(`<option value="${sc.id}" ${sc.id == currentVal ? 'selected' : ''}>${sc.name}</option>`);
@@ -374,7 +374,7 @@
             $.get(`@Url.Action("GetItemsBySubCategory", "StoreReturn")?subCategoryId=${subCategoryId}`, function (data) {
                 let itemSelect = $(`.itemSelect[data-row="${rowId}"]`);
                 itemSelect.empty();
-                itemSelect.append('<option value="">اختر الصنف</option>');
+                itemSelect.append('<option value="">Select Item</option>');
 
                 data.forEach(item => {
                     itemSelect.append(`<option value="${item.id}">${item.itemName}</option>`);
@@ -404,10 +404,10 @@
             $.get(`@Url.Action("GetBatchesByItem", "StoreReturn")?itemId=${itemId}`, function (data) {
                 let batchSelect = $(`#batch_${rowId}`);
                 batchSelect.empty();
-                batchSelect.append('<option value="">اختر الدفعة</option>');
+                batchSelect.append('<option value="">Select Batch</option>');
 
                 data.forEach(batch => {
-                    batchSelect.append(`<option value="${batch.batchNo}" data-expired="${batch.expiredDate}">دفعة ${batch.batchNo} - كمية: ${batch.availableQuantity}</option>`);
+                    batchSelect.append(`<option value="${batch.batchNo}" data-expired="${batch.expiredDate}">Batch ${batch.batchNo} - Qty: ${batch.availableQuantity}</option>`);
                 });
 
                 batchSelect.change(function () {
@@ -426,7 +426,7 @@
                 let subUomSelect = $(`#subUOM_${rowId}`);
                 let currentVal = subUomSelect.val();
                 subUomSelect.empty();
-                subUomSelect.append('<option value="">اختر الوحدة الفرعية</option>');
+                subUomSelect.append('<option value="">Select SubUOM</option>');
 
                 data.forEach(su => {
                     subUomSelect.append(`<option value="${su.id}" ${su.id == currentVal ? 'selected' : ''}>${su.subUOMName}</option>`);
@@ -469,7 +469,7 @@
             });
 
             if (details.length === 0) {
-                alert('يرجى إضافة صنف واحد على الأقل');
+                alert('Please add at least one item');
                 return false;
             }
 
