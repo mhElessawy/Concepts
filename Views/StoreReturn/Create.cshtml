@@ -1,0 +1,425 @@
+@model Concept.Models.StoreReturnHeader
+
+@{
+    ViewData["Title"] = "إنشاء إرجاع مخزون جديد";
+}
+
+<div class="container-fluid">
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <h2>إنشاء إرجاع مخزون جديد</h2>
+        </div>
+        <div class="col-md-6 text-end">
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> العودة للقائمة
+            </a>
+        </div>
+    </div>
+
+    <form id="returnForm" asp-action="Create" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" id="detailsJson" name="detailsJson" />
+
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5>معلومات الإرجاع</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">رقم الإرجاع</label>
+                        <input type="text" class="form-control" id="returnNoDisplay" value="سيتم إنشاؤه تلقائياً" readonly />
+                        <small class="text-muted">سيتم إنشاؤه تلقائياً</small>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">نوع الإرجاع <span class="text-danger">*</span></label>
+                        <select asp-for="ReturnType" class="form-select" id="returnType" required>
+                            <option value="">-- اختر نوع الإرجاع --</option>
+                            <option value="1">مخزن إلى مخزن</option>
+                            <option value="2">مخزن إلى قسم</option>
+                            <option value="3">قسم إلى مخزن</option>
+                            <option value="4">قسم إلى قسم</option>
+                        </select>
+                        <span asp-validation-for="ReturnType" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">تاريخ الإرجاع <span class="text-danger">*</span></label>
+                        <input asp-for="ReturnDate" type="date" class="form-control" required />
+                        <span asp-validation-for="ReturnDate" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">وقت الإرجاع <span class="text-danger">*</span></label>
+                        <input asp-for="ReturnTime" type="time" class="form-control" required />
+                        <span asp-validation-for="ReturnTime" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row" id="fromSection">
+                    <div class="col-md-6 mb-3" id="fromWarehouseDiv" style="display:none;">
+                        <label class="form-label">من مخزن <span class="text-danger">*</span></label>
+                        <select asp-for="FromWarehouseId" class="form-select" asp-items="ViewBag.Warehouses">
+                            <option value="">-- اختر المخزن --</option>
+                        </select>
+                        <span asp-validation-for="FromWarehouseId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3" id="fromDepartmentDiv" style="display:none;">
+                        <label class="form-label">من قسم <span class="text-danger">*</span></label>
+                        <select asp-for="FromDepartmentId" class="form-select" asp-items="ViewBag.Departments">
+                            <option value="">-- اختر القسم --</option>
+                        </select>
+                        <span asp-validation-for="FromDepartmentId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3" id="toWarehouseDiv" style="display:none;">
+                        <label class="form-label">إلى مخزن <span class="text-danger">*</span></label>
+                        <select asp-for="ToWarehouseId" class="form-select" asp-items="ViewBag.Warehouses">
+                            <option value="">-- اختر المخزن --</option>
+                        </select>
+                        <span asp-validation-for="ToWarehouseId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3" id="toDepartmentDiv" style="display:none;">
+                        <label class="form-label">إلى قسم <span class="text-danger">*</span></label>
+                        <select asp-for="ToDepartmentId" class="form-select" asp-items="ViewBag.Departments">
+                            <option value="">-- اختر القسم --</option>
+                        </select>
+                        <span asp-validation-for="ToDepartmentId" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label class="form-label">ملاحظات إضافية</label>
+                        <textarea asp-for="AdditionalNotes" class="form-control" rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5>الأصناف المرتجعة</h5>
+                <button type="button" class="btn btn-sm btn-success" onclick="addItemRow()">
+                    <i class="bi bi-plus-circle"></i> إضافة صنف
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm" id="itemsTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 10%;">التصنيف</th>
+                                <th style="width: 10%;">التصنيف الفرعي</th>
+                                <th style="width: 15%;">الصنف</th>
+                                <th style="width: 8%;">رقم الدفعة</th>
+                                <th style="width: 7%;">الكمية</th>
+                                <th style="width: 8%;">الوحدة</th>
+                                <th style="width: 8%;">الوحدة الفرعية</th>
+                                <th style="width: 7%;">حجم العبوة</th>
+                                <th style="width: 7%;">القيمة/الوحدة</th>
+                                <th style="width: 7%;">السعر</th>
+                                <th style="width: 8%;">تاريخ الانتهاء</th>
+                                <th style="width: 5%;">الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="itemsTableBody">
+                            <!-- Items will be added here dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12 text-end">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save"></i> حفظ الإرجاع
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">إلغاء</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        let itemCounter = 0;
+        let categories = [];
+        let uoms = [];
+
+        $(document).ready(function () {
+            // Set default date and time
+            $('#ReturnDate').val(new Date().toISOString().split('T')[0]);
+            $('#ReturnTime').val(new Date().toTimeString().slice(0, 5));
+
+            // Load data
+            loadCategories();
+            loadUOMs();
+
+            // Return type change handler
+            $('#returnType').change(function () {
+                var type = parseInt($(this).val());
+                updateReturnFields(type);
+            });
+        });
+
+        function updateReturnFields(type) {
+            // Hide all fields first
+            $('#fromWarehouseDiv, #fromDepartmentDiv, #toWarehouseDiv, #toDepartmentDiv').hide();
+            $('#FromWarehouseId, #FromDepartmentId, #ToWarehouseId, #ToDepartmentId').prop('required', false).val('');
+
+            switch (type) {
+                case 1: // Warehouse to Warehouse
+                    $('#fromWarehouseDiv, #toWarehouseDiv').show();
+                    $('#FromWarehouseId, #ToWarehouseId').prop('required', true);
+                    break;
+                case 2: // Warehouse to Department
+                    $('#fromWarehouseDiv, #toDepartmentDiv').show();
+                    $('#FromWarehouseId, #ToDepartmentId').prop('required', true);
+                    break;
+                case 3: // Department to Warehouse
+                    $('#fromDepartmentDiv, #toWarehouseDiv').show();
+                    $('#FromDepartmentId, #ToWarehouseId').prop('required', true);
+                    break;
+                case 4: // Department to Department
+                    $('#fromDepartmentDiv, #toDepartmentDiv').show();
+                    $('#FromDepartmentId, #ToDepartmentId').prop('required', true);
+                    break;
+            }
+        }
+
+        function loadCategories() {
+            $.get('@Url.Action("GetCategories", "StoreReturn")', function (data) {
+                categories = data;
+            });
+        }
+
+        function loadUOMs() {
+            $.get('@Url.Action("GetUOMs", "StoreReturn")', function (data) {
+                uoms = data;
+            });
+        }
+
+        function addItemRow() {
+            itemCounter++;
+            let row = `
+                <tr id="row_${itemCounter}">
+                    <td>
+                        <select class="form-select form-select-sm categorySelect" data-row="${itemCounter}" required>
+                            <option value="">اختر</option>
+                            ${categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
+                        </select>
+                    </td>
+                    <td>
+                        <select class="form-select form-select-sm subCategorySelect" data-row="${itemCounter}" required>
+                            <option value="">اختر التصنيف أولاً</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="form-select form-select-sm itemSelect" data-row="${itemCounter}" required>
+                            <option value="">اختر التصنيف الفرعي أولاً</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="form-select form-select-sm batchSelect" data-row="${itemCounter}" id="batch_${itemCounter}">
+                            <option value="">اختر الصنف أولاً</option>
+                        </select>
+                    </td>
+                    <td><input type="number" step="0.01" class="form-control form-control-sm" id="quantity_${itemCounter}" onchange="calculateRowTotal(${itemCounter})" required /></td>
+                    <td>
+                        <select class="form-select form-select-sm uomSelect" data-row="${itemCounter}" required>
+                            <option value="">اختر</option>
+                            ${uoms.map(u => `<option value="${u.id}">${u.uomName}</option>`).join('')}
+                        </select>
+                    </td>
+                    <td>
+                        <select class="form-select form-select-sm subUomSelect" data-row="${itemCounter}" id="subUOM_${itemCounter}" required>
+                            <option value="">اختر الوحدة أولاً</option>
+                        </select>
+                    </td>
+                    <td><input type="number" class="form-control form-control-sm" id="packSize_${itemCounter}" readonly /></td>
+                    <td><input type="number" step="0.01" class="form-control form-control-sm" id="valueUnit_${itemCounter}" readonly /></td>
+                    <td><input type="number" step="0.01" class="form-control form-control-sm" id="price_${itemCounter}" onchange="calculateRowTotal(${itemCounter})" required /></td>
+                    <td><input type="date" class="form-control form-control-sm" id="expiredDate_${itemCounter}" /></td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="removeItemRow(${itemCounter})">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+
+            $('#itemsTableBody').append(row);
+
+            // Attach events
+            $(`.categorySelect[data-row="${itemCounter}"]`).change(function () {
+                loadSubCategories($(this).val(), itemCounter);
+            });
+
+            $(`.subCategorySelect[data-row="${itemCounter}"]`).change(function () {
+                loadItems($(this).val(), itemCounter);
+            });
+
+            $(`.itemSelect[data-row="${itemCounter}"]`).change(function () {
+                loadItemDetails($(this).val(), itemCounter);
+                loadBatches($(this).val(), itemCounter);
+            });
+
+            $(`.uomSelect[data-row="${itemCounter}"]`).change(function () {
+                loadSubUOMs($(this).val(), itemCounter);
+            });
+        }
+
+        function loadSubCategories(categoryId, rowId) {
+            if (!categoryId) return;
+
+            $.get(`@Url.Action("GetSubCategoriesByCategory", "StoreReturn")?categoryId=${categoryId}`, function (data) {
+                let subCategorySelect = $(`.subCategorySelect[data-row="${rowId}"]`);
+                subCategorySelect.empty();
+                subCategorySelect.append('<option value="">اختر التصنيف الفرعي</option>');
+
+                data.forEach(sc => {
+                    subCategorySelect.append(`<option value="${sc.id}">${sc.name}</option>`);
+                });
+            });
+        }
+
+        function loadItems(subCategoryId, rowId) {
+            if (!subCategoryId) return;
+
+            $.get(`@Url.Action("GetItemsBySubCategory", "StoreReturn")?subCategoryId=${subCategoryId}`, function (data) {
+                let itemSelect = $(`.itemSelect[data-row="${rowId}"]`);
+                itemSelect.empty();
+                itemSelect.append('<option value="">اختر الصنف</option>');
+
+                data.forEach(item => {
+                    itemSelect.append(`<option value="${item.id}">${item.itemName}</option>`);
+                });
+            });
+        }
+
+        function loadItemDetails(itemId, rowId) {
+            if (!itemId) return;
+
+            $.get(`@Url.Action("GetItemFullDetails", "StoreReturn")?itemId=${itemId}`, function (data) {
+                if (data) {
+                    $(`#packSize_${rowId}`).val(data.packSize || 0);
+                    $(`#valueUnit_${rowId}`).val(data.purchaseValue || 0);
+                    $(`#price_${rowId}`).val(data.purchaseValue || 0);
+
+                    // Set UOM if available
+                    if (data.uomId) {
+                        $(`.uomSelect[data-row="${rowId}"]`).val(data.uomId).trigger('change');
+                    }
+                }
+            });
+        }
+
+        function loadBatches(itemId, rowId) {
+            if (!itemId) return;
+
+            $.get(`@Url.Action("GetBatchesByItem", "StoreReturn")?itemId=${itemId}`, function (data) {
+                let batchSelect = $(`#batch_${rowId}`);
+                batchSelect.empty();
+                batchSelect.append('<option value="">اختر الدفعة</option>');
+
+                data.forEach(batch => {
+                    batchSelect.append(`<option value="${batch.batchNo}" data-expired="${batch.expiredDate}">دفعة ${batch.batchNo} - كمية: ${batch.availableQuantity}</option>`);
+                });
+
+                // Set expired date when batch is selected
+                batchSelect.change(function () {
+                    let expired = $(this).find(':selected').data('expired');
+                    if (expired) {
+                        $(`#expiredDate_${rowId}`).val(expired);
+                    }
+                });
+            });
+        }
+
+        function loadSubUOMs(uomId, rowId) {
+            if (!uomId) return;
+
+            $.get(`@Url.Action("GetSubUOMsByUOM", "StoreReturn")?uomId=${uomId}`, function (data) {
+                let subUomSelect = $(`#subUOM_${rowId}`);
+                subUomSelect.empty();
+                subUomSelect.append('<option value="">اختر الوحدة الفرعية</option>');
+
+                data.forEach(su => {
+                    subUomSelect.append(`<option value="${su.id}">${su.subUOMName}</option>`);
+                });
+            });
+        }
+
+        function calculateRowTotal(rowId) {
+            let quantity = parseFloat($(`#quantity_${rowId}`).val()) || 0;
+            let price = parseFloat($(`#price_${rowId}`).val()) || 0;
+            // Total calculation can be shown elsewhere if needed
+        }
+
+        function removeItemRow(rowId) {
+            $(`#row_${rowId}`).remove();
+        }
+
+        $('#returnForm').submit(function (e) {
+            e.preventDefault();
+
+            // Collect details
+            let details = [];
+            $('#itemsTableBody tr').each(function () {
+                let rowId = $(this).attr('id').split('_')[1];
+                let categoryId = $(this).find('.categorySelect').val();
+                let subCategoryId = $(this).find('.subCategorySelect').val();
+                let itemId = $(this).find('.itemSelect').val();
+
+                if (categoryId && subCategoryId && itemId) {
+                    details.push({
+                        CategoryId: parseInt(categoryId),
+                        SubCategoryId: parseInt(subCategoryId),
+                        ItemId: parseInt(itemId),
+                        UOMId: parseInt($(this).find('.uomSelect').val()) || 0,
+                        BatchNo: $(`#batch_${rowId}`).val() || '',
+                        Quantity: parseFloat($(`#quantity_${rowId}`).val()) || 0,
+                        SubUOMId: parseInt($(`#subUOM_${rowId}`).val()) || 0,
+                        PackSize: parseInt($(`#packSize_${rowId}`).val()) || 0,
+                        ValueOrUnit: parseFloat($(`#valueUnit_${rowId}`).val()) || 0,
+                        PriceType: parseFloat($(`#price_${rowId}`).val()) || 0,
+                        TotalType: (parseFloat($(`#quantity_${rowId}`).val()) || 0) * (parseFloat($(`#price_${rowId}`).val()) || 0),
+                        CostType: 0,
+                        ExpiredDate: $(`#expiredDate_${rowId}`).val() || new Date().toISOString().split('T')[0],
+                        Remark: ''
+                    });
+                }
+            });
+
+            if (details.length === 0) {
+                alert('يرجى إضافة صنف واحد على الأقل');
+                return false;
+            }
+
+            $('#detailsJson').val(JSON.stringify(details));
+            this.submit();
+        });
+    </script>
+
+    <style>
+        .table-sm td, .table-sm th {
+            padding: 0.25rem;
+            vertical-align: middle;
+        }
+
+        .form-select-sm, .form-control-sm {
+            font-size: 0.875rem;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+    </style>
+}

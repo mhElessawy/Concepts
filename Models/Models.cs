@@ -702,7 +702,7 @@ namespace Concept.Models
       
     }
 
-    public class StoreReturnHeader 
+    public class StoreReturnHeader
     {
         [Key]
         public int Id { get; set; }
@@ -717,12 +717,14 @@ namespace Concept.Models
 
         public int ToWarehouseId { get; set; } = 0;
         public int ToDepartmentId { get; set; } = 0;
+        public int ReturnStatus { get; set; } = 0; // 0=Pending, 1=Approved, 2=Rejected
+        public int? ApprovedBy { get; set; }
         public int UserId { get; set; }
         public string? AdditionalNotes { get; set; }
         public bool Active { get; set; } = true;
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public DateTime ModifiedDate { get; set; } = DateTime.Now;
-       
+
         // Navigation Properties (No Foreign Key Constraints for From/To fields)
         [ForeignKey("UserId")]
         public virtual UserInfo? User { get; set; }

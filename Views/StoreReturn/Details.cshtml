@@ -1,0 +1,243 @@
+@model Concept.Models.StoreReturnHeader
+
+@{
+    ViewData["Title"] = "تفاصيل إرجاع المخزون";
+    var details = ViewBag.Details as List<Concept.Models.StoreReturnDetails>;
+}
+
+<div class="container-fluid">
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <h2>تفاصيل إرجاع المخزون</h2>
+        </div>
+        <div class="col-md-6 text-end">
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> العودة للقائمة
+            </a>
+            @if (Model.ReturnStatus == 0)
+            {
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                    <i class="bi bi-pencil"></i> تعديل
+                </a>
+                <form asp-action="Approve" asp-route-id="@Model.Id" method="post" class="d-inline" onsubmit="return confirm('هل أنت متأكد من الموافقة على هذا الإرجاع؟');">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-check-circle"></i> موافقة
+                    </button>
+                </form>
+                <form asp-action="Reject" asp-route-id="@Model.Id" method="post" class="d-inline" onsubmit="return confirm('هل أنت متأكد من رفض هذا الإرجاع؟');">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-x-circle"></i> رفض
+                    </button>
+                </form>
+            }
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="card mb-3">
+        <div class="card-header">
+            <h5>معلومات الإرجاع</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <table class="table table-sm">
+                        <tr>
+                            <th style="width: 40%;">رقم الإرجاع:</th>
+                            <td><span class="badge bg-primary">@Model.ReturnNo</span></td>
+                        </tr>
+                        <tr>
+                            <th>كود الإرجاع:</th>
+                            <td>@Model.ReturnCode</td>
+                        </tr>
+                        <tr>
+                            <th>نوع الإرجاع:</th>
+                            <td>
+                                @switch (Model.ReturnType)
+                                {
+                                    case 1:
+                                        <span class="badge bg-info">مخزن إلى مخزن</span>
+                                        break;
+                                    case 2:
+                                        <span class="badge bg-primary">مخزن إلى قسم</span>
+                                        break;
+                                    case 3:
+                                        <span class="badge bg-warning text-dark">قسم إلى مخزن</span>
+                                        break;
+                                    case 4:
+                                        <span class="badge bg-secondary">قسم إلى قسم</span>
+                                        break;
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>تاريخ الإرجاع:</th>
+                            <td>@Model.ReturnDate.ToString("dd/MM/yyyy")</td>
+                        </tr>
+                        <tr>
+                            <th>وقت الإرجاع:</th>
+                            <td>@Model.ReturnTime.ToString("hh\\:mm")</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <table class="table table-sm">
+                        <tr>
+                            <th style="width: 40%;">من:</th>
+                            <td>
+                                @if (Model.ReturnType == 1 || Model.ReturnType == 2)
+                                {
+                                    <span>مخزن (@Model.FromWarehouseId)</span>
+                                }
+                                else
+                                {
+                                    <span>قسم (@Model.FromDepartmentId)</span>
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>إلى:</th>
+                            <td>
+                                @if (Model.ReturnType == 1 || Model.ReturnType == 3)
+                                {
+                                    <span>مخزن (@Model.ToWarehouseId)</span>
+                                }
+                                else
+                                {
+                                    <span>قسم (@Model.ToDepartmentId)</span>
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>الحالة:</th>
+                            <td>
+                                @switch (Model.ReturnStatus)
+                                {
+                                    case 0:
+                                        <span class="badge bg-warning text-dark">قيد الانتظار</span>
+                                        break;
+                                    case 1:
+                                        <span class="badge bg-success">تمت الموافقة</span>
+                                        break;
+                                    case 2:
+                                        <span class="badge bg-danger">مرفوض</span>
+                                        break;
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>المستخدم:</th>
+                            <td>@(Model.User?.FullName ?? "N/A")</td>
+                        </tr>
+                        <tr>
+                            <th>تاريخ الإنشاء:</th>
+                            <td>@Model.CreatedDate.ToString("dd/MM/yyyy HH:mm")</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            @if (!string.IsNullOrEmpty(Model.AdditionalNotes))
+            {
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <strong>ملاحظات إضافية:</strong>
+                        <p>@Model.AdditionalNotes</p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h5>الأصناف المرتجعة</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered table-sm">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>التصنيف</th>
+                            <th>التصنيف الفرعي</th>
+                            <th>الصنف</th>
+                            <th>رقم الدفعة</th>
+                            <th>الكمية</th>
+                            <th>الوحدة</th>
+                            <th>الوحدة الفرعية</th>
+                            <th>حجم العبوة</th>
+                            <th>القيمة/الوحدة</th>
+                            <th>السعر</th>
+                            <th>الإجمالي</th>
+                            <th>تاريخ الانتهاء</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (details != null && details.Any())
+                        {
+                            decimal grandTotal = 0;
+                            int counter = 1;
+                            @foreach (var item in details)
+                            {
+                                grandTotal += item.TotalType;
+                                <tr>
+                                    <td>@counter</td>
+                                    <td>@(item.Category?.Name ?? "N/A")</td>
+                                    <td>@(item.SubCategory?.Name ?? "N/A")</td>
+                                    <td>@(item.Item?.ItemName ?? "N/A")</td>
+                                    <td>@item.BatchNo</td>
+                                    <td>@item.Quantity.ToString("N2")</td>
+                                    <td>@(item.UOM?.UOMName ?? "N/A")</td>
+                                    <td>@(item.SubUOM?.SubUOMName ?? "N/A")</td>
+                                    <td>@(item.PackSize ?? 0)</td>
+                                    <td>@item.ValueOrUnit.ToString("N2")</td>
+                                    <td>@item.PriceType.ToString("N2")</td>
+                                    <td>@item.TotalType.ToString("N2")</td>
+                                    <td>@item.ExpiredDate.ToString("dd/MM/yyyy")</td>
+                                </tr>
+                                counter++;
+                            }
+                            <tr class="table-info">
+                                <td colspan="11" class="text-end"><strong>الإجمالي الكلي:</strong></td>
+                                <td colspan="2"><strong>@grandTotal.ToString("N2")</strong></td>
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="13" class="text-center">لا توجد أصناف</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function () {
+            $('.alert').fadeOut('slow');
+        }, 5000);
+    </script>
+}
