@@ -37,6 +37,9 @@ namespace Concept.Data
         public DbSet<StoreTransferHeader> StoreTransferHeaders { get; set; }
         public DbSet<StoreTransferDetails> StoreTransferDetails { get; set; }
 
+        public DbSet<StoreReturnHeader> StoreReturnHeaders { get; set; }
+        public DbSet<StoreReturnDetails> StoreReturnDetails { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -317,6 +320,77 @@ namespace Concept.Data
 
             modelBuilder.Entity<StoreTransferDetails>()
                 .Property(t => t.ValueOrUnit).HasColumnType("decimal(18,2)");
+
+            // Store Return Header Configuration
+            modelBuilder.Entity<StoreReturnHeader>().ToTable("StoreReturn_Header");
+            modelBuilder.Entity<StoreReturnHeader>().HasIndex(r => r.ReturnNo);
+
+            // No Foreign Key Constraints for From/To fields to allow 0 values
+            modelBuilder.Entity<StoreReturnHeader>()
+                .Ignore(r => r.FromWarehouse)
+                .Ignore(r => r.FromDepartment)
+                .Ignore(r => r.ToWarehouse)
+                .Ignore(r => r.ToDepartment)
+                .HasOne(r => r.User)
+                .WithMany()
+                .HasForeignKey(r => r.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            // Store Return Details Configuration
+            modelBuilder.Entity<StoreReturnDetails>().ToTable("StoreReturn_Details");
+
+            modelBuilder.Entity<StoreReturnDetails>()
+                .HasOne(r => r.storeReturnHeader)
+                .WithMany()
+                .HasForeignKey(r => r.StoreReturnHeaderId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<StoreReturnDetails>()
+                .HasOne(r => r.Category)
+                .WithMany()
+                .HasForeignKey(r => r.CategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<StoreReturnDetails>()
+                .HasOne(r => r.SubCategory)
+                .WithMany()
+                .HasForeignKey(r => r.SubCategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<StoreReturnDetails>()
+                .HasOne(r => r.Item)
+                .WithMany()
+                .HasForeignKey(r => r.ItemId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<StoreReturnDetails>()
+                .HasOne(r => r.UOM)
+                .WithMany()
+                .HasForeignKey(r => r.UOMId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<StoreReturnDetails>()
+                .HasOne(r => r.SubUOM)
+                .WithMany()
+                .HasForeignKey(r => r.SubUOMId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Configure decimal precision for Return Details
+            modelBuilder.Entity<StoreReturnDetails>()
+                .Property(r => r.Quantity).HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<StoreReturnDetails>()
+                .Property(r => r.PriceType).HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<StoreReturnDetails>()
+                .Property(r => r.CostType).HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<StoreReturnDetails>()
+                .Property(r => r.TotalType).HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<StoreReturnDetails>()
+                .Property(r => r.ValueOrUnit).HasColumnType("decimal(18,2)");
+
         }
     }
 }
