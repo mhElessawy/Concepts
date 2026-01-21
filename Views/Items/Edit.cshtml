@@ -1,4 +1,4 @@
-﻿@model StoreItem
+@model StoreItem
 
 @{
     ViewData["Title"] = "Edit Item";
@@ -139,7 +139,7 @@
 
                         <div class="col-md-6">
                             <label asp-for="PackSize" class="form-label">Pack Size</label>
-                            <input asp-for="PackSize" type="number" class="form-control" />
+                            <input asp-for="PackSize" type="number" id="PackSize" class="form-control" />
                         </div>
 
                         <div class="col-md-6">
@@ -166,8 +166,9 @@
                         </div>
 
                         <div class="col-md-4">
-                            <label asp-for="QuantityInStore" class="form-label">Quantity in Store</label>
-                            <input asp-for="QuantityInStore" type="number" step="0.001" class="form-control" />
+                            <label asp-for="QuantityInStore" class="form-label">Quantity in Store <span class="text-muted">(Read Only)</span></label>
+                            <input asp-for="QuantityInStore" type="number" step="0.001" class="form-control" readonly style="background-color: #f0f0f0; cursor: not-allowed;" />
+                            <small class="text-muted">Can only be updated via Store Received</small>
                         </div>
 
                         <div class="col-md-4">
@@ -184,7 +185,7 @@
                             <label asp-for="PurchaseValue" class="form-label">Purchase Price</label>
                             <div class="input-group">
                                 <span class="input-group-text">$</span>
-                                <input asp-for="PurchaseValue" type="number" step="0.01" class="form-control" />
+                                <input asp-for="PurchaseValue" type="number" step="0.01" id="PurchaseValue" class="form-control" />
                             </div>
                         </div>
 
@@ -192,24 +193,26 @@
                             <label asp-for="SaleValue" class="form-label">Sale Price</label>
                             <div class="input-group">
                                 <span class="input-group-text">$</span>
-                                <input asp-for="SaleValue" type="number" step="0.01" class="form-control" />
+                                <input asp-for="SaleValue" type="number" step="0.01" id="SaleValue" class="form-control" />
                             </div>
                         </div>
 
                         <div class="col-md-6">
-                            <label asp-for="PurchaseValueDefault" class="form-label">Default Purchase Price</label>
+                            <label asp-for="PurchaseValueDefault" class="form-label">Default Purchase Price <span class="text-muted">(Auto Calculated)</span></label>
                             <div class="input-group">
                                 <span class="input-group-text">$</span>
-                                <input asp-for="PurchaseValueDefault" type="number" step="0.01" class="form-control" />
+                                <input asp-for="PurchaseValueDefault" type="number" step="0.01" id="PurchaseValueDefault" class="form-control" readonly style="background-color: #f0f0f0; cursor: not-allowed;" />
                             </div>
+                            <small class="text-muted">= Purchase Price / Pack Size</small>
                         </div>
 
                         <div class="col-md-6">
-                            <label asp-for="SaleValueDefault" class="form-label">Default Sale Price</label>
+                            <label asp-for="SaleValueDefault" class="form-label">Default Sale Price <span class="text-muted">(Auto Calculated)</span></label>
                             <div class="input-group">
                                 <span class="input-group-text">$</span>
-                                <input asp-for="SaleValueDefault" type="number" step="0.01" class="form-control" />
+                                <input asp-for="SaleValueDefault" type="number" step="0.01" id="SaleValueDefault" class="form-control" readonly style="background-color: #f0f0f0; cursor: not-allowed;" />
                             </div>
+                            <small class="text-muted">= Sale Price / Pack Size</small>
                         </div>
 
                         <!-- Additional Information -->
@@ -256,6 +259,32 @@
     <partial name="_ValidationScriptsPartial" />
     <script>
         $(document).ready(function() {
+            // Function to calculate default values
+            function calculateDefaultValues() {
+                var purchaseValue = parseFloat($('#PurchaseValue').val()) || 0;
+                var saleValue = parseFloat($('#SaleValue').val()) || 0;
+                var packSize = parseInt($('#PackSize').val()) || 0;
+
+                if (packSize > 0) {
+                    var purchaseDefault = (purchaseValue / packSize).toFixed(2);
+                    var saleDefault = (saleValue / packSize).toFixed(2);
+
+                    $('#PurchaseValueDefault').val(purchaseDefault);
+                    $('#SaleValueDefault').val(saleDefault);
+                } else {
+                    $('#PurchaseValueDefault').val('0.00');
+                    $('#SaleValueDefault').val('0.00');
+                }
+            }
+
+            // Initialize default values on page load
+            calculateDefaultValues();
+
+            // Attach change events to trigger calculation
+            $('#PurchaseValue, #SaleValue, #PackSize').on('input change', function() {
+                calculateDefaultValues();
+            });
+
             // Category -> SubCategory
             $('#CategoryId').change(function() {
                 var categoryId = $(this).val();
