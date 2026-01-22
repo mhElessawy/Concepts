@@ -382,13 +382,47 @@ namespace Concept.Controllers
                     return NotFound();
                 }
 
+                // التحقق من أن Transfer لم يتم الموافقة عليه مسبقاً
+                if (header.TransferStatus == 1)
+                {
+                    TempData["ErrorMessage"] = "This transfer has already been approved!";
+                    return RedirectToAction(nameof(Details), new { id });
+                }
+
+                // تحديث حالة الموافقة
                 header.TransferStatus = 1; // Approved
                 header.AprovedBy = GetCurrentUserId();
                 header.ModifiedDate = DateTime.Now;
 
+                // تحديث كميات المخزن (QuantityInStore) للمنتجات المنقولة
+                // الطرح من المخزن الذي تم النقل منه
+                var details = await _context.StoreTransferDetails
+                    .Where(d => d.StoreTransferHeaderId == id)
+                    .ToListAsync();
+
+                foreach (var detail in details)
+                {
+                    var item = await _context.StoreItems.FindAsync(detail.ItemId);
+                    if (item != null)
+                    {
+                        // طرح الكمية المنقولة من المخزن
+                        item.QuantityInStore -= detail.Quantity;
+
+                        // التأكد من عدم السماح بكمية سالبة
+                        if (item.QuantityInStore < 0)
+                        {
+                            TempData["ErrorMessage"] = $"Error: Transfer quantity for item '{item.ItemName}' exceeds available quantity in store!";
+                            return RedirectToAction(nameof(Details), new { id });
+                        }
+
+                        item.ModifiedDate = DateTime.Now;
+                        _context.Update(item);
+                    }
+                }
+
                 await _context.SaveChangesAsync();
 
-                TempData["SuccessMessage"] = "Transfer approved successfully!";
+                TempData["SuccessMessage"] = "Transfer approved successfully and inventory updated!";
                 return RedirectToAction(nameof(Details), new { id });
             }
             catch (Exception ex)
