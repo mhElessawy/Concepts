@@ -122,6 +122,7 @@ namespace Concept.Controllers
         }
 
         // POST: PurchaseRecieved/Approve/5
+        // POST: PurchaseRecieved/Approve/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Approve(int id, string approvalNotes)
@@ -140,6 +141,14 @@ namespace Concept.Controllers
                     return NotFound();
                 }
 
+                // التحقق من أن الـ Received لم يتم الموافقة عليه مسبقاً
+                if (received.Approved == 1)
+                {
+                    TempData["ErrorMessage"] = "This purchase received has already been approved!";
+                    return RedirectToAction(nameof(PendingApproval));
+                }
+
+                // تحديث حالة الموافقة
                 received.Approved = 1;
                 received.ModifiedDate = DateTime.Now;
 
@@ -148,9 +157,26 @@ namespace Concept.Controllers
                     received.AdditionalNotes = (received.AdditionalNotes ?? "") + "\n[Approval Notes]: " + approvalNotes;
                 }
 
+                // تحديث كميات المخزن (QuantityInStore) للمنتجات المستلمة
+                var details = await _context.PurchaseRecievedDetails
+                    .Where(d => d.PurchaseRecievedHeaderId == id)
+                    .ToListAsync();
+
+                foreach (var detail in details)
+                {
+                    var item = await _context.StoreItems.FindAsync(detail.ItemId);
+                    if (item != null)
+                    {
+                        // إضافة الكمية المستلمة (TotalQuantity) إلى المخزن
+                        item.QuantityInStore += detail.TotalQuantity;
+                        item.ModifiedDate = DateTime.Now;
+                        _context.Update(item);
+                    }
+                }
+
                 await _context.SaveChangesAsync();
 
-                TempData["SuccessMessage"] = $"Purchase Received {received.RecieveNo} has been approved successfully!";
+                TempData["SuccessMessage"] = $"Purchase Received {received.RecieveNo} has been approved successfully and inventory updated!";
                 return RedirectToAction(nameof(PendingApproval));
             }
             catch (Exception ex)
@@ -160,6 +186,7 @@ namespace Concept.Controllers
                 return RedirectToAction(nameof(PendingApproval));
             }
         }
+
 
         // POST: PurchaseRecieved/Reject/5
         [HttpPost]
