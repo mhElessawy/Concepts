@@ -358,13 +358,46 @@ namespace Concept.Controllers
                     return NotFound();
                 }
 
+                // Check if already approved
+                if (header.ReturnStatus == 1)
+                {
+                    TempData["ErrorMessage"] = "تم الموافقة على هذا الإرجاع مسبقاً!";
+                    return RedirectToAction(nameof(Details), new { id });
+                }
+
+                // Get all return details
+                var details = await _context.StoreReturnDetails
+                    .Where(d => d.StoreReturnHeaderId == id)
+                    .ToListAsync();
+
+                // Update inventory for each item
+                foreach (var detail in details)
+                {
+                    var item = await _context.StoreItems.FindAsync(detail.ItemId);
+                    if (item != null)
+                    {
+                        // Subtract the returned quantity from store inventory
+                        item.QuantityInStore -= detail.Quantity;
+
+                        // Check if quantity goes negative
+                        if (item.QuantityInStore < 0)
+                        {
+                            TempData["ErrorMessage"] = $"خطأ: كمية الإرجاع للصنف '{item.ItemName}' تتجاوز الكمية المتوفرة في المخزون!";
+                            return RedirectToAction(nameof(Details), new { id });
+                        }
+
+                        item.ModifiedDate = DateTime.Now;
+                        _context.Update(item);
+                    }
+                }
+
                 header.ReturnStatus = 1; // Approved
                 header.ApprovedBy = GetCurrentUserId();
                 header.ModifiedDate = DateTime.Now;
 
                 await _context.SaveChangesAsync();
 
-                TempData["SuccessMessage"] = "تمت الموافقة على إرجاع المخزون بنجاح!";
+                TempData["SuccessMessage"] = "تمت الموافقة على إرجاع المخزون بنجاح وتم تحديث الكميات!";
                 return RedirectToAction(nameof(Details), new { id });
             }
             catch (Exception ex)
