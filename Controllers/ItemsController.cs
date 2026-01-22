@@ -71,6 +71,21 @@ namespace Concept.Controllers
                         return View(item);
                     }
 
+                    // حساب القيم الافتراضية تلقائياً
+                    if (item.PackSize.HasValue && item.PackSize.Value > 0)
+                    {
+                        item.PurchaseValueDefault = item.PurchaseValue / item.PackSize.Value;
+                        item.SaleValueDefault = item.SaleValue / item.PackSize.Value;
+                    }
+                    else
+                    {
+                        item.PurchaseValueDefault = 0;
+                        item.SaleValueDefault = 0;
+                    }
+
+                    // تعيين QuantityInStore إلى 0 (لا يمكن إضافتها من النموذج)
+                    item.QuantityInStore = 0;
+
                     item.CreatedDate = DateTime.Now;
                     item.ModifiedDate = DateTime.Now;
 
@@ -144,6 +159,25 @@ namespace Concept.Controllers
                         ModelState.AddModelError("ItemCode", "Item Code already exists");
                         LoadDropdowns(item);
                         return View(item);
+                    }
+
+                    // حساب القيم الافتراضية تلقائياً
+                    if (item.PackSize.HasValue && item.PackSize.Value > 0)
+                    {
+                        item.PurchaseValueDefault = item.PurchaseValue / item.PackSize.Value;
+                        item.SaleValueDefault = item.SaleValue / item.PackSize.Value;
+                    }
+                    else
+                    {
+                        item.PurchaseValueDefault = 0;
+                        item.SaleValueDefault = 0;
+                    }
+
+                    // الحفاظ على QuantityInStore من قاعدة البيانات (عدم تحديثها من النموذج)
+                    var existingItem = await _context.StoreItems.AsNoTracking().FirstOrDefaultAsync(i => i.Id == item.Id);
+                    if (existingItem != null)
+                    {
+                        item.QuantityInStore = existingItem.QuantityInStore;
                     }
 
                     item.ModifiedDate = DateTime.Now;
