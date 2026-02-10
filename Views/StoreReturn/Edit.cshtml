@@ -118,6 +118,7 @@
                                 <th style="width: 10%;">Category</th>
                                 <th style="width: 10%;">Sub Category</th>
                                 <th style="width: 15%;">Item</th>
+                                <th style="width: 7%;">Available Qty</th>
                                 <th style="width: 8%;">Batch</th>
                                 <th style="width: 7%;">Quantity</th>
                                 <th style="width: 8%;">UOM</th>
@@ -174,18 +175,18 @@
             // Load existing details
             @if (details != null && details.Any())
             {
-                    <text>
-                    setTimeout(function() {
-                        @foreach (var item in details)
-                        {
-                                <text>
-                                addExistingItem(@item.CategoryId, @item.SubCategoryId, @item.ItemId, @item.UOMId,
-                                                '@item.BatchNo', @item.Quantity, @item.SubUOMId, @item.PackSize,
-                                                @item.ValueOrUnit, @item.PriceType, '@item.ExpiredDate.ToString("yyyy-MM-dd")');
-                                </text>
-                        }
-                    }, 1000);
-                    </text>
+                        <text>
+                        setTimeout(function() {
+                            @foreach (var item in details)
+                            {
+                                        <text>
+                                        addExistingItem(@item.CategoryId, @item.SubCategoryId, @item.ItemId, @item.UOMId,
+                                                        '@item.BatchNo', @item.Quantity, @item.SubUOMId, @item.PackSize,
+                                                        @item.ValueOrUnit, @item.PriceType, '@item.ExpiredDate.ToString("yyyy-MM-dd")');
+                                        </text>
+                            }
+                        }, 1000);
+                        </text>
             }
         });
 
@@ -246,11 +247,15 @@
                         </select>
                     </td>
                     <td>
+                        <input type="number" step="0.01" class="form-control form-control-sm" id="availableQty_${itemCounter}" readonly style="background-color: #e9ecef;" />
+                        <input type="hidden" id="availableQtyValue_${itemCounter}" value="0" />
+                    </td>
+                    <td>
                         <select class="form-select form-select-sm batchSelect" data-row="${itemCounter}" id="batch_${itemCounter}">
                             <option value="">Select Item First</option>
                         </select>
                     </td>
-                    <td><input type="number" step="0.01" class="form-control form-control-sm" id="quantity_${itemCounter}" required /></td>
+                    <td><input type="number" step="0.01" class="form-control form-control-sm" id="quantity_${itemCounter}" onchange="validateQuantity(${itemCounter})" required /></td>
                     <td>
                         <select class="form-select form-select-sm uomSelect" data-row="${itemCounter}" required>
                             <option value="">Select</option>
@@ -298,11 +303,15 @@
                         </select>
                     </td>
                     <td>
+                        <input type="number" step="0.01" class="form-control form-control-sm" id="availableQty_${itemCounter}" readonly style="background-color: #e9ecef;" />
+                        <input type="hidden" id="availableQtyValue_${itemCounter}" value="0" />
+                    </td>
+                    <td>
                         <select class="form-select form-select-sm batchSelect" data-row="${itemCounter}" id="batch_${itemCounter}">
                             <option value="${batchNo}" selected>${batchNo}</option>
                         </select>
                     </td>
-                    <td><input type="number" step="0.01" class="form-control form-control-sm" id="quantity_${itemCounter}" value="${qty}" required /></td>
+                    <td><input type="number" step="0.01" class="form-control form-control-sm" id="quantity_${itemCounter}" value="${qty}" onchange="validateQuantity(${itemCounter})" required /></td>
                     <td>
                         <select class="form-select form-select-sm uomSelect" data-row="${itemCounter}" required>
                             ${uoms.map(u => `<option value="${u.id}" ${u.id == uomId ? 'selected' : ''}>${u.uomName}</option>`).join('')}
@@ -391,6 +400,10 @@
                     $(`#valueUnit_${rowId}`).val(data.purchaseValue || 0);
                     $(`#price_${rowId}`).val(data.purchaseValue || 0);
 
+                    // عرض الكمية المتاحة في المخزن
+                    $(`#availableQty_${rowId}`).val(data.quantityInStore || 0);
+                    $(`#availableQtyValue_${rowId}`).val(data.quantityInStore || 0);
+
                     if (data.uomId) {
                         $(`.uomSelect[data-row="${rowId}"]`).val(data.uomId).trigger('change');
                     }
@@ -432,6 +445,20 @@
                     subUomSelect.append(`<option value="${su.id}" ${su.id == currentVal ? 'selected' : ''}>${su.subUOMName}</option>`);
                 });
             });
+        }
+
+        function validateQuantity(rowId) {
+            let enteredQty = parseFloat($(`#quantity_${rowId}`).val()) || 0;
+            let availableQty = parseFloat($(`#availableQtyValue_${rowId}`).val()) || 0;
+
+            if (enteredQty > availableQty) {
+                alert(`الكمية المدخلة (${enteredQty}) أكبر من الكمية المتاحة (${availableQty})!\nالرجاء إدخال كمية أقل من أو تساوي الكمية المتاحة.`);
+                $(`#quantity_${rowId}`).val('');
+                $(`#quantity_${rowId}`).focus();
+                return false;
+            }
+
+            return true;
         }
 
         function removeItemRow(rowId) {

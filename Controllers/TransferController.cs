@@ -394,35 +394,12 @@ namespace Concept.Controllers
                 header.AprovedBy = GetCurrentUserId();
                 header.ModifiedDate = DateTime.Now;
 
-                // تحديث كميات المخزن (QuantityInStore) للمنتجات المنقولة
-                // الطرح من المخزن الذي تم النقل منه
-                var details = await _context.StoreTransferDetails
-                    .Where(d => d.StoreTransferHeaderId == id)
-                    .ToListAsync();
-
-                foreach (var detail in details)
-                {
-                    var item = await _context.StoreItems.FindAsync(detail.ItemId);
-                    if (item != null)
-                    {
-                        // طرح الكمية المنقولة من المخزن
-                        item.QuantityInStore -= detail.Quantity;
-
-                        // التأكد من عدم السماح بكمية سالبة
-                        if (item.QuantityInStore < 0)
-                        {
-                            TempData["ErrorMessage"] = $"Error: Transfer quantity for item '{item.ItemName}' exceeds available quantity in store!";
-                            return RedirectToAction(nameof(Details), new { id });
-                        }
-
-                        item.ModifiedDate = DateTime.Now;
-                        _context.Update(item);
-                    }
-                }
+                // Transfer لا يقلل من QuantityInStore لأنه نقل داخلي فقط
+                // Store Return هو الذي يقلل من المخزن عند الإرجاع أو الإتلاف
 
                 await _context.SaveChangesAsync();
 
-                TempData["SuccessMessage"] = "Transfer approved successfully and inventory updated!";
+                TempData["SuccessMessage"] = "Transfer approved successfully!";
                 return RedirectToAction(nameof(Details), new { id });
             }
             catch (Exception ex)
