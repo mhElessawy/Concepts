@@ -21,6 +21,7 @@ namespace Concept.Controllers
                     .ThenInclude(c => c.Country)
                 .Include(v => v.JobTitle)
                 .Include(v => v.Bank)
+                .Include(v => v.CostCenter)
                 .OrderBy(v => v.VenderCode)
                 .ToListAsync();
 
@@ -39,6 +40,7 @@ namespace Concept.Controllers
                     .ThenInclude(c => c.Country)
                 .Include(v => v.JobTitle)
                 .Include(v => v.Bank)
+                .Include(v => v.CostCenter)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (vendor == null)
@@ -48,9 +50,11 @@ namespace Concept.Controllers
             return View(vendor);
         }
         // GET: Vendors/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
             LoadDropdowns();
+            var nextCode = await GenerateNextVenderCode();
+            ViewBag.NextVenderCode = nextCode;
             return View();
         }
         // POST: Vendors/Create
@@ -62,17 +66,14 @@ namespace Concept.Controllers
             ModelState.Remove("City");
             ModelState.Remove("JobTitle");
             ModelState.Remove("Bank");
+            ModelState.Remove("CostCenter");
+            ModelState.Remove("VenderCode");
             if (ModelState.IsValid)
             {
                 try
                 {
-                    // التحقق من عدم تكرار VenderCode
-                    if (await _context.Venders.AnyAsync(v => v.VenderCode == vendor.VenderCode))
-                    {
-                        ModelState.AddModelError("VenderCode", "Vendor Code already exists");
-                        LoadDropdowns(vendor);
-                        return View(vendor);
-                    }
+                    // Auto-generate VenderCode
+                    vendor.VenderCode = await GenerateNextVenderCode();
 
                     vendor.CreatedDate = DateTime.Now;
                     vendor.ModifiedDate = DateTime.Now;
@@ -81,6 +82,7 @@ namespace Concept.Controllers
                     vendor.City = null;
                     vendor.JobTitle = null;
                     vendor.Bank = null;
+                    vendor.CostCenter = null;
 
                     _context.Add(vendor);
                     await _context.SaveChangesAsync();
@@ -95,6 +97,7 @@ namespace Concept.Controllers
                 }
             }
             LoadDropdowns(vendor);
+            ViewBag.NextVenderCode = await GenerateNextVenderCode();
             return View(vendor);
         }
         // GET: Vendors/Edit/5
@@ -127,6 +130,7 @@ namespace Concept.Controllers
             ModelState.Remove("City");
             ModelState.Remove("JobTitle");
             ModelState.Remove("Bank");
+            ModelState.Remove("CostCenter");
 
             if (ModelState.IsValid)
             {
@@ -143,6 +147,7 @@ namespace Concept.Controllers
                     vendor.City = null;
                     vendor.JobTitle = null;
                     vendor.Bank = null;
+                    vendor.CostCenter = null;
 
                     _context.Update(vendor);
                     await _context.SaveChangesAsync();
@@ -184,6 +189,7 @@ namespace Concept.Controllers
                     .ThenInclude(c => c.Country)
                 .Include(v => v.JobTitle)
                 .Include(v => v.Bank)
+                .Include(v => v.CostCenter)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (vendor == null)
@@ -260,6 +266,37 @@ namespace Concept.Controllers
                 "BankName",
                 vendor?.BankId
             );
+
+            // Cost Centers
+            ViewBag.CostCenters = new SelectList(
+                _context.DeffCostCenters.Where(cc => cc.Active).OrderBy(cc => cc.CostCenterName),
+                "Id",
+                "CostCenterName",
+                vendor?.CostCenterId
+            );
+        }
+
+        private async Task<string> GenerateNextVenderCode()
+        {
+            var lastVender = await _context.Venders
+                .OrderByDescending(v => v.VenderCode)
+                .FirstOrDefaultAsync();
+
+            if (lastVender == null)
+                return "V001";
+
+            // Extract numeric part from code like "V001"
+            var code = lastVender.VenderCode;
+            var numericPart = new string(code.Where(char.IsDigit).ToArray());
+
+            if (int.TryParse(numericPart, out int lastNumber))
+            {
+                return $"V{(lastNumber + 1).ToString().PadLeft(3, '0')}";
+            }
+
+            // Fallback: count existing vendors + 1
+            var count = await _context.Venders.CountAsync();
+            return $"V{(count + 1).ToString().PadLeft(3, '0')}";
         }
     }
 }

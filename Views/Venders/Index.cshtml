@@ -29,10 +29,11 @@
                         <tr>
                             <th>Code</th>
                             <th>Vendor Name</th>
-                            <th>Business Type</th>
+                            <th>Account No</th>
+                            <th>Payment Terms</th>
+                            <th>Cost Center</th>
                             <th>Contact</th>
                             <th>City</th>
-                            <th>Bank</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
@@ -43,7 +44,9 @@
                             <tr>
                                 <td><strong>@vendor.VenderCode</strong></td>
                                 <td>@vendor.VenderName</td>
-                                <td>@(vendor.BusinessType ?? "N/A")</td>
+                                <td>@(vendor.AccountNo ?? "N/A")</td>
+                                <td>@vendor.PaymentTerms Days</td>
+                                <td>@(vendor.CostCenter?.CostCenterName ?? "N/A")</td>
                                 <td>
                                     @if (!string.IsNullOrEmpty(vendor.ContactPerson))
                                     {
@@ -64,7 +67,6 @@
                                         <span class="text-muted">N/A</span>
                                     }
                                 </td>
-                                <td>@(vendor.Bank?.BankName ?? "N/A")</td>
                                 <td>
                                     @if (vendor.Active)
                                     {

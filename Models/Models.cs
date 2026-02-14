@@ -329,6 +329,12 @@ namespace Concept.Models
 
         public int? CostCenterId { get; set; }
 
+        [Required]
+        public string AccountNo { get; set; }
+
+        [Required]
+        public int PaymentTerms { get; set; }
+
         public string BusinessType { get; set; }
 
         public string Address { get; set; }
@@ -367,6 +373,9 @@ namespace Concept.Models
         [ForeignKey("BankId")]
         public virtual DefBank Bank { get; set; }
 
+        [ForeignKey("CostCenterId")]
+        public virtual DeffCostCenter CostCenter { get; set; }
+
     }
     public class DefBank
     {
@@ -379,6 +388,19 @@ namespace Concept.Models
         public bool Active { get; set; } = true;
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public DateTime ModifiedDate { get; set; } = DateTime.Now;
+    }
+    public class DeffCostCenter
+    {
+        [Key]
+        public int Id { get; set; }
+        [Required]
+        public string CostCenterCode { get; set; }
+        [Required]
+        public string CostCenterName { get; set; }
+        public bool Active { get; set; } = true;
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime ModifiedDate { get; set; } = DateTime.Now;
+        public string Description { get; set; }
     }
     public class DeffLocation
     {

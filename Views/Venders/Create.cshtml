@@ -25,10 +25,10 @@
 
                         <div class="col-md-4">
                             <label asp-for="VenderCode" class="form-label">
-                                Vendor Code <span class="text-danger">*</span>
+                                Vendor Code
                             </label>
-                            <input asp-for="VenderCode" class="form-control" placeholder="e.g., V001" />
-                            <span asp-validation-for="VenderCode" class="text-danger"></span>
+                            <input asp-for="VenderCode" class="form-control" value="@ViewBag.NextVenderCode" readonly />
+                            <small class="text-muted">Auto-generated</small>
                         </div>
 
                         <div class="col-md-8">
@@ -39,15 +39,38 @@
                             <span asp-validation-for="VenderName" class="text-danger"></span>
                         </div>
 
+                        <div class="col-md-4">
+                            <label asp-for="AccountNo" class="form-label">
+                                Account No <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="AccountNo" class="form-control" placeholder="Account number" />
+                            <span asp-validation-for="AccountNo" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="PaymentTerms" class="form-label">
+                                Payment Terms (Days) <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="PaymentTerms" type="number" class="form-control" placeholder="e.g., 30" />
+                            <span asp-validation-for="PaymentTerms" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="CostCenterId" class="form-label">Cost Center</label>
+                            <select asp-for="CostCenterId" class="form-select" asp-items="ViewBag.CostCenters">
+                                <option value="">-- Select Cost Center --</option>
+                            </select>
+                        </div>
+
                         <div class="col-md-6">
                             <label asp-for="BusinessType" class="form-label">Business Type</label>
-                            <input asp-for="BusinessType" class="form-control" 
+                            <input asp-for="BusinessType" class="form-control"
                                    placeholder="e.g., Manufacturer, Distributor" />
                         </div>
 
                         <div class="col-md-6">
                             <label asp-for="Email" class="form-label">Email</label>
-                            <input asp-for="Email" type="email" class="form-control" 
+                            <input asp-for="Email" type="email" class="form-control"
                                    placeholder="vendor@example.com" />
                         </div>
 
