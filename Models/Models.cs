@@ -321,7 +321,7 @@ namespace Concept.Models
         [Key]
         public int Id { get; set; }
         [Required]
-        public string VenderCode { get; set; }
+        public string VenderCode { get; set; } = string.Empty;
         [Required]
         public string VenderName { get; set; }
 
@@ -330,7 +330,7 @@ namespace Concept.Models
         public int? CostCenterId { get; set; }
 
         [Required]
-        public string AccountNo { get; set; }
+        public string AccountNo { get; set; } = string.Empty;
 
         [Required]
         public int PaymentTerms { get; set; }

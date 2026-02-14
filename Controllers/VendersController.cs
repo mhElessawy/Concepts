@@ -68,6 +68,13 @@ namespace Concept.Controllers
             ModelState.Remove("Bank");
             ModelState.Remove("CostCenter");
             ModelState.Remove("VenderCode");
+
+            // Validate required fields manually
+            if (string.IsNullOrWhiteSpace(vendor.AccountNo))
+            {
+                ModelState.AddModelError("AccountNo", "Account No is required");
+            }
+
             if (ModelState.IsValid)
             {
                 try
@@ -93,7 +100,7 @@ namespace Concept.Controllers
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Error: {ex.InnerException?.Message}");
-                    ModelState.AddModelError("", "Error saving vendor");
+                    ModelState.AddModelError("", "Error saving vendor: " + (ex.InnerException?.Message ?? ex.Message));
                 }
             }
             LoadDropdowns(vendor);
