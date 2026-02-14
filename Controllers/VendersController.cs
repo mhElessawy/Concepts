@@ -75,34 +75,47 @@ namespace Concept.Controllers
                 ModelState.AddModelError("AccountNo", "Account No is required");
             }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                try
-                {
-                    // Auto-generate VenderCode
-                    vendor.VenderCode = await GenerateNextVenderCode();
+                // Collect all validation errors for display
+                var errors = ModelState
+                    .Where(x => x.Value.Errors.Count > 0)
+                    .Select(x => $"{x.Key}: {string.Join(", ", x.Value.Errors.Select(e => e.ErrorMessage))}")
+                    .ToList();
+                TempData["ErrorMessage"] = "Validation Errors:\n" + string.Join("\n", errors);
 
-                    vendor.CreatedDate = DateTime.Now;
-                    vendor.ModifiedDate = DateTime.Now;
-
-                    // تأكد أن Navigation Properties = null
-                    vendor.City = null;
-                    vendor.JobTitle = null;
-                    vendor.Bank = null;
-                    vendor.CostCenter = null;
-
-                    _context.Add(vendor);
-                    await _context.SaveChangesAsync();
-
-                    TempData["SuccessMessage"] = "Vendor created successfully!";
-                    return RedirectToAction(nameof(Index));
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error: {ex.InnerException?.Message}");
-                    ModelState.AddModelError("", "Error saving vendor: " + (ex.InnerException?.Message ?? ex.Message));
-                }
+                LoadDropdowns(vendor);
+                ViewBag.NextVenderCode = await GenerateNextVenderCode();
+                return View(vendor);
             }
+
+            try
+            {
+                // Auto-generate VenderCode
+                vendor.VenderCode = await GenerateNextVenderCode();
+
+                vendor.CreatedDate = DateTime.Now;
+                vendor.ModifiedDate = DateTime.Now;
+
+                // تأكد أن Navigation Properties = null
+                vendor.City = null;
+                vendor.JobTitle = null;
+                vendor.Bank = null;
+                vendor.CostCenter = null;
+
+                _context.Add(vendor);
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "Vendor created successfully!";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                var fullError = ex.InnerException?.Message ?? ex.Message;
+                Console.WriteLine($"Error: {fullError}");
+                TempData["ErrorMessage"] = "Database Error:\n" + fullError;
+            }
+
             LoadDropdowns(vendor);
             ViewBag.NextVenderCode = await GenerateNextVenderCode();
             return View(vendor);
