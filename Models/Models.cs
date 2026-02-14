@@ -329,6 +329,12 @@ namespace Concept.Models
 
         public int? CostCenterId { get; set; }
 
+        [Required]
+        public string AccountNo { get; set; }
+
+        [Required]
+        public int PaymentTerms { get; set; }
+
         public string BusinessType { get; set; }
 
         public string Address { get; set; }
@@ -367,6 +373,9 @@ namespace Concept.Models
         [ForeignKey("BankId")]
         public virtual DefBank Bank { get; set; }
 
+        [ForeignKey("CostCenterId")]
+        public virtual DeffCostCenter CostCenter { get; set; }
+
     }
     public class DefBank
     {
@@ -379,6 +388,19 @@ namespace Concept.Models
         public bool Active { get; set; } = true;
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public DateTime ModifiedDate { get; set; } = DateTime.Now;
+    }
+    public class DeffCostCenter
+    {
+        [Key]
+        public int Id { get; set; }
+        [Required]
+        public string CostCenterCode { get; set; }
+        [Required]
+        public string CostCenterName { get; set; }
+        public bool Active { get; set; } = true;
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime ModifiedDate { get; set; } = DateTime.Now;
+        public string Description { get; set; }
     }
     public class DeffLocation
     {
@@ -638,7 +660,7 @@ namespace Concept.Models
         public string? TransferCode { get; set; }
         public int? TransferNo { get; set; }
         public int TransferType { get; set; }
-        public int RequestedBy{ get; set; }
+        public int RequestedBy { get; set; }
         public int AprovedBy { get; set; }
         public int TransferStatus { get; set; }
         public DateTime TransferDate { get; set; } = DateTime.Now;
@@ -650,7 +672,7 @@ namespace Concept.Models
         public int ToDepartmentId { get; set; } = 0;
         public int UserId { get; set; }
         public string? AdditionalNotes { get; set; }
-       public bool Active { get; set; } = true;
+        public bool Active { get; set; } = true;
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public DateTime ModifiedDate { get; set; } = DateTime.Now;
         // Navigation Properties (No Foreign Key Constraints for From/To fields)
@@ -673,7 +695,7 @@ namespace Concept.Models
         public int SubCategoryId { get; set; }
         public int ItemId { get; set; }
         public int UOMId { get; set; }
-        public string BatchNo  { get; set; }
+        public string BatchNo { get; set; }
         public decimal Quantity { get; set; }
 
         public decimal PriceType { get; set; }
@@ -683,7 +705,7 @@ namespace Concept.Models
         public int? PackSize { get; set; }
         public decimal ValueOrUnit { get; set; }
         public DateOnly ExpiredDate { get; set; }
-        public String  Remark { get; set; }
+        public String Remark { get; set; }
 
         // Navigation Properties
         [ForeignKey("StoreTransferHeaderId")]
@@ -696,10 +718,10 @@ namespace Concept.Models
         public virtual StoreItem Item { get; set; }
         [ForeignKey("UOMId")]
         public virtual DefUOM UOM { get; set; }
-      
+
         [ForeignKey("SubUOMId")]
         public virtual DefSubUOM? SubUOM { get; set; }
-      
+
     }
 
     public class StoreReturnHeader

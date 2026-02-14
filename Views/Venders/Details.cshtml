@@ -47,6 +47,24 @@
                                 }
                             </dd>
 
+                            <dt class="col-sm-5">Account No:</dt>
+                            <dd class="col-sm-7"><strong>@(Model.AccountNo ?? "N/A")</strong></dd>
+
+                            <dt class="col-sm-5">Payment Terms:</dt>
+                            <dd class="col-sm-7">@Model.PaymentTerms Days</dd>
+
+                            <dt class="col-sm-5">Cost Center:</dt>
+                            <dd class="col-sm-7">
+                                @if (Model.CostCenter != null)
+                                {
+                                    <span class="badge bg-secondary">@Model.CostCenter.CostCenterName</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">N/A</span>
+                                }
+                            </dd>
+
                             <dt class="col-sm-5">Status:</dt>
                             <dd class="col-sm-7">
                                 @if (Model.Active)

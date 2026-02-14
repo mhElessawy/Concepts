@@ -23,6 +23,7 @@ namespace Concept.Data
         public DbSet<StoreItem> StoreItems { get; set; }
         public DbSet<DefBank> DefBanks { get; set; }
         public DbSet<Vender> Venders { get; set; }
+        public DbSet<DeffCostCenter> DeffCostCenters { get; set; }
         public DbSet<DeffLocation> DeffLocations { get; set; }
         public DbSet<PurchaseRequestHeader> PurchaseRequestHeaders { get; set; }
         public DbSet<PurchaseRequestDetails> PurchaseRequestDetails { get; set; }
@@ -131,6 +132,15 @@ namespace Concept.Data
                 .HasOne(v => v.Bank)
                 .WithMany()
                 .HasForeignKey(v => v.BankId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<DeffCostCenter>().ToTable("Deff_CostCenter");
+            modelBuilder.Entity<DeffCostCenter>().HasIndex(cc => cc.CostCenterCode).IsUnique();
+
+            modelBuilder.Entity<Vender>()
+                .HasOne(v => v.CostCenter)
+                .WithMany()
+                .HasForeignKey(v => v.CostCenterId)
                 .OnDelete(DeleteBehavior.SetNull);
 
             // User relationships
