@@ -335,28 +335,28 @@ namespace Concept.Models
         [Required]
         public int PaymentTerms { get; set; }
 
-        public string BusinessType { get; set; }
+        public string? BusinessType { get; set; }
 
-        public string Address { get; set; }
+        public string? Address { get; set; }
         public int? CityId { get; set; }
 
-        public string Email { get; set; }
-        public string ContactPerson { get; set; }
-        public string PhoneNumber { get; set; }
+        public string? Email { get; set; }
+        public string? ContactPerson { get; set; }
+        public string? PhoneNumber { get; set; }
 
         public int? JobTitleId { get; set; }
         public int? BankId { get; set; }
-        public string BankAccountNumber { get; set; } = string.Empty;
+        public string? BankAccountNumber { get; set; }
 
-        public string BankAccountIBan { get; set; } = string.Empty;
+        public string? BankAccountIBan { get; set; }
 
-        public string AdditionalInfo { get; set; } = string.Empty;
+        public string? AdditionalInfo { get; set; }
 
         public bool Active { get; set; } = true;
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public DateTime ModifiedDate { get; set; } = DateTime.Now;
 
-        public string Description { get; set; } = string.Empty;
+        public string? Description { get; set; }
 
         public int? AccountId { get; set; }
 
