@@ -8,6 +8,15 @@
     <h2><i class="bi bi-plus-circle"></i> Add New Vendor</h2>
 </div>
 
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong><i class="bi bi-exclamation-triangle"></i> Error:</strong>
+        <pre class="mb-0 mt-2">@TempData["ErrorMessage"]</pre>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
 <div class="row">
     <div class="col-md-12">
         <div class="card">
@@ -251,13 +260,5 @@
                 }
             });
         });
-
-        @if (TempData["ErrorMessage"] != null)
-        {
-            <text>
-            alert(@Html.Raw(Json.Serialize(TempData["ErrorMessage"].ToString())));
-            </text>
-        }
-    });
     </script>
 }
