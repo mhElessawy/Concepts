@@ -1316,6 +1316,14 @@ namespace Concept.Migrations
                     b.Property<int?>("JobTitleId")
                         .HasColumnType("int");
 
+                    b.Property<string>("LedgerAccountCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LedgerAccountName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("ModifiedDate")
                         .HasColumnType("datetime2");
 

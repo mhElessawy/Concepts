@@ -48,18 +48,37 @@
                         </div>
 
                         <div class="col-md-4">
+                            <label asp-for="LedgerAccountName" class="form-label">
+                                Ledger Account Name <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="LedgerAccountName" class="form-control" placeholder="Ledger account name" />
+                            <span asp-validation-for="LedgerAccountName" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="LedgerAccountCode" class="form-label">
+                                Ledger Account Code <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="LedgerAccountCode" class="form-control" placeholder="Ledger account code" />
+                            <span asp-validation-for="LedgerAccountCode" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-4">
                             <label asp-for="PaymentTerms" class="form-label">
                                 Payment Terms (Days) <span class="text-danger">*</span>
                             </label>
-                            <input asp-for="PaymentTerms" type="number" class="form-control" placeholder="e.g., 30" />
+                            <input asp-for="PaymentTerms" type="number" class="form-control" placeholder="e.g., 30" min="1" />
                             <span asp-validation-for="PaymentTerms" class="text-danger"></span>
                         </div>
 
                         <div class="col-md-4">
-                            <label asp-for="CostCenterId" class="form-label">Cost Center</label>
+                            <label asp-for="CostCenterId" class="form-label">
+                                Cost Center <span class="text-danger">*</span>
+                            </label>
                             <select asp-for="CostCenterId" class="form-select" asp-items="ViewBag.CostCenters">
                                 <option value="">-- Select Cost Center --</option>
                             </select>
+                            <span asp-validation-for="CostCenterId" class="text-danger"></span>
                         </div>
 
                         <div class="col-md-6">

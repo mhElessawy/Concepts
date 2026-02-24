@@ -50,6 +50,12 @@
                             <dt class="col-sm-5">Account No:</dt>
                             <dd class="col-sm-7"><strong>@(Model.AccountNo ?? "N/A")</strong></dd>
 
+                            <dt class="col-sm-5">Ledger Account Name:</dt>
+                            <dd class="col-sm-7">@(Model.LedgerAccountName ?? "N/A")</dd>
+
+                            <dt class="col-sm-5">Ledger Account Code:</dt>
+                            <dd class="col-sm-7"><code>@(Model.LedgerAccountCode ?? "N/A")</code></dd>
+
                             <dt class="col-sm-5">Payment Terms:</dt>
                             <dd class="col-sm-7">@Model.PaymentTerms Days</dd>
 
@@ -58,6 +64,7 @@
                                 @if (Model.CostCenter != null)
                                 {
                                     <span class="badge bg-secondary">@Model.CostCenter.CostCenterName</span>
+                                    <small class="text-muted ms-1">(@Model.CostCenter.CostCenterCode)</small>
                                 }
                                 else
                                 {
