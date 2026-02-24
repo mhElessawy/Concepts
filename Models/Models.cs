@@ -333,10 +333,10 @@ namespace Concept.Models
         public string AccountNo { get; set; }
 
         [Required(ErrorMessage = "Ledger Account Name is required")]
-        public string LedgerAccountName { get; set; }
+        public string LedgerAccountName { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Ledger Account Code is required")]
-        public string LedgerAccountCode { get; set; }
+        public string LedgerAccountCode { get; set; } = string.Empty;
 
         [Required]
         [Range(1, int.MaxValue, ErrorMessage = "Payment Terms must be at least 1 day")]
