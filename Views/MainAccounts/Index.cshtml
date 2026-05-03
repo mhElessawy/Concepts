@@ -275,7 +275,7 @@
                     <div>
                         <div class="form-field" style="margin-bottom:8px;">
                             <label>Account NO.</label>
-                            <input type="text" id="accountNo" />
+                            <input type="text" id="accountNo" readonly style="background:#e8e8e8; color:#333; font-weight:bold;" />
                         </div>
 
                         <div class="form-field" style="margin-bottom:8px;">
@@ -395,9 +395,18 @@
         labelSpan.title = account.accountNo + ' - ' + account.accountName;
         labelSpan.textContent = account.accountNo + '  ' + account.accountName;
 
+        var addBtn = document.createElement('span');
+        addBtn.title = 'Add sub-account under ' + account.accountNo;
+        addBtn.style.cssText = 'margin-left:auto; color:#2563eb; font-size:0.7rem; padding:0 3px; display:none;';
+        addBtn.innerHTML = '<i class="bi bi-plus-circle"></i>';
+        addBtn.onclick = function (e) { e.stopPropagation(); newSubAccount(account.id, account.accountNo, account.accountName); };
+        div.addEventListener('mouseenter', () => addBtn.style.display = 'inline');
+        div.addEventListener('mouseleave', () => addBtn.style.display = 'none');
+
         div.appendChild(toggleSpan);
         div.appendChild(iconSpan);
         div.appendChild(labelSpan);
+        div.appendChild(addBtn);
         div.onclick = function () { selectAccount(account.id, div); };
 
         container.appendChild(div);
@@ -478,6 +487,22 @@
         document.getElementById('parentSection').style.display = data.parentAccountId ? 'flex' : 'none';
     }
 
+    // ---- Generate Next Account No ----
+    function generateAccountNo() {
+        var isNew = document.getElementById('accountId').value === '0';
+        if (!isNew) return; // don't overwrite when editing an existing account
+
+        var parentId = document.getElementById('parentAccountId').value;
+        var url = '/MainAccounts/GetNextAccountNo';
+        if (parentId) url += '?parentId=' + parentId;
+
+        fetch(url)
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('accountNo').value = data.accountNo || '';
+            });
+    }
+
     // ---- Toggle Root Mode ----
     function toggleRootMode() {
         var isRoot = document.getElementById('chkCreateRoot').checked;
@@ -490,6 +515,7 @@
         } else {
             parentSection.style.display = 'flex';
         }
+        generateAccountNo();
     }
 
     // ---- Toggle Tree Expand All ----
@@ -503,6 +529,7 @@
         if (!no) {
             document.getElementById('parentAccountId').value = '';
             document.getElementById('parentAccountName').value = '';
+            document.getElementById('accountNo').value = '';
             return;
         }
         fetch('/MainAccounts/GetParentByNo?no=' + encodeURIComponent(no))
@@ -511,15 +538,17 @@
                 if (data.found) {
                     document.getElementById('parentAccountId').value = data.id;
                     document.getElementById('parentAccountName').value = data.accountName;
+                    generateAccountNo();
                 } else {
                     document.getElementById('parentAccountId').value = '';
                     document.getElementById('parentAccountName').value = '';
+                    document.getElementById('accountNo').value = '';
                     showAlert('Parent account not found.', false);
                 }
             });
     }
 
-    // ---- New Account ----
+    // ---- New Account (root by default) ----
     function newAccount() {
         selectedId = 0;
         document.querySelectorAll('.tree-node.selected').forEach(el => el.classList.remove('selected'));
@@ -534,8 +563,30 @@
         document.getElementById('parentAccountId').value = '';
         document.getElementById('parentAccountNo').value = '';
         document.getElementById('parentAccountName').value = '';
+        document.getElementById('chkCreateRoot').checked = true;
+        document.getElementById('parentSection').style.display = 'none';
+        generateAccountNo();
+    }
+
+    // ---- New Sub-Account under a specific parent ----
+    function newSubAccount(parentId, parentNo, parentName) {
+        selectedId = 0;
+        document.querySelectorAll('.tree-node.selected').forEach(el => el.classList.remove('selected'));
+        document.getElementById('accountId').value = '0';
+        document.getElementById('accountNo').value = '';
+        document.getElementById('accountName').value = '';
+        document.getElementById('accountEffect').value = 'Debit';
+        document.getElementById('treatsAsCash').checked = false;
+        document.getElementById('activeStatus').checked = true;
+        document.getElementById('openAccountDate').value = new Date().toISOString().split('T')[0];
+        document.getElementById('noteField').value = '';
+        document.getElementById('parentAccountId').value = parentId;
+        document.getElementById('parentAccountNo').value = parentNo;
+        document.getElementById('parentAccountName').value = parentName;
         document.getElementById('chkCreateRoot').checked = false;
         document.getElementById('parentSection').style.display = 'flex';
+        generateAccountNo();
+        document.getElementById('accountName').focus();
     }
 
     // ---- Save Account ----

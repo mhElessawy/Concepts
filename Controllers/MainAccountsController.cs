@@ -75,6 +75,53 @@ namespace Concept.Controllers
             });
         }
 
+        // GET: MainAccounts/GetNextAccountNo?parentId=5  (omit or 0 for root)
+        [HttpGet]
+        public async Task<IActionResult> GetNextAccountNo(int? parentId)
+        {
+            if (parentId == null || parentId == 0)
+            {
+                var rootNos = await _context.MainAccounts
+                    .Where(a => a.ParentAccountId == null)
+                    .Select(a => a.AccountNo)
+                    .ToListAsync();
+
+                int maxNo = 0;
+                foreach (var no in rootNos)
+                    if (int.TryParse(no, out int n) && n > maxNo)
+                        maxNo = n;
+
+                return Json(new { accountNo = (maxNo + 1).ToString() });
+            }
+            else
+            {
+                var parent = await _context.MainAccounts.FindAsync(parentId.Value);
+                if (parent == null)
+                    return Json(new { accountNo = "" });
+
+                string parentNo = parent.AccountNo;
+
+                var siblingNos = await _context.MainAccounts
+                    .Where(a => a.ParentAccountId == parentId.Value)
+                    .Select(a => a.AccountNo)
+                    .ToListAsync();
+
+                int maxSuffix = 0;
+                foreach (var no in siblingNos)
+                {
+                    if (no.StartsWith(parentNo) && no.Length == parentNo.Length + 2)
+                    {
+                        string suffix = no.Substring(parentNo.Length);
+                        if (int.TryParse(suffix, out int s) && s > maxSuffix)
+                            maxSuffix = s;
+                    }
+                }
+
+                string nextSuffix = (maxSuffix + 1).ToString("D2");
+                return Json(new { accountNo = parentNo + nextSuffix });
+            }
+        }
+
         // POST: MainAccounts/Save
         [HttpPost]
         [ValidateAntiForgeryToken]
