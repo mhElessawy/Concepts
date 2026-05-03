@@ -1,0 +1,775 @@
+@model IEnumerable<Concept.Models.ChildAccount>
+
+@{
+    ViewData["Title"] = "Child Account";
+}
+
+<style>
+    .child-page {
+        background: #f0f0f0;
+        min-height: calc(100vh - 70px);
+        padding: 10px;
+    }
+
+    .page-title {
+        color: #8b0000;
+        font-weight: bold;
+        font-size: 1.1rem;
+        margin-bottom: 8px;
+    }
+
+    /* Search bar */
+    .search-bar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+        background: #f0f0f0;
+        padding: 4px 0;
+        font-size: 0.8rem;
+    }
+
+    .search-bar label { white-space: nowrap; }
+
+    .search-bar input[type="text"] {
+        width: 140px;
+        border: 1px solid #999;
+        padding: 2px 5px;
+        font-size: 0.8rem;
+    }
+
+    .search-bar button {
+        padding: 2px 14px;
+        font-size: 0.8rem;
+        background: #e0e0e0;
+        border: 1px solid #999;
+        cursor: pointer;
+    }
+
+    .search-bar button:hover { background: #ccc; }
+
+    /* Alert */
+    .alert-banner {
+        padding: 5px 12px;
+        font-size: 0.8rem;
+        border-radius: 3px;
+        margin-bottom: 6px;
+        display: none;
+    }
+    .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .alert-danger  { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+    /* Main layout */
+    .main-panel {
+        display: flex;
+        gap: 8px;
+        height: calc(100vh - 155px);
+    }
+
+    /* Tree */
+    .tree-panel {
+        width: 240px;
+        min-width: 200px;
+        background: white;
+        border: 1px solid #ccc;
+        overflow-y: auto;
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .tree-panel-header {
+        background: #f5f5f5;
+        border-bottom: 1px solid #ddd;
+        padding: 4px 6px;
+        font-size: 0.75rem;
+        font-weight: bold;
+        color: #555;
+    }
+
+    .tree-node {
+        cursor: pointer;
+        padding: 3px 6px;
+        font-size: 0.78rem;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        border-bottom: 1px solid #f5f5f5;
+        user-select: none;
+        overflow: hidden;
+    }
+
+    .tree-node:hover { background: #e8f0fe; }
+    .tree-node.selected { background: #cce0ff; font-weight: bold; }
+    .tree-node.inactive-account { color: #aaa; }
+
+    .tree-toggle { width: 14px; text-align: center; font-size: 0.65rem; color: #555; flex-shrink: 0; }
+    .tree-toggle.no-children { visibility: hidden; }
+    .tree-icon { color: #d4a017; font-size: 0.72rem; flex-shrink: 0; }
+    .tree-label { overflow: hidden; text-overflow: ellipsis; flex: 1; }
+
+    /* Child accounts under main account in tree */
+    .child-entry {
+        padding: 2px 6px 2px 30px;
+        font-size: 0.75rem;
+        color: #2563eb;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    .child-entry:hover { background: #eff6ff; }
+    .child-entry.selected { background: #dbeafe; font-weight: bold; }
+
+    /* Bottom buttons for tree */
+    .tree-bottom {
+        border-top: 1px solid #ddd;
+        padding: 5px;
+        display: flex;
+        gap: 4px;
+        background: #f5f5f5;
+        flex-shrink: 0;
+    }
+
+    .tree-bottom button {
+        flex: 1;
+        font-size: 0.72rem;
+        padding: 3px 4px;
+        border: 1px solid #999;
+        background: #e8e8e8;
+        cursor: pointer;
+    }
+    .tree-bottom button:hover { background: #d0d0d0; }
+
+    /* Form panel */
+    .form-panel {
+        flex: 1;
+        background: #d9d9d9;
+        border: 1px solid #bbb;
+        overflow-y: auto;
+        padding: 10px 14px;
+    }
+
+    .form-section-title {
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 10px;
+        border-bottom: 1px solid #bbb;
+        padding-bottom: 4px;
+    }
+
+    /* Form rows */
+    .frow {
+        display: flex;
+        align-items: center;
+        margin-bottom: 7px;
+        gap: 6px;
+        font-size: 0.8rem;
+    }
+
+    .frow label {
+        min-width: 120px;
+        text-align: right;
+        color: #333;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .frow input[type="text"],
+    .frow input[type="email"],
+    .frow input[type="number"],
+    .frow select {
+        border: 1px solid #999;
+        padding: 2px 5px;
+        font-size: 0.8rem;
+        background: white;
+        border-radius: 0;
+    }
+
+    .finput-sm  { width: 140px; }
+    .finput-md  { width: 200px; }
+    .finput-lg  { width: 360px; }
+    .finput-ro  { background: #e8e8e8 !important; font-weight: bold; }
+
+    .fselect-md { width: 160px; }
+
+    .important-note {
+        color: #cc0000;
+        font-size: 0.75rem;
+        margin-left: 6px;
+        font-style: italic;
+    }
+
+    .frow-group {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .section-sep {
+        border: none;
+        border-top: 1px solid #bbb;
+        margin: 8px 0;
+    }
+</style>
+
+<div class="child-page">
+    <div class="page-title">Child Account</div>
+
+    <!-- Search bar -->
+    <div class="search-bar">
+        <label>Account Number</label>
+        <input type="text" id="searchNo" placeholder="Account No" />
+        <label>Account Name</label>
+        <input type="text" id="searchName" placeholder="Name" />
+        <button type="button" onclick="doSearch()"><i class="bi bi-search"></i> Search</button>
+        <button type="button" onclick="clearSearch()" style="background:#f5f5f5;">Clear</button>
+    </div>
+
+    <!-- Search results dropdown -->
+    <div id="searchResults" style="display:none; background:white; border:1px solid #ccc; max-height:150px; overflow-y:auto; margin-bottom:6px; font-size:0.78rem; position:absolute; z-index:100; width:460px;"></div>
+
+    <div id="alertBanner" class="alert-banner"></div>
+
+    <div class="main-panel">
+        <!-- Tree Panel (Main Accounts) -->
+        <div class="tree-panel">
+            <div class="tree-panel-header"><i class="bi bi-diagram-2"></i> Main Accounts</div>
+            <div id="treeContainer" style="flex:1; overflow-y:auto;"></div>
+            <div class="tree-bottom">
+                <button type="button" onclick="toggleAllTree()"><i class="bi bi-arrows-expand"></i> Open Tree</button>
+                <button type="button" onclick="newChildAccount()"><i class="bi bi-plus"></i> New</button>
+            </div>
+        </div>
+
+        <!-- Form Panel -->
+        <div class="form-panel">
+            <div class="form-section-title">Child Account INFO</div>
+
+            <form id="childForm">
+                @Html.AntiForgeryToken()
+                <input type="hidden" id="childId" value="0" />
+                <input type="hidden" id="parentAccountId" value="0" />
+
+                <!-- Row 1: Account No + Parent -->
+                <div class="frow">
+                    <label>Account No.</label>
+                    <input type="text" id="accountNo" class="finput-sm finput-ro" readonly />
+                </div>
+
+                <div class="frow">
+                    <label>Perant Account</label>
+                    <input type="text" id="parentAccountNo" class="finput-sm finput-ro" readonly />
+                </div>
+
+                <div class="frow">
+                    <label>Perant Id</label>
+                    <input type="text" id="parentAccountIdDisplay" class="finput-sm finput-ro" readonly />
+                </div>
+
+                <div class="frow">
+                    <label>Perant Name</label>
+                    <input type="text" id="parentAccountName" class="finput-md finput-ro" readonly />
+                </div>
+
+                <hr class="section-sep" />
+
+                <!-- Account Name -->
+                <div class="frow">
+                    <label>Account Name</label>
+                    <input type="text" id="accountName" class="finput-lg" />
+                </div>
+
+                <!-- Account Type -->
+                <div class="frow">
+                    <label>Account Type</label>
+                    <select id="accountType" class="fselect-md">
+                        <option value=""></option>
+                        <option value="Asset">Asset</option>
+                        <option value="Liability">Liability</option>
+                        <option value="Equity">Equity</option>
+                        <option value="Revenue">Revenue</option>
+                        <option value="Expense">Expense</option>
+                    </select>
+                    <span class="important-note">Very important to select</span>
+                </div>
+
+                <!-- Account Effect -->
+                <div class="frow">
+                    <label>Account Effect</label>
+                    <select id="accountEffect" class="fselect-md">
+                        <option value="Debit">Debit</option>
+                        <option value="Credit">Credit</option>
+                    </select>
+                </div>
+
+                <!-- Nature of Account -->
+                <div class="frow">
+                    <label>Nature of account</label>
+                    <select id="natureOfAccount" class="fselect-md">
+                        <option value=""></option>
+                        <option value="Current">Current</option>
+                        <option value="Fixed">Fixed</option>
+                        <option value="Accrued">Accrued</option>
+                        <option value="Prepaid">Prepaid</option>
+                    </select>
+                    <span style="margin-left:20px;">
+                        <input type="checkbox" id="treatsAsBankAccount" />
+                        <label for="treatsAsBankAccount" style="font-size:0.8rem;">This Account treats as Bank account</label>
+                    </span>
+                </div>
+
+                <hr class="section-sep" />
+
+                <!-- Cost Center -->
+                <div class="frow">
+                    <label>Cost Name</label>
+                    <input type="text" id="costName" class="finput-sm finput-ro" readonly />
+                    <label style="min-width:50px;">Cost Id</label>
+                    <input type="text" id="costCenterId" class="finput-sm"
+                           onblur="lookupCostCenter()"
+                           placeholder="Cost Center ID" />
+                    <input type="checkbox" id="fixedCostCenter" style="margin-left:8px;" />
+                    <label for="fixedCostCenter" style="font-size:0.8rem; min-width:auto;">Fixed Cost Center</label>
+                </div>
+
+                <hr class="section-sep" />
+
+                <!-- Address -->
+                <div class="frow">
+                    <label>Address</label>
+                    <input type="text" id="address" class="finput-lg" />
+                </div>
+
+                <!-- Tel + Mobile -->
+                <div class="frow">
+                    <label>Tel.</label>
+                    <input type="text" id="tel" class="finput-sm" />
+                    <label style="min-width:50px; text-align:left; padding-left:10px;">Mobile</label>
+                    <input type="text" id="mobile" class="finput-sm" />
+                </div>
+
+                <!-- Email -->
+                <div class="frow">
+                    <label>Email Address</label>
+                    <input type="text" id="emailAddress" class="finput-md" />
+                </div>
+
+                <!-- Civil ID -->
+                <div class="frow">
+                    <label>Civil ID</label>
+                    <input type="text" id="civilId" class="finput-sm" />
+                </div>
+
+                <!-- Account Limit + Receipt Limit -->
+                <div class="frow">
+                    <label>Account Limit</label>
+                    <input type="number" id="accountLimit" class="finput-sm" value="0" min="0" step="0.01" />
+                    <label style="min-width:90px; text-align:left; padding-left:10px;">Receipt Limit</label>
+                    <input type="number" id="receiptLimit" class="finput-sm" value="0" min="0" step="0.01" />
+                </div>
+
+                <!-- Name -->
+                <div class="frow">
+                    <label>Name</label>
+                    <input type="text" id="nameField" class="finput-md" />
+                </div>
+
+                <hr class="section-sep" />
+
+                <!-- Note -->
+                <div class="frow" style="align-items:flex-start;">
+                    <label style="margin-top:3px;">Note</label>
+                    <textarea id="noteField" style="width:360px; height:70px; border:1px solid #999; padding:4px; font-size:0.8rem; resize:none; background:white;"></textarea>
+                </div>
+
+                <hr class="section-sep" />
+
+                <!-- Buttons -->
+                <div style="display:flex; gap:8px; margin-top:4px;">
+                    <button type="button" class="btn btn-sm btn-primary" onclick="saveChildAccount()">
+                        <i class="bi bi-save"></i> Save
+                    </button>
+                    <button type="button" class="btn btn-sm btn-secondary" onclick="newChildAccount()">
+                        <i class="bi bi-plus"></i> New
+                    </button>
+                    <button type="button" class="btn btn-sm btn-danger" onclick="deleteChildAccount()">
+                        <i class="bi bi-trash"></i> Delete
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    var allMainAccounts = [];
+    var treeExpanded = false;
+    var selectedMainId = 0;
+    var selectedChildId = 0;
+
+    document.addEventListener('DOMContentLoaded', function () {
+        loadMainTree();
+    });
+
+    // ============ TREE ============
+    function loadMainTree() {
+        fetch('/ChildAccounts/GetMainAccountTree')
+            .then(r => r.json())
+            .then(data => {
+                allMainAccounts = data;
+                renderTree();
+            });
+    }
+
+    function renderTree() {
+        var container = document.getElementById('treeContainer');
+        container.innerHTML = '';
+        var roots = allMainAccounts.filter(a => !a.parentAccountId);
+        roots.forEach(a => renderMainNode(container, a, 0));
+    }
+
+    function renderMainNode(container, account, depth) {
+        var children = allMainAccounts.filter(a => a.parentAccountId === account.id);
+        var hasChildren = children.length > 0;
+
+        var div = document.createElement('div');
+        div.dataset.id = account.id;
+        div.dataset.expanded = 'false';
+        div.style.paddingLeft = (depth * 14 + 4) + 'px';
+        div.className = 'tree-node' + (account.active ? '' : ' inactive-account') +
+                        (account.id === selectedMainId ? ' selected' : '');
+
+        var toggleSpan = document.createElement('span');
+        toggleSpan.className = 'tree-toggle' + (hasChildren ? '' : ' no-children');
+        toggleSpan.innerHTML = '&#9658;';
+        toggleSpan.onclick = function (e) { e.stopPropagation(); toggleNode(div, account.id, depth); };
+
+        var iconSpan = document.createElement('span');
+        iconSpan.className = 'tree-icon';
+        iconSpan.innerHTML = hasChildren
+            ? '<i class="bi bi-folder2"></i>'
+            : '<i class="bi bi-file-text"></i>';
+
+        var labelSpan = document.createElement('span');
+        labelSpan.className = 'tree-label';
+        labelSpan.title = account.accountNo + ' - ' + account.accountName;
+        labelSpan.textContent = account.accountNo + '  ' + account.accountName;
+
+        div.appendChild(toggleSpan);
+        div.appendChild(iconSpan);
+        div.appendChild(labelSpan);
+        div.onclick = function () { selectMainAccount(account.id, account.accountNo, account.accountName, div); };
+
+        container.appendChild(div);
+
+        var childContainer = document.createElement('div');
+        childContainer.id = 'children_' + account.id;
+        childContainer.style.display = 'none';
+        container.appendChild(childContainer);
+
+        if (treeExpanded) expandNode(div, account.id, depth);
+    }
+
+    function toggleNode(div, accountId, depth) {
+        if (div.dataset.expanded === 'true') {
+            collapseNode(div, accountId);
+        } else {
+            expandNode(div, accountId, depth);
+        }
+    }
+
+    function expandNode(div, accountId, depth) {
+        var childContainer = document.getElementById('children_' + accountId);
+        if (!childContainer) return;
+        childContainer.innerHTML = '';
+
+        var subMain = allMainAccounts.filter(a => a.parentAccountId === accountId);
+        subMain.forEach(a => renderMainNode(childContainer, a, depth + 1));
+
+        // Show child accounts under this main account
+        fetch('/ChildAccounts/GetByParent?parentId=' + accountId)
+            .then(r => r.json())
+            .then(childs => {
+                childs.forEach(c => {
+                    var ce = document.createElement('div');
+                    ce.className = 'child-entry' + (c.id === selectedChildId ? ' selected' : '');
+                    ce.style.paddingLeft = ((depth + 1) * 14 + 4) + 'px';
+                    ce.innerHTML = '<i class="bi bi-person-lines-fill" style="color:#2563eb; font-size:0.7rem;"></i> ' +
+                                   c.accountNo + '  ' + c.accountName;
+                    ce.onclick = function (e) {
+                        e.stopPropagation();
+                        document.querySelectorAll('.child-entry.selected').forEach(el => el.classList.remove('selected'));
+                        ce.classList.add('selected');
+                        selectedChildId = c.id;
+                        loadChildAccount(c.id);
+                    };
+                    childContainer.appendChild(ce);
+                });
+            });
+
+        childContainer.style.display = 'block';
+        div.dataset.expanded = 'true';
+        var toggle = div.querySelector('.tree-toggle');
+        if (toggle && !toggle.classList.contains('no-children')) toggle.innerHTML = '&#9660;';
+    }
+
+    function collapseNode(div, accountId) {
+        var cc = document.getElementById('children_' + accountId);
+        if (cc) { cc.style.display = 'none'; cc.innerHTML = ''; }
+        div.dataset.expanded = 'false';
+        var toggle = div.querySelector('.tree-toggle');
+        if (toggle && !toggle.classList.contains('no-children')) toggle.innerHTML = '&#9658;';
+    }
+
+    function selectMainAccount(id, no, name, div) {
+        document.querySelectorAll('.tree-node.selected').forEach(el => el.classList.remove('selected'));
+        div.classList.add('selected');
+        selectedMainId = id;
+
+        // Set parent fields and generate account no for NEW entry
+        document.getElementById('parentAccountId').value = id;
+        document.getElementById('parentAccountNo').value = no;
+        document.getElementById('parentAccountIdDisplay').value = id;
+        document.getElementById('parentAccountName').value = name;
+
+        var isNew = document.getElementById('childId').value === '0';
+        if (isNew) generateAccountNo(id);
+
+        // Expand to show children
+        if (div.dataset.expanded !== 'true') toggleNode(div, id, parseInt(div.style.paddingLeft) / 14);
+    }
+
+    function toggleAllTree() {
+        treeExpanded = !treeExpanded;
+        renderTree();
+    }
+
+    // ============ ACCOUNT NO GENERATION ============
+    function generateAccountNo(parentId) {
+        if (!parentId) return;
+        var isNew = document.getElementById('childId').value === '0';
+        if (!isNew) return;
+
+        fetch('/ChildAccounts/GetNextAccountNo?parentId=' + parentId)
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('accountNo').value = data.accountNo || '';
+            });
+    }
+
+    // ============ LOAD CHILD ACCOUNT ============
+    function loadChildAccount(id) {
+        fetch('/ChildAccounts/GetChildAccount/' + id)
+            .then(r => r.json())
+            .then(data => fillForm(data));
+    }
+
+    function fillForm(data) {
+        document.getElementById('childId').value = data.id;
+        document.getElementById('accountNo').value = data.accountNo;
+        document.getElementById('parentAccountId').value = data.parentAccountId;
+        document.getElementById('parentAccountNo').value = data.parentAccountNo;
+        document.getElementById('parentAccountIdDisplay').value = data.parentAccountId;
+        document.getElementById('parentAccountName').value = data.parentAccountName;
+        document.getElementById('accountName').value = data.accountName;
+        document.getElementById('accountType').value = data.accountType;
+        document.getElementById('accountEffect').value = data.accountEffect;
+        document.getElementById('natureOfAccount').value = data.natureOfAccount;
+        document.getElementById('treatsAsBankAccount').checked = data.treatsAsBankAccount;
+        document.getElementById('costCenterId').value = data.costCenterId || '';
+        document.getElementById('costName').value = data.costCenterName || '';
+        document.getElementById('fixedCostCenter').checked = data.fixedCostCenter;
+        document.getElementById('address').value = data.address;
+        document.getElementById('tel').value = data.tel;
+        document.getElementById('mobile').value = data.mobile;
+        document.getElementById('emailAddress').value = data.emailAddress;
+        document.getElementById('civilId').value = data.civilId;
+        document.getElementById('accountLimit').value = data.accountLimit;
+        document.getElementById('receiptLimit').value = data.receiptLimit;
+        document.getElementById('nameField').value = data.name;
+        document.getElementById('noteField').value = data.note;
+        selectedMainId = data.parentAccountId;
+        selectedChildId = data.id;
+    }
+
+    // ============ COST CENTER LOOKUP ============
+    function lookupCostCenter() {
+        var val = document.getElementById('costCenterId').value.trim();
+        document.getElementById('costName').value = '';
+        if (!val) return;
+        // If numeric, treat as ID; otherwise leave blank
+        if (isNaN(val)) return;
+        // Simple fetch (we just display ID - full lookup would need an endpoint)
+        document.getElementById('costName').value = 'ID: ' + val;
+    }
+
+    // ============ SEARCH ============
+    function doSearch() {
+        var no = document.getElementById('searchNo').value.trim();
+        var name = document.getElementById('searchName').value.trim();
+        if (!no && !name) { showAlert('Enter Account Number or Name to search.', false); return; }
+
+        fetch('/ChildAccounts/Search?accountNo=' + encodeURIComponent(no) + '&accountName=' + encodeURIComponent(name))
+            .then(r => r.json())
+            .then(data => {
+                var container = document.getElementById('searchResults');
+                if (data.length === 0) {
+                    container.innerHTML = '<div style="padding:6px 10px; color:#999;">No results found.</div>';
+                } else {
+                    container.innerHTML = data.map(a =>
+                        '<div class="search-result-item" onclick="selectSearchResult(' + a.id + ')" ' +
+                        'style="padding:5px 10px; cursor:pointer; border-bottom:1px solid #eee;" ' +
+                        'onmouseover="this.style.background=\'#f0f7ff\'" onmouseout="this.style.background=\'\'"> ' +
+                        '<strong>' + a.accountNo + '</strong> - ' + a.accountName +
+                        ' <small style="color:#888;">(' + a.parentAccountNo + ' ' + a.parentAccountName + ')</small>' +
+                        '</div>'
+                    ).join('');
+                }
+                container.style.display = 'block';
+            });
+    }
+
+    function selectSearchResult(id) {
+        document.getElementById('searchResults').style.display = 'none';
+        selectedChildId = id;
+        loadChildAccount(id);
+    }
+
+    function clearSearch() {
+        document.getElementById('searchNo').value = '';
+        document.getElementById('searchName').value = '';
+        document.getElementById('searchResults').style.display = 'none';
+    }
+
+    document.addEventListener('click', function (e) {
+        if (!e.target.closest('#searchResults') && !e.target.closest('.search-bar'))
+            document.getElementById('searchResults').style.display = 'none';
+    });
+
+    // ============ NEW ============
+    function newChildAccount() {
+        selectedChildId = 0;
+        document.querySelectorAll('.child-entry.selected').forEach(el => el.classList.remove('selected'));
+        document.getElementById('childId').value = '0';
+        document.getElementById('accountNo').value = '';
+        document.getElementById('accountName').value = '';
+        document.getElementById('accountType').value = '';
+        document.getElementById('accountEffect').value = 'Debit';
+        document.getElementById('natureOfAccount').value = '';
+        document.getElementById('treatsAsBankAccount').checked = false;
+        document.getElementById('costCenterId').value = '';
+        document.getElementById('costName').value = '';
+        document.getElementById('fixedCostCenter').checked = false;
+        document.getElementById('address').value = '';
+        document.getElementById('tel').value = '';
+        document.getElementById('mobile').value = '';
+        document.getElementById('emailAddress').value = '';
+        document.getElementById('civilId').value = '';
+        document.getElementById('accountLimit').value = '0';
+        document.getElementById('receiptLimit').value = '0';
+        document.getElementById('nameField').value = '';
+        document.getElementById('noteField').value = '';
+
+        // If a main account is already selected, keep it and regenerate
+        var parentId = document.getElementById('parentAccountId').value;
+        if (parentId && parentId !== '0') {
+            generateAccountNo(parseInt(parentId));
+        } else {
+            document.getElementById('parentAccountId').value = '0';
+            document.getElementById('parentAccountNo').value = '';
+            document.getElementById('parentAccountIdDisplay').value = '';
+            document.getElementById('parentAccountName').value = '';
+        }
+        document.getElementById('accountName').focus();
+    }
+
+    // ============ SAVE ============
+    function saveChildAccount() {
+        var token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+        var parentId = document.getElementById('parentAccountId').value;
+
+        if (!parentId || parentId === '0') {
+            showAlert('Please select a Parent Account from the tree.', false);
+            return;
+        }
+
+        var body = new URLSearchParams({
+            __RequestVerificationToken: token,
+            id: document.getElementById('childId').value,
+            accountNo: document.getElementById('accountNo').value,
+            parentAccountId: parentId,
+            accountName: document.getElementById('accountName').value,
+            accountType: document.getElementById('accountType').value,
+            accountEffect: document.getElementById('accountEffect').value,
+            natureOfAccount: document.getElementById('natureOfAccount').value,
+            treatsAsBankAccount: document.getElementById('treatsAsBankAccount').checked,
+            costCenterId: document.getElementById('costCenterId').value || '',
+            fixedCostCenter: document.getElementById('fixedCostCenter').checked,
+            address: document.getElementById('address').value,
+            tel: document.getElementById('tel').value,
+            mobile: document.getElementById('mobile').value,
+            emailAddress: document.getElementById('emailAddress').value,
+            civilId: document.getElementById('civilId').value,
+            accountLimit: document.getElementById('accountLimit').value || '0',
+            receiptLimit: document.getElementById('receiptLimit').value || '0',
+            name: document.getElementById('nameField').value,
+            note: document.getElementById('noteField').value,
+            active: true
+        });
+
+        fetch('/ChildAccounts/Save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: body.toString()
+        })
+        .then(r => r.json())
+        .then(data => {
+            showAlert(data.message, data.success);
+            if (data.success) {
+                document.getElementById('childId').value = data.id;
+                selectedChildId = data.id;
+                loadMainTree(); // refresh to show new child in tree
+            }
+        });
+    }
+
+    // ============ DELETE ============
+    function deleteChildAccount() {
+        var id = document.getElementById('childId').value;
+        if (id === '0' || id === '') {
+            showAlert('Please select a child account to delete.', false);
+            return;
+        }
+        if (!confirm('Are you sure you want to delete this account?')) return;
+
+        var token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+        fetch('/ChildAccounts/Delete/' + id, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ __RequestVerificationToken: token, id: id }).toString()
+        })
+        .then(r => r.json())
+        .then(data => {
+            showAlert(data.message, data.success);
+            if (data.success) {
+                newChildAccount();
+                loadMainTree();
+            }
+        });
+    }
+
+    // ============ ALERT ============
+    function showAlert(msg, success) {
+        var el = document.getElementById('alertBanner');
+        el.textContent = msg;
+        el.className = 'alert-banner ' + (success ? 'alert-success' : 'alert-danger');
+        el.style.display = 'block';
+        setTimeout(() => { el.style.display = 'none'; }, 4000);
+    }
+</script>
+}

@@ -22,6 +22,94 @@ namespace Concept.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Concept.Models.ChildAccount", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AccountEffect")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("AccountLimit")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("AccountName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AccountNo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("AccountType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CivilId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("CostCenterId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("EmailAddress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("FixedCostCenter")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Mobile")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NatureOfAccount")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ParentAccountId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("ReceiptLimit")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Tel")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("TreatsAsBankAccount")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountNo")
+                        .IsUnique();
+
+                    b.HasIndex("CostCenterId");
+
+                    b.HasIndex("ParentAccountId");
+
+                    b.ToTable("Child_Account", (string)null);
+                });
+
             modelBuilder.Entity("Concept.Models.MainAccount", b =>
                 {
                     b.Property<int>("Id")
@@ -1956,6 +2044,23 @@ namespace Concept.Migrations
                     b.Navigation("Cities");
 
                     b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("Concept.Models.ChildAccount", b =>
+                {
+                    b.HasOne("Concept.Models.MainAccount", "ParentAccount")
+                        .WithMany()
+                        .HasForeignKey("ParentAccountId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Concept.Models.DeffCostCenter", "CostCenter")
+                        .WithMany()
+                        .HasForeignKey("CostCenterId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("ParentAccount");
+                    b.Navigation("CostCenter");
                 });
 
             modelBuilder.Entity("Concept.Models.MainAccount", b =>

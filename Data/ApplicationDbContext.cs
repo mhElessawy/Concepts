@@ -42,6 +42,7 @@ namespace Concept.Data
         public DbSet<StoreReturnDetails> StoreReturnDetails { get; set; }
 
         public DbSet<MainAccount> MainAccounts { get; set; }
+        public DbSet<ChildAccount> ChildAccounts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -386,6 +387,22 @@ namespace Concept.Data
                 .WithMany()
                 .HasForeignKey(r => r.SubUOMId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // ChildAccount Configuration
+            modelBuilder.Entity<ChildAccount>().ToTable("Child_Account");
+            modelBuilder.Entity<ChildAccount>().HasIndex(a => a.AccountNo).IsUnique();
+
+            modelBuilder.Entity<ChildAccount>()
+                .HasOne(a => a.ParentAccount)
+                .WithMany()
+                .HasForeignKey(a => a.ParentAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ChildAccount>()
+                .HasOne(a => a.CostCenter)
+                .WithMany()
+                .HasForeignKey(a => a.CostCenterId)
+                .OnDelete(DeleteBehavior.SetNull);
 
             // MainAccount (Chart of Accounts) Configuration
             modelBuilder.Entity<MainAccount>().ToTable("Main_Account");
