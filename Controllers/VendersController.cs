@@ -68,6 +68,13 @@ namespace Concept.Controllers
             ModelState.Remove("Bank");
             ModelState.Remove("CostCenter");
             ModelState.Remove("VenderCode");
+
+            // Validate required Cost Center selection
+            if (!vendor.CostCenterId.HasValue || vendor.CostCenterId == 0)
+            {
+                ModelState.AddModelError("CostCenterId", "Cost Center is required");
+            }
+
             if (ModelState.IsValid)
             {
                 try
@@ -131,6 +138,12 @@ namespace Concept.Controllers
             ModelState.Remove("JobTitle");
             ModelState.Remove("Bank");
             ModelState.Remove("CostCenter");
+
+            // Validate required Cost Center selection
+            if (!vendor.CostCenterId.HasValue || vendor.CostCenterId == 0)
+            {
+                ModelState.AddModelError("CostCenterId", "Cost Center is required");
+            }
 
             if (ModelState.IsValid)
             {
@@ -283,20 +296,20 @@ namespace Concept.Controllers
                 .FirstOrDefaultAsync();
 
             if (lastVender == null)
-                return "V001";
+                return "VND-00001";
 
-            // Extract numeric part from code like "V001"
+            // Extract numeric part from code like "VND-00001"
             var code = lastVender.VenderCode;
             var numericPart = new string(code.Where(char.IsDigit).ToArray());
 
             if (int.TryParse(numericPart, out int lastNumber))
             {
-                return $"V{(lastNumber + 1).ToString().PadLeft(3, '0')}";
+                return $"VND-{(lastNumber + 1).ToString().PadLeft(5, '0')}";
             }
 
             // Fallback: count existing vendors + 1
             var count = await _context.Venders.CountAsync();
-            return $"V{(count + 1).ToString().PadLeft(3, '0')}";
+            return $"VND-{(count + 1).ToString().PadLeft(5, '0')}";
         }
     }
 }
