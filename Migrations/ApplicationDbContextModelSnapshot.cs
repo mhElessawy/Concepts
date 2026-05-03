@@ -22,6 +22,57 @@ namespace Concept.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Concept.Models.MainAccount", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AccountEffect")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AccountName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AccountNo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("OpenAccountDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ParentAccountId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("TreatsAsCashAccount")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountNo")
+                        .IsUnique();
+
+                    b.HasIndex("ParentAccountId");
+
+                    b.ToTable("Main_Account", (string)null);
+                });
+
             modelBuilder.Entity("Concept.Models.DefBank", b =>
                 {
                     b.Property<int>("Id")
@@ -1905,6 +1956,21 @@ namespace Concept.Migrations
                     b.Navigation("Cities");
 
                     b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("Concept.Models.MainAccount", b =>
+                {
+                    b.HasOne("Concept.Models.MainAccount", "ParentAccount")
+                        .WithMany("Children")
+                        .HasForeignKey("ParentAccountId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("ParentAccount");
+                });
+
+            modelBuilder.Entity("Concept.Models.MainAccount", b =>
+                {
+                    b.Navigation("Children");
                 });
 
             modelBuilder.Entity("Concept.Models.DeffDepartment", b =>

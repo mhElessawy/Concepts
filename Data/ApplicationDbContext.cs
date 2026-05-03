@@ -41,6 +41,8 @@ namespace Concept.Data
         public DbSet<StoreReturnHeader> StoreReturnHeaders { get; set; }
         public DbSet<StoreReturnDetails> StoreReturnDetails { get; set; }
 
+        public DbSet<MainAccount> MainAccounts { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -383,6 +385,16 @@ namespace Concept.Data
                 .HasOne(r => r.SubUOM)
                 .WithMany()
                 .HasForeignKey(r => r.SubUOMId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // MainAccount (Chart of Accounts) Configuration
+            modelBuilder.Entity<MainAccount>().ToTable("Main_Account");
+            modelBuilder.Entity<MainAccount>().HasIndex(a => a.AccountNo).IsUnique();
+
+            modelBuilder.Entity<MainAccount>()
+                .HasOne(a => a.ParentAccount)
+                .WithMany(a => a.Children)
+                .HasForeignKey(a => a.ParentAccountId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Configure decimal precision for Return Details

@@ -760,6 +760,38 @@ namespace Concept.Models
         public virtual UserInfo? User { get; set; }
 
     }
+    public class MainAccount
+    {
+        [Key]
+        public int Id { get; set; }
+
+        [Required]
+        public string AccountNo { get; set; } = string.Empty;
+
+        [Required]
+        public string AccountName { get; set; } = string.Empty;
+
+        public string AccountEffect { get; set; } = "Debit";
+
+        public bool TreatsAsCashAccount { get; set; } = false;
+
+        public bool Active { get; set; } = true;
+
+        public DateTime OpenAccountDate { get; set; } = DateTime.Now;
+
+        public string? Note { get; set; }
+
+        public int? ParentAccountId { get; set; }
+
+        [ForeignKey("ParentAccountId")]
+        public virtual MainAccount? ParentAccount { get; set; }
+
+        public virtual ICollection<MainAccount> Children { get; set; } = new List<MainAccount>();
+
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime ModifiedDate { get; set; } = DateTime.Now;
+    }
+
     public class StoreReturnDetails
     {
         [Key]

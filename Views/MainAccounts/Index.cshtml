@@ -1,0 +1,616 @@
+@model IEnumerable<Concept.Models.MainAccount>
+
+@{
+    ViewData["Title"] = "Main Account";
+}
+
+<style>
+    .accounts-page {
+        background: #f0f0f0;
+        min-height: calc(100vh - 70px);
+        padding: 10px;
+    }
+
+    .accounts-title {
+        color: #8b0000;
+        font-weight: bold;
+        font-size: 1.1rem;
+        margin-bottom: 8px;
+    }
+
+    .top-checkboxes {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 8px;
+        font-size: 0.85rem;
+    }
+
+    .top-checkboxes label {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        cursor: pointer;
+    }
+
+    .main-panel {
+        display: flex;
+        gap: 8px;
+        height: calc(100vh - 130px);
+    }
+
+    /* Tree Panel */
+    .tree-panel {
+        width: 240px;
+        min-width: 200px;
+        background: white;
+        border: 1px solid #ccc;
+        overflow-y: auto;
+        flex-shrink: 0;
+    }
+
+    .tree-node {
+        cursor: pointer;
+        padding: 3px 6px;
+        font-size: 0.8rem;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        border-bottom: 1px solid #f5f5f5;
+        user-select: none;
+    }
+
+    .tree-node:hover {
+        background: #e8f0fe;
+    }
+
+    .tree-node.selected {
+        background: #cce0ff;
+        font-weight: bold;
+    }
+
+    .tree-node.inactive-account {
+        color: #999;
+    }
+
+    .tree-toggle {
+        width: 14px;
+        text-align: center;
+        font-size: 0.7rem;
+        color: #555;
+        flex-shrink: 0;
+    }
+
+    .tree-toggle.no-children {
+        visibility: hidden;
+    }
+
+    .tree-icon {
+        color: #d4a017;
+        font-size: 0.75rem;
+        flex-shrink: 0;
+    }
+
+    .tree-label {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Form Panel */
+    .form-panel {
+        flex: 1;
+        background: #d9d9d9;
+        border: 1px solid #bbb;
+        overflow-y: auto;
+        padding: 10px;
+    }
+
+    .form-section-title {
+        background: transparent;
+        color: #333;
+        font-size: 0.82rem;
+        font-weight: 600;
+        margin-bottom: 10px;
+        border-bottom: 1px solid #bbb;
+        padding-bottom: 4px;
+    }
+
+    .form-row-custom {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 8px;
+    }
+
+    .form-field {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.8rem;
+    }
+
+    .form-field label {
+        min-width: 110px;
+        text-align: right;
+        color: #333;
+        font-size: 0.8rem;
+        white-space: nowrap;
+    }
+
+    .form-field input[type="text"],
+    .form-field input[type="date"],
+    .form-field select,
+    .form-field textarea {
+        border: 1px solid #999;
+        padding: 2px 5px;
+        font-size: 0.8rem;
+        background: white;
+        border-radius: 0;
+    }
+
+    .form-field input[type="text"] { width: 180px; }
+    .form-field select { width: 192px; }
+    .form-field input[type="date"] { width: 140px; }
+
+    .form-field-readonly input[type="text"] {
+        background: #e8e8e8;
+    }
+
+    .note-field {
+        margin-top: 6px;
+    }
+
+    .note-field label {
+        min-width: 110px;
+        text-align: right;
+        vertical-align: top;
+        margin-top: 3px;
+        font-size: 0.8rem;
+    }
+
+    .note-field textarea {
+        width: 300px;
+        height: 80px;
+        resize: none;
+        border: 1px solid #999;
+        padding: 4px;
+        font-size: 0.8rem;
+    }
+
+    .status-field {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.8rem;
+        margin-bottom: 8px;
+    }
+
+    .status-field label.status-label {
+        min-width: 110px;
+        text-align: right;
+        color: #333;
+    }
+
+    .cash-checkbox-row {
+        margin-left: 116px;
+        margin-bottom: 8px;
+        font-size: 0.8rem;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    /* Right column */
+    .right-col {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .right-field {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.8rem;
+    }
+
+    .right-field label {
+        min-width: 130px;
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    .right-field input[type="text"] {
+        width: 180px;
+        border: 1px solid #999;
+        padding: 2px 5px;
+        font-size: 0.8rem;
+        background: #e8e8e8;
+    }
+
+    /* Alerts */
+    .alert-banner {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+        border-radius: 3px;
+        margin-bottom: 8px;
+        display: none;
+    }
+
+    .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .alert-danger { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+</style>
+
+<div class="accounts-page">
+    <div class="accounts-title">Main Account</div>
+
+    <div class="top-checkboxes">
+        <label>
+            <input type="checkbox" id="chkCreateRoot" onchange="toggleRootMode()" />
+            Create Root Account
+        </label>
+        <label>
+            <input type="checkbox" id="chkOpenTree" onchange="toggleTree()" />
+            Open Tree
+        </label>
+    </div>
+
+    <div id="alertBanner" class="alert-banner"></div>
+
+    <div class="main-panel">
+        <!-- Tree Panel -->
+        <div class="tree-panel" id="treePanel">
+            <div id="treeContainer"></div>
+        </div>
+
+        <!-- Form Panel -->
+        <div class="form-panel">
+            <div class="form-section-title">Main Account INFO</div>
+
+            <form id="accountForm">
+                @Html.AntiForgeryToken()
+                <input type="hidden" id="accountId" value="0" />
+
+                <div style="display:flex; gap:30px;">
+                    <!-- Left column -->
+                    <div>
+                        <div class="form-field" style="margin-bottom:8px;">
+                            <label>Account NO.</label>
+                            <input type="text" id="accountNo" />
+                        </div>
+
+                        <div class="form-field" style="margin-bottom:8px;">
+                            <label>Account Name</label>
+                            <input type="text" id="accountName" />
+                        </div>
+
+                        <div class="form-field" style="margin-bottom:8px;">
+                            <label>Account Effect</label>
+                            <select id="accountEffect">
+                                <option value="Debit">Debit</option>
+                                <option value="Credit">Credit</option>
+                            </select>
+                        </div>
+
+                        <div class="cash-checkbox-row">
+                            <input type="checkbox" id="treatsAsCash" />
+                            <label for="treatsAsCash">Treats as a cash account</label>
+                        </div>
+
+                        <div class="status-field">
+                            <label class="status-label">Status</label>
+                            <input type="checkbox" id="activeStatus" />
+                            <label for="activeStatus">Active</label>
+                        </div>
+
+                        <div class="form-field" style="margin-bottom:8px;">
+                            <label>Open Account Date</label>
+                            <input type="date" id="openAccountDate" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                        </div>
+
+                        <div class="note-field" style="display:flex; align-items:flex-start; gap:6px;">
+                            <label style="margin-top:3px;">Note</label>
+                            <textarea id="noteField"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Right column -->
+                    <div class="right-col" id="parentSection">
+                        <div class="right-field">
+                            <label>Account Parente NO.</label>
+                            <input type="text" id="parentAccountNo" onblur="lookupParent()" />
+                        </div>
+                        <div class="right-field">
+                            <label>Parente Account</label>
+                            <input type="text" id="parentAccountName" readonly />
+                        </div>
+                        <input type="hidden" id="parentAccountId" value="" />
+                    </div>
+                </div>
+
+                <div style="margin-top:14px; display:flex; gap:8px;">
+                    <button type="button" class="btn btn-sm btn-primary" onclick="saveAccount()">
+                        <i class="bi bi-save"></i> Save
+                    </button>
+                    <button type="button" class="btn btn-sm btn-secondary" onclick="newAccount()">
+                        <i class="bi bi-plus"></i> New
+                    </button>
+                    <button type="button" class="btn btn-sm btn-danger" onclick="deleteAccount()">
+                        <i class="bi bi-trash"></i> Delete
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    // ---- State ----
+    var allAccounts = [];
+    var selectedId = 0;
+
+    // ---- Init ----
+    document.addEventListener('DOMContentLoaded', function () {
+        loadTree();
+    });
+
+    // ---- Load Tree ----
+    function loadTree() {
+        fetch('/MainAccounts/GetTree')
+            .then(r => r.json())
+            .then(data => {
+                allAccounts = data;
+                renderTree();
+            });
+    }
+
+    function renderTree() {
+        var container = document.getElementById('treeContainer');
+        container.innerHTML = '';
+        var roots = allAccounts.filter(a => !a.parentAccountId);
+        roots.forEach(a => renderNode(container, a, 0));
+    }
+
+    function renderNode(container, account, depth) {
+        var children = allAccounts.filter(a => a.parentAccountId === account.id);
+        var hasChildren = children.length > 0;
+
+        var div = document.createElement('div');
+        div.dataset.id = account.id;
+        div.dataset.expanded = 'false';
+        div.style.paddingLeft = (depth * 14 + 4) + 'px';
+        div.className = 'tree-node' + (account.active ? '' : ' inactive-account') + (account.id === selectedId ? ' selected' : '');
+
+        var toggleSpan = document.createElement('span');
+        toggleSpan.className = 'tree-toggle' + (hasChildren ? '' : ' no-children');
+        toggleSpan.innerHTML = hasChildren ? '&#9658;' : '&#9658;';
+        toggleSpan.onclick = function (e) { e.stopPropagation(); toggleNode(div, account.id, depth); };
+
+        var iconSpan = document.createElement('span');
+        iconSpan.className = 'tree-icon';
+        iconSpan.innerHTML = hasChildren ? '<i class="bi bi-folder2"></i>' : '<i class="bi bi-file-text"></i>';
+
+        var labelSpan = document.createElement('span');
+        labelSpan.className = 'tree-label';
+        labelSpan.title = account.accountNo + ' - ' + account.accountName;
+        labelSpan.textContent = account.accountNo + '  ' + account.accountName;
+
+        div.appendChild(toggleSpan);
+        div.appendChild(iconSpan);
+        div.appendChild(labelSpan);
+        div.onclick = function () { selectAccount(account.id, div); };
+
+        container.appendChild(div);
+
+        // Children container (hidden initially unless chkOpenTree)
+        var childContainer = document.createElement('div');
+        childContainer.id = 'children_' + account.id;
+        childContainer.style.display = 'none';
+        container.appendChild(childContainer);
+
+        if (document.getElementById('chkOpenTree').checked) {
+            expandNode(div, account.id, depth);
+        }
+    }
+
+    function toggleNode(div, accountId, depth) {
+        var childContainer = document.getElementById('children_' + accountId);
+        if (!childContainer) return;
+
+        if (div.dataset.expanded === 'true') {
+            collapseNode(div, accountId);
+        } else {
+            expandNode(div, accountId, depth);
+        }
+    }
+
+    function expandNode(div, accountId, depth) {
+        var childContainer = document.getElementById('children_' + accountId);
+        if (!childContainer) return;
+
+        childContainer.innerHTML = '';
+        var children = allAccounts.filter(a => a.parentAccountId === accountId);
+        children.forEach(a => renderNode(childContainer, a, depth + 1));
+        childContainer.style.display = 'block';
+
+        div.dataset.expanded = 'true';
+        var toggle = div.querySelector('.tree-toggle');
+        if (toggle && !toggle.classList.contains('no-children')) toggle.innerHTML = '&#9660;';
+    }
+
+    function collapseNode(div, accountId) {
+        var childContainer = document.getElementById('children_' + accountId);
+        if (childContainer) {
+            childContainer.style.display = 'none';
+            childContainer.innerHTML = '';
+        }
+        div.dataset.expanded = 'false';
+        var toggle = div.querySelector('.tree-toggle');
+        if (toggle && !toggle.classList.contains('no-children')) toggle.innerHTML = '&#9658;';
+    }
+
+    function selectAccount(id, divEl) {
+        // Remove previous selection
+        document.querySelectorAll('.tree-node.selected').forEach(el => el.classList.remove('selected'));
+        divEl.classList.add('selected');
+        selectedId = id;
+
+        fetch('/MainAccounts/GetAccount/' + id)
+            .then(r => r.json())
+            .then(data => fillForm(data));
+    }
+
+    function fillForm(data) {
+        document.getElementById('accountId').value = data.id;
+        document.getElementById('accountNo').value = data.accountNo;
+        document.getElementById('accountName').value = data.accountName;
+        document.getElementById('accountEffect').value = data.accountEffect;
+        document.getElementById('treatsAsCash').checked = data.treatsAsCashAccount;
+        document.getElementById('activeStatus').checked = data.active;
+        document.getElementById('openAccountDate').value = data.openAccountDate;
+        document.getElementById('noteField').value = data.note || '';
+        document.getElementById('parentAccountId').value = data.parentAccountId || '';
+        document.getElementById('parentAccountNo').value = data.parentAccountNo || '';
+        document.getElementById('parentAccountName').value = data.parentAccountName || '';
+
+        // Sync Create Root checkbox
+        document.getElementById('chkCreateRoot').checked = !data.parentAccountId;
+        document.getElementById('parentSection').style.display = data.parentAccountId ? 'flex' : 'none';
+    }
+
+    // ---- Toggle Root Mode ----
+    function toggleRootMode() {
+        var isRoot = document.getElementById('chkCreateRoot').checked;
+        var parentSection = document.getElementById('parentSection');
+        if (isRoot) {
+            parentSection.style.display = 'none';
+            document.getElementById('parentAccountId').value = '';
+            document.getElementById('parentAccountNo').value = '';
+            document.getElementById('parentAccountName').value = '';
+        } else {
+            parentSection.style.display = 'flex';
+        }
+    }
+
+    // ---- Toggle Tree Expand All ----
+    function toggleTree() {
+        renderTree();
+    }
+
+    // ---- Lookup Parent by AccountNo ----
+    function lookupParent() {
+        var no = document.getElementById('parentAccountNo').value.trim();
+        if (!no) {
+            document.getElementById('parentAccountId').value = '';
+            document.getElementById('parentAccountName').value = '';
+            return;
+        }
+        fetch('/MainAccounts/GetParentByNo?no=' + encodeURIComponent(no))
+            .then(r => r.json())
+            .then(data => {
+                if (data.found) {
+                    document.getElementById('parentAccountId').value = data.id;
+                    document.getElementById('parentAccountName').value = data.accountName;
+                } else {
+                    document.getElementById('parentAccountId').value = '';
+                    document.getElementById('parentAccountName').value = '';
+                    showAlert('Parent account not found.', false);
+                }
+            });
+    }
+
+    // ---- New Account ----
+    function newAccount() {
+        selectedId = 0;
+        document.querySelectorAll('.tree-node.selected').forEach(el => el.classList.remove('selected'));
+        document.getElementById('accountId').value = '0';
+        document.getElementById('accountNo').value = '';
+        document.getElementById('accountName').value = '';
+        document.getElementById('accountEffect').value = 'Debit';
+        document.getElementById('treatsAsCash').checked = false;
+        document.getElementById('activeStatus').checked = true;
+        document.getElementById('openAccountDate').value = new Date().toISOString().split('T')[0];
+        document.getElementById('noteField').value = '';
+        document.getElementById('parentAccountId').value = '';
+        document.getElementById('parentAccountNo').value = '';
+        document.getElementById('parentAccountName').value = '';
+        document.getElementById('chkCreateRoot').checked = false;
+        document.getElementById('parentSection').style.display = 'flex';
+    }
+
+    // ---- Save Account ----
+    function saveAccount() {
+        var token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+        var parentId = document.getElementById('parentAccountId').value;
+
+        var body = new URLSearchParams({
+            __RequestVerificationToken: token,
+            id: document.getElementById('accountId').value,
+            accountNo: document.getElementById('accountNo').value.trim(),
+            accountName: document.getElementById('accountName').value.trim(),
+            accountEffect: document.getElementById('accountEffect').value,
+            treatsAsCashAccount: document.getElementById('treatsAsCash').checked,
+            active: document.getElementById('activeStatus').checked,
+            openAccountDate: document.getElementById('openAccountDate').value,
+            note: document.getElementById('noteField').value,
+            parentAccountId: parentId || ''
+        });
+
+        fetch('/MainAccounts/Save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: body.toString()
+        })
+        .then(r => r.json())
+        .then(data => {
+            showAlert(data.message, data.success);
+            if (data.success) {
+                loadTree();
+                if (document.getElementById('accountId').value === '0') {
+                    document.getElementById('accountId').value = data.id;
+                    selectedId = data.id;
+                }
+            }
+        });
+    }
+
+    // ---- Delete Account ----
+    function deleteAccount() {
+        var id = document.getElementById('accountId').value;
+        if (id === '0' || id === '') {
+            showAlert('Please select an account to delete.', false);
+            return;
+        }
+        if (!confirm('Are you sure you want to delete this account?')) return;
+
+        var token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+        var body = new URLSearchParams({
+            __RequestVerificationToken: token,
+            id: id
+        });
+
+        fetch('/MainAccounts/Delete/' + id, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: body.toString()
+        })
+        .then(r => r.json())
+        .then(data => {
+            showAlert(data.message, data.success);
+            if (data.success) {
+                newAccount();
+                loadTree();
+            }
+        });
+    }
+
+    // ---- Alert Helper ----
+    function showAlert(msg, success) {
+        var el = document.getElementById('alertBanner');
+        el.textContent = msg;
+        el.className = 'alert-banner ' + (success ? 'alert-success' : 'alert-danger');
+        el.style.display = 'block';
+        setTimeout(() => { el.style.display = 'none'; }, 4000);
+    }
+</script>
+}
