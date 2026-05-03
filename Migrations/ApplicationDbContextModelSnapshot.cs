@@ -210,6 +210,52 @@ namespace Concept.Migrations
                     b.ToTable("Deff_City", (string)null);
                 });
 
+            modelBuilder.Entity("Concept.Models.DeffChildAccount", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AccountCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("AccountName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("CostCenterId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ParentAccountId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountCode")
+                        .IsUnique();
+
+                    b.HasIndex("CostCenterId");
+
+                    b.HasIndex("ParentAccountId");
+
+                    b.ToTable("Deff_ChildAccount", (string)null);
+                });
+
             modelBuilder.Entity("Concept.Models.DeffCostCenter", b =>
                 {
                     b.Property<int>("Id")
@@ -233,16 +279,23 @@ namespace Concept.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("ModifiedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("ParentId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("Target")
+                        .HasColumnType("decimal(18,2)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CostCenterCode")
                         .IsUnique();
+
+                    b.HasIndex("ParentId");
 
                     b.ToTable("Deff_CostCenter", (string)null);
                 });
@@ -1827,6 +1880,33 @@ namespace Concept.Migrations
                     b.Navigation("Location");
                 });
 
+            modelBuilder.Entity("Concept.Models.DeffChildAccount", b =>
+                {
+                    b.HasOne("Concept.Models.DeffCostCenter", "CostCenter")
+                        .WithMany()
+                        .HasForeignKey("CostCenterId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Concept.Models.DeffChildAccount", "ParentAccount")
+                        .WithMany("Children")
+                        .HasForeignKey("ParentAccountId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CostCenter");
+
+                    b.Navigation("ParentAccount");
+                });
+
+            modelBuilder.Entity("Concept.Models.DeffCostCenter", b =>
+                {
+                    b.HasOne("Concept.Models.DeffCostCenter", "Parent")
+                        .WithMany("Children")
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Parent");
+                });
+
             modelBuilder.Entity("Concept.Models.Vender", b =>
                 {
                     b.HasOne("Concept.Models.DefBank", "Bank")
@@ -1920,6 +2000,16 @@ namespace Concept.Migrations
             modelBuilder.Entity("Concept.Models.DeffLocation", b =>
                 {
                     b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("Concept.Models.DeffChildAccount", b =>
+                {
+                    b.Navigation("Children");
+                });
+
+            modelBuilder.Entity("Concept.Models.DeffCostCenter", b =>
+                {
+                    b.Navigation("Children");
                 });
 
             modelBuilder.Entity("Concept.Models.DeffSubCategory", b =>

@@ -404,10 +404,39 @@ namespace Concept.Models
         public string CostCenterCode { get; set; }
         [Required]
         public string CostCenterName { get; set; }
+        public int? ParentId { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal? Target { get; set; }
         public bool Active { get; set; } = true;
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public DateTime ModifiedDate { get; set; } = DateTime.Now;
         public string Description { get; set; }
+
+        [ForeignKey("ParentId")]
+        public virtual DeffCostCenter Parent { get; set; }
+        public virtual ICollection<DeffCostCenter> Children { get; set; } = new List<DeffCostCenter>();
+    }
+
+    public class DeffChildAccount
+    {
+        [Key]
+        public int Id { get; set; }
+        [Required]
+        public string AccountCode { get; set; }
+        [Required]
+        public string AccountName { get; set; }
+        public int? ParentAccountId { get; set; }
+        public int? CostCenterId { get; set; }
+        public bool Active { get; set; } = true;
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime ModifiedDate { get; set; } = DateTime.Now;
+        public string Description { get; set; }
+
+        [ForeignKey("CostCenterId")]
+        public virtual DeffCostCenter CostCenter { get; set; }
+        [ForeignKey("ParentAccountId")]
+        public virtual DeffChildAccount ParentAccount { get; set; }
+        public virtual ICollection<DeffChildAccount> Children { get; set; } = new List<DeffChildAccount>();
     }
     public class DeffLocation
     {

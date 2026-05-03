@@ -1,0 +1,63 @@
+@model DeffCostCenter
+
+@{
+    ViewData["Title"] = "Delete Cost Center";
+}
+
+<div class="page-header">
+    <h2><i class="bi bi-trash text-danger"></i> Delete Cost Center</h2>
+    <a asp-action="Index" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back
+    </a>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <i class="bi bi-exclamation-triangle"></i> Confirm Delete
+            </div>
+            <div class="card-body">
+                @if (Model.Children.Any())
+                {
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-circle"></i>
+                        This cost center has <strong>@Model.Children.Count child(ren)</strong>. Cannot delete.
+                    </div>
+                }
+                else
+                {
+                    <p>Are you sure you want to delete this cost center?</p>
+                }
+
+                <dl class="row">
+                    <dt class="col-sm-4">Code</dt>
+                    <dd class="col-sm-8"><strong>@Model.CostCenterCode</strong></dd>
+                    <dt class="col-sm-4">Name</dt>
+                    <dd class="col-sm-8">@Model.CostCenterName</dd>
+                    <dt class="col-sm-4">Parent</dt>
+                    <dd class="col-sm-8">@(Model.Parent?.CostCenterName ?? "Root")</dd>
+                </dl>
+
+                @if (!Model.Children.Any())
+                {
+                    <form asp-action="Delete" method="post">
+                        <input type="hidden" asp-for="Id" />
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Delete
+                        </button>
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Cancel
+                        </a>
+                    </form>
+                }
+                else
+                {
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Back
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+</div>

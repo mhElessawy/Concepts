@@ -1,0 +1,86 @@
+@model DeffCostCenter
+
+@{
+    ViewData["Title"] = "Cost Center Details";
+}
+
+<div class="page-header">
+    <h2><i class="bi bi-eye"></i> Cost Center Details</h2>
+    <div>
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
+            <i class="bi bi-pencil"></i> Edit
+        </a>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-light py-2">
+                <strong>Cost Center INFO</strong>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4">Code</dt>
+                    <dd class="col-sm-8"><strong>@Model.CostCenterCode</strong></dd>
+
+                    <dt class="col-sm-4">Name</dt>
+                    <dd class="col-sm-8">@Model.CostCenterName</dd>
+
+                    <dt class="col-sm-4">Parent Code</dt>
+                    <dd class="col-sm-8">@(Model.Parent?.CostCenterCode ?? "-")</dd>
+
+                    <dt class="col-sm-4">Parent Name</dt>
+                    <dd class="col-sm-8">@(Model.Parent?.CostCenterName ?? "-")</dd>
+
+                    <dt class="col-sm-4">Target</dt>
+                    <dd class="col-sm-8">@(Model.Target.HasValue ? Model.Target.Value.ToString("N2") : "-")</dd>
+
+                    <dt class="col-sm-4">Status</dt>
+                    <dd class="col-sm-8">
+                        @if (Model.Active)
+                        {
+                            <span class="badge bg-success">Active</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Inactive</span>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-4">Created Date</dt>
+                    <dd class="col-sm-8">@Model.CreatedDate.ToString("yyyy-MM-dd")</dd>
+
+                    <dt class="col-sm-4">Modified Date</dt>
+                    <dd class="col-sm-8">@Model.ModifiedDate.ToString("yyyy-MM-dd")</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.Children.Any())
+    {
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-light py-2">
+                    <strong>Child Cost Centers (@Model.Children.Count)</strong>
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush">
+                        @foreach (var child in Model.Children)
+                        {
+                            <li class="list-group-item py-2">
+                                <a asp-action="Details" asp-route-id="@child.Id">
+                                    @child.CostCenterCode - @child.CostCenterName
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    }
+</div>

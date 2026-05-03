@@ -1,0 +1,103 @@
+@model IEnumerable<DeffChildAccount>
+
+@{
+    ViewData["Title"] = "Child Accounts";
+}
+
+<div class="page-header">
+    <h2><i class="bi bi-journal-bookmark"></i> Child Accounts</h2>
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> New Account
+    </a>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show">
+        <i class="bi bi-check-circle"></i> @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show">
+        <i class="bi bi-exclamation-circle"></i> @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th>Parent Account</th>
+                        <th>Cost Center</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><strong>@item.AccountCode</strong></td>
+                            <td>@item.AccountName</td>
+                            <td>
+                                @if (item.ParentAccount != null)
+                                {
+                                    <span class="text-muted">@item.ParentAccount.AccountCode - @item.ParentAccount.AccountName</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-info">Root</span>
+                                }
+                            </td>
+                            <td>
+                                @if (item.CostCenter != null)
+                                {
+                                    <span class="badge bg-primary">@item.CostCenter.CostCenterCode</span>
+                                    <span class="ms-1">@item.CostCenter.CostCenterName</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            </td>
+                            <td>
+                                @if (item.Active)
+                                {
+                                    <span class="badge bg-success">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Inactive</span>
+                                }
+                            </td>
+                            <td class="action-buttons">
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">No accounts found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

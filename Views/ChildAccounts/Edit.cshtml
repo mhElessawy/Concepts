@@ -1,0 +1,117 @@
+@model DeffChildAccount
+
+@{
+    ViewData["Title"] = "Edit Child Account";
+}
+
+<div class="page-header">
+    <h2><i class="bi bi-pencil"></i> Edit Child Account</h2>
+    <a asp-action="Index" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back
+    </a>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-light py-2">
+                <strong>Account INFO</strong>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Edit" method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                    <input asp-for="Id" type="hidden" />
+                    <input asp-for="CreatedDate" type="hidden" />
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="AccountCode" class="form-label">
+                                Account Code <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="AccountCode" class="form-control" />
+                            <span asp-validation-for="AccountCode" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="AccountName" class="form-label">
+                                Account Name <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="AccountName" class="form-control" />
+                            <span asp-validation-for="AccountName" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="ParentAccountId" class="form-label">Parent Account</label>
+                            <select asp-for="ParentAccountId" class="form-select">
+                                <option value="">-- Root (No Parent) --</option>
+                                @foreach (var item in ViewBag.ParentAccounts)
+                                {
+                                    <option value="@item.Id" @(item.Id == ViewBag.SelectedParentAccountId ? "selected" : "")>
+                                        @item.Display
+                                    </option>
+                                }
+                            </select>
+                        </div>
+
+                        <!-- Cost Center Selection with Name Display -->
+                        <div class="col-md-6">
+                            <label asp-for="CostCenterId" class="form-label">Cost Center</label>
+                            <select asp-for="CostCenterId" id="costCenterSelect" class="form-select">
+                                <option value="">-- Select Cost Center --</option>
+                                @foreach (var item in ViewBag.CostCenters)
+                                {
+                                    <option value="@item.Id" @(item.Id == ViewBag.SelectedCostCenterId ? "selected" : "")>
+                                        @item.Display
+                                    </option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Cost Center Name</label>
+                            <input type="text" id="costCenterName" class="form-control bg-light" readonly
+                                   value="@ViewBag.CostCenterName" />
+                        </div>
+
+                        <div class="col-12">
+                            <div class="form-check form-switch">
+                                <input asp-for="Active" class="form-check-input" type="checkbox" />
+                                <label asp-for="Active" class="form-check-label">Active</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label asp-for="Description" class="form-label">Description</label>
+                            <textarea asp-for="Description" class="form-control" rows="2"></textarea>
+                        </div>
+
+                        <div class="col-12 mt-3">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> Update
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $('#costCenterSelect').on('change', function () {
+            var id = $(this).val();
+            if (id) {
+                $.get('/CostCenters/GetCostCenterName', { id: id }, function (data) {
+                    $('#costCenterName').val(data.name);
+                });
+            } else {
+                $('#costCenterName').val('');
+            }
+        });
+    </script>
+}

@@ -24,6 +24,7 @@ namespace Concept.Data
         public DbSet<DefBank> DefBanks { get; set; }
         public DbSet<Vender> Venders { get; set; }
         public DbSet<DeffCostCenter> DeffCostCenters { get; set; }
+        public DbSet<DeffChildAccount> DeffChildAccounts { get; set; }
         public DbSet<DeffLocation> DeffLocations { get; set; }
         public DbSet<PurchaseRequestHeader> PurchaseRequestHeaders { get; set; }
         public DbSet<PurchaseRequestDetails> PurchaseRequestDetails { get; set; }
@@ -136,6 +137,24 @@ namespace Concept.Data
 
             modelBuilder.Entity<DeffCostCenter>().ToTable("Deff_CostCenter");
             modelBuilder.Entity<DeffCostCenter>().HasIndex(cc => cc.CostCenterCode).IsUnique();
+            modelBuilder.Entity<DeffCostCenter>()
+                .HasOne(cc => cc.Parent)
+                .WithMany(cc => cc.Children)
+                .HasForeignKey(cc => cc.ParentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<DeffChildAccount>().ToTable("Deff_ChildAccount");
+            modelBuilder.Entity<DeffChildAccount>().HasIndex(ca => ca.AccountCode).IsUnique();
+            modelBuilder.Entity<DeffChildAccount>()
+                .HasOne(ca => ca.CostCenter)
+                .WithMany()
+                .HasForeignKey(ca => ca.CostCenterId)
+                .OnDelete(DeleteBehavior.SetNull);
+            modelBuilder.Entity<DeffChildAccount>()
+                .HasOne(ca => ca.ParentAccount)
+                .WithMany(ca => ca.Children)
+                .HasForeignKey(ca => ca.ParentAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Vender>()
                 .HasOne(v => v.CostCenter)

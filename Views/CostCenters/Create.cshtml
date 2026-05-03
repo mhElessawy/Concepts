@@ -1,0 +1,160 @@
+@model DeffCostCenter
+
+@{
+    ViewData["Title"] = "New Cost Center";
+}
+
+<div class="page-header">
+    <h2><i class="bi bi-plus-circle"></i> New Cost Center</h2>
+    <a asp-action="Index" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back
+    </a>
+</div>
+
+<div class="row">
+    <!-- Tree Panel -->
+    <div class="col-md-3">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white py-2">
+                <i class="bi bi-diagram-3"></i> Cost Center Tree
+            </div>
+            <div class="card-body p-2" style="min-height:400px; overflow-y:auto;">
+                <div id="ccTree" class="list-group list-group-flush"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form Panel -->
+    <div class="col-md-9">
+        <div class="card">
+            <div class="card-header bg-light py-2">
+                <strong>Cost Center INFO</strong>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Create" method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input type="checkbox" class="form-check-input" id="chkCreateRoot" />
+                            <label class="form-check-label" for="chkCreateRoot">Create Root</label>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="CostCenterCode" class="form-label">
+                                Code of cost center <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="CostCenterCode" class="form-control" placeholder="e.g. CC-001" />
+                            <span asp-validation-for="CostCenterCode" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Parent Code</label>
+                            <input type="text" id="parentCode" class="form-control" readonly placeholder="Select from tree" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Parent Name</label>
+                            <input type="text" id="parentName" class="form-control" readonly />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="CostCenterName" class="form-label">
+                                Name of cost center <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="CostCenterName" class="form-control" />
+                            <span asp-validation-for="CostCenterName" class="text-danger"></span>
+                        </div>
+
+                        <input asp-for="ParentId" type="hidden" id="parentIdField" />
+
+                        <div class="col-md-6">
+                            <label asp-for="CreatedDate" class="form-label">Date</label>
+                            <input asp-for="CreatedDate" type="date" class="form-control"
+                                   value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="Target" class="form-label">Target</label>
+                            <input asp-for="Target" type="number" step="0.01" class="form-control" placeholder="0.00" />
+                        </div>
+
+                        <div class="col-12">
+                            <div class="form-check form-switch">
+                                <input asp-for="Active" class="form-check-input" type="checkbox" checked />
+                                <label asp-for="Active" class="form-check-label">Active</label>
+                            </div>
+                        </div>
+
+                        <div class="col-12 mt-3">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> Save
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        var selectedParentId = null;
+
+        // Load tree
+        $.get('/CostCenters/GetTree', function (data) {
+            buildTree(data, null, $('#ccTree'), 0);
+        });
+
+        function buildTree(items, parentId, container, level) {
+            var children = items.filter(i => i.parentId === parentId);
+            children.forEach(function (item) {
+                var indent = level * 16;
+                var btn = $('<a class="list-group-item list-group-item-action py-1 px-2" href="#"></a>')
+                    .css('padding-left', (indent + 8) + 'px')
+                    .attr('data-id', item.id)
+                    .html((level > 0 ? '<i class="bi bi-arrow-return-right text-muted me-1"></i>' : '<i class="bi bi-diagram-3 text-primary me-1"></i>') + item.text);
+
+                btn.on('click', function (e) {
+                    e.preventDefault();
+                    if ($('#chkCreateRoot').is(':checked')) return;
+                    selectParent(item.id, item.text);
+                    $('.list-group-item').removeClass('active');
+                    $(this).addClass('active');
+                });
+
+                container.append(btn);
+                buildTree(items, item.id, container, level + 1);
+            });
+        }
+
+        function selectParent(id, text) {
+            $.get('/CostCenters/GetCostCenterInfo', { id: id }, function (data) {
+                if (data) {
+                    $('#parentIdField').val(data.id);
+                    $('#parentCode').val(data.code);
+                    $('#parentName').val(data.name);
+                    selectedParentId = data.id;
+                }
+            });
+        }
+
+        // Create Root checkbox clears parent
+        $('#chkCreateRoot').on('change', function () {
+            if ($(this).is(':checked')) {
+                $('#parentIdField').val('');
+                $('#parentCode').val('');
+                $('#parentName').val('');
+                selectedParentId = null;
+                $('.list-group-item').removeClass('active');
+            }
+        });
+    </script>
+}
