@@ -4,6 +4,7 @@ using Concept.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Concept.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260503134910_accountTreeChild")]
+    partial class accountTreeChild
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -320,27 +323,17 @@ namespace Concept.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("ModifiedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("ParentCostCenterId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Target")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CostCenterCode")
                         .IsUnique();
-
-                    b.HasIndex("ParentCostCenterId");
 
                     b.ToTable("Deff_CostCenter", (string)null);
                 });
@@ -1619,16 +1612,6 @@ namespace Concept.Migrations
                     b.Navigation("Country");
                 });
 
-            modelBuilder.Entity("Concept.Models.DeffCostCenter", b =>
-                {
-                    b.HasOne("Concept.Models.DeffCostCenter", "ParentCostCenter")
-                        .WithMany("Children")
-                        .HasForeignKey("ParentCostCenterId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("ParentCostCenter");
-                });
-
             modelBuilder.Entity("Concept.Models.DeffSubCategory", b =>
                 {
                     b.HasOne("Concept.Models.DeffCategory", "Category")
@@ -2085,11 +2068,6 @@ namespace Concept.Migrations
             modelBuilder.Entity("Concept.Models.DeffCategory", b =>
                 {
                     b.Navigation("SubCategories");
-                });
-
-            modelBuilder.Entity("Concept.Models.DeffCostCenter", b =>
-                {
-                    b.Navigation("Children");
                 });
 
             modelBuilder.Entity("Concept.Models.DeffCountry", b =>

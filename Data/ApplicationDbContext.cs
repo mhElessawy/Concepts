@@ -41,6 +41,9 @@ namespace Concept.Data
         public DbSet<StoreReturnHeader> StoreReturnHeaders { get; set; }
         public DbSet<StoreReturnDetails> StoreReturnDetails { get; set; }
 
+        public DbSet<MainAccount> MainAccounts { get; set; }
+        public DbSet<ChildAccount> ChildAccounts { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -136,6 +139,12 @@ namespace Concept.Data
 
             modelBuilder.Entity<DeffCostCenter>().ToTable("Deff_CostCenter");
             modelBuilder.Entity<DeffCostCenter>().HasIndex(cc => cc.CostCenterCode).IsUnique();
+
+            modelBuilder.Entity<DeffCostCenter>()
+                .HasOne(cc => cc.ParentCostCenter)
+                .WithMany(cc => cc.Children)
+                .HasForeignKey(cc => cc.ParentCostCenterId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Vender>()
                 .HasOne(v => v.CostCenter)
@@ -383,6 +392,32 @@ namespace Concept.Data
                 .HasOne(r => r.SubUOM)
                 .WithMany()
                 .HasForeignKey(r => r.SubUOMId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // ChildAccount Configuration
+            modelBuilder.Entity<ChildAccount>().ToTable("Child_Account");
+            modelBuilder.Entity<ChildAccount>().HasIndex(a => a.AccountNo).IsUnique();
+
+            modelBuilder.Entity<ChildAccount>()
+                .HasOne(a => a.ParentAccount)
+                .WithMany()
+                .HasForeignKey(a => a.ParentAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ChildAccount>()
+                .HasOne(a => a.CostCenter)
+                .WithMany()
+                .HasForeignKey(a => a.CostCenterId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            // MainAccount (Chart of Accounts) Configuration
+            modelBuilder.Entity<MainAccount>().ToTable("Main_Account");
+            modelBuilder.Entity<MainAccount>().HasIndex(a => a.AccountNo).IsUnique();
+
+            modelBuilder.Entity<MainAccount>()
+                .HasOne(a => a.ParentAccount)
+                .WithMany(a => a.Children)
+                .HasForeignKey(a => a.ParentAccountId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Configure decimal precision for Return Details

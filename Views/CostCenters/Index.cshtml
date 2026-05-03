@@ -1,0 +1,487 @@
+﻿@model IEnumerable<Concept.Models.DeffCostCenter>
+
+@{
+    ViewData["Title"] = "Cost Center";
+}
+
+<style>
+    .cc-page {
+        background: #f0f0f0;
+        min-height: calc(100vh - 70px);
+        padding: 10px;
+    }
+
+    .cc-title {
+        color: #8b0000;
+        font-weight: bold;
+        font-size: 1.1rem;
+        margin-bottom: 8px;
+    }
+
+    .top-opts {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 8px;
+        font-size: 0.82rem;
+    }
+
+        .top-opts label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+    .alert-banner {
+        padding: 5px 12px;
+        font-size: 0.8rem;
+        border-radius: 3px;
+        margin-bottom: 6px;
+        display: none;
+    }
+
+    .alert-success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+
+    .alert-danger {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
+    .main-panel {
+        display: flex;
+        gap: 8px;
+        height: calc(100vh - 140px);
+    }
+
+    /* Tree */
+    .tree-panel {
+        width: 240px;
+        min-width: 200px;
+        background: white;
+        border: 1px solid #ccc;
+        overflow-y: auto;
+        flex-shrink: 0;
+    }
+
+    .tree-node {
+        cursor: pointer;
+        padding: 3px 6px;
+        font-size: 0.78rem;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        border-bottom: 1px solid #f5f5f5;
+        user-select: none;
+    }
+
+        .tree-node:hover {
+            background: #e8f0fe;
+        }
+
+        .tree-node.selected {
+            background: #cce0ff;
+            font-weight: bold;
+        }
+
+        .tree-node.inactive-cc {
+            color: #aaa;
+        }
+
+    .tree-toggle {
+        width: 14px;
+        text-align: center;
+        font-size: 0.65rem;
+        color: #555;
+        flex-shrink: 0;
+    }
+
+        .tree-toggle.no-children {
+            visibility: hidden;
+        }
+
+    .tree-icon {
+        color: #cc7700;
+        font-size: 0.72rem;
+        flex-shrink: 0;
+    }
+
+    .tree-label {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        flex: 1;
+    }
+
+    /* Form */
+    .form-panel {
+        flex: 1;
+        background: #d9d9d9;
+        border: 1px solid #bbb;
+        overflow-y: auto;
+        padding: 10px 14px;
+    }
+
+    .form-section-title {
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 10px;
+        border-bottom: 1px solid #bbb;
+        padding-bottom: 4px;
+    }
+
+    .frow {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+        gap: 6px;
+        font-size: 0.8rem;
+    }
+
+        .frow label {
+            min-width: 130px;
+            text-align: right;
+            color: #333;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .frow input[type="text"], .frow input[type="date"], .frow select {
+            border: 1px solid #999;
+            padding: 2px 5px;
+            font-size: 0.8rem;
+            background: white;
+            border-radius: 0;
+        }
+
+    .finput-sm {
+        width: 150px;
+    }
+
+    .finput-md {
+        width: 210px;
+    }
+
+    .finput-ro {
+        background: #e8e8e8 !important;
+        font-weight: bold;
+    }
+
+    .section-sep {
+        border: none;
+        border-top: 1px solid #bbb;
+        margin: 8px 0;
+    }
+</style>
+
+<div class="cc-page">
+    <div class="cc-title">Cost Center</div>
+
+    <div class="top-opts">
+        <label>
+            <input type="checkbox" id="chkCreateRoot" onchange="toggleRootMode()" />
+            Create Root
+        </label>
+        <label>
+            <input type="checkbox" id="chkOpenTree" onchange="renderTree()" />
+            Open Tree
+        </label>
+    </div>
+
+    <div id="alertBanner" class="alert-banner"></div>
+
+    <div class="main-panel">
+        <!-- Tree Panel -->
+        <div class="tree-panel">
+            <div id="treeContainer"></div>
+        </div>
+
+        <!-- Form Panel -->
+        <div class="form-panel">
+            <div class="form-section-title">Cost Center INFO</div>
+
+            <form id="ccForm">
+                @Html.AntiForgeryToken()
+                <input type="hidden" id="ccId" value="0" />
+                <input type="hidden" id="parentCcId" value="" />
+
+                <div class="frow">
+                    <label>Code of cost center</label>
+                    <input type="text" id="ccCode" class="finput-sm finput-ro" readonly />
+                </div>
+
+                <div class="frow" id="parentSection">
+                    <label>Perant Code</label>
+                    <input type="text" id="parentCode" class="finput-sm finput-ro" readonly />
+                </div>
+
+                <div class="frow" id="parentNameSection">
+                    <label>Perant Name</label>
+                    <input type="text" id="parentName" class="finput-md finput-ro" readonly />
+                </div>
+
+                <div class="frow">
+                    <label>Name of cost center</label>
+                    <input type="text" id="ccName" class="finput-md" />
+                </div>
+
+                <div class="frow">
+                    <label>Date</label>
+                    <input type="date" id="ccDate" class="finput-sm" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                </div>
+
+                <div class="frow">
+                    <label>Status</label>
+                    <input type="checkbox" id="ccActive" />
+                    <label for="ccActive" style="min-width:auto;">Active</label>
+                </div>
+
+                <div class="frow">
+                    <label>Target</label>
+                    <input type="text" id="ccTarget" class="finput-md" />
+                </div>
+
+                <hr class="section-sep" />
+
+                <div style="display:flex; gap:8px;">
+                    <button type="button" class="btn btn-sm btn-primary" onclick="saveCostCenter()">
+                        <i class="bi bi-save"></i> Save
+                    </button>
+                    <button type="button" class="btn btn-sm btn-secondary" onclick="newCostCenter()">
+                        <i class="bi bi-plus"></i> New
+                    </button>
+                    <button type="button" class="btn btn-sm btn-danger" onclick="deleteCostCenter()">
+                        <i class="bi bi-trash"></i> Delete
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var allCCs = [];
+        var selectedId = 0;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            loadTree();
+            newCostCenter();
+        });
+
+        function loadTree() {
+            fetch('/CostCenters/GetTree')
+                .then(r => r.json())
+                .then(data => { allCCs = data; renderTree(); });
+        }
+
+        function renderTree() {
+            var container = document.getElementById('treeContainer');
+            container.innerHTML = '';
+            var roots = allCCs.filter(c => !c.parentId);
+            roots.forEach(c => renderNode(container, c, 0));
+        }
+
+        function renderNode(container, cc, depth) {
+            var children = allCCs.filter(c => c.parentId === cc.id);
+            var hasChildren = children.length > 0;
+
+            var div = document.createElement('div');
+            div.dataset.id = cc.id;
+            div.dataset.expanded = 'false';
+            div.style.paddingLeft = (depth * 14 + 4) + 'px';
+            div.className = 'tree-node' + (cc.active ? '' : ' inactive-cc') + (cc.id === selectedId ? ' selected' : '');
+
+            var toggle = document.createElement('span');
+            toggle.className = 'tree-toggle' + (hasChildren ? '' : ' no-children');
+            toggle.innerHTML = '&#9658;';
+            toggle.onclick = e => { e.stopPropagation(); toggleNode(div, cc.id, depth); };
+
+            var icon = document.createElement('span');
+            icon.className = 'tree-icon';
+            icon.innerHTML = hasChildren ? '<i class="bi bi-diagram-3"></i>' : '<i class="bi bi-file-text"></i>';
+
+            var addBtn = document.createElement('span');
+            addBtn.title = 'Add sub cost center';
+            addBtn.style.cssText = 'margin-left:auto; color:#2563eb; font-size:0.68rem; padding:0 3px; display:none;';
+            addBtn.innerHTML = '<i class="bi bi-plus-circle"></i>';
+            addBtn.onclick = e => { e.stopPropagation(); newSubCC(cc.id, cc.code, cc.name); };
+            div.addEventListener('mouseenter', () => addBtn.style.display = 'inline');
+            div.addEventListener('mouseleave', () => addBtn.style.display = 'none');
+
+            var label = document.createElement('span');
+            label.className = 'tree-label';
+            label.title = cc.code + ' - ' + cc.name;
+            label.textContent = cc.code + '  ' + cc.name;
+
+            div.append(toggle, icon, label, addBtn);
+            div.onclick = () => selectCC(cc.id, div);
+            container.appendChild(div);
+
+            var childContainer = document.createElement('div');
+            childContainer.id = 'cc_children_' + cc.id;
+            childContainer.style.display = 'none';
+            container.appendChild(childContainer);
+
+            if (document.getElementById('chkOpenTree').checked)
+                expandNode(div, cc.id, depth);
+        }
+
+        function toggleNode(div, id, depth) {
+            div.dataset.expanded === 'true' ? collapseNode(div, id) : expandNode(div, id, depth);
+        }
+
+        function expandNode(div, id, depth) {
+            var cc = document.getElementById('cc_children_' + id);
+            if (!cc) return;
+            cc.innerHTML = '';
+            allCCs.filter(c => c.parentId === id).forEach(c => renderNode(cc, c, depth + 1));
+            cc.style.display = 'block';
+            div.dataset.expanded = 'true';
+            var t = div.querySelector('.tree-toggle');
+            if (t && !t.classList.contains('no-children')) t.innerHTML = '&#9660;';
+        }
+
+        function collapseNode(div, id) {
+            var cc = document.getElementById('cc_children_' + id);
+            if (cc) { cc.style.display = 'none'; cc.innerHTML = ''; }
+            div.dataset.expanded = 'false';
+            var t = div.querySelector('.tree-toggle');
+            if (t && !t.classList.contains('no-children')) t.innerHTML = '&#9658;';
+        }
+
+        function selectCC(id, div) {
+            document.querySelectorAll('.tree-node.selected').forEach(el => el.classList.remove('selected'));
+            div.classList.add('selected');
+            selectedId = id;
+            fetch('/CostCenters/GetCostCenter/' + id)
+                .then(r => r.json())
+                .then(data => fillForm(data));
+        }
+
+        function fillForm(data) {
+            document.getElementById('ccId').value = data.id;
+            document.getElementById('ccCode').value = data.code;
+            document.getElementById('parentCcId').value = data.parentId || '';
+            document.getElementById('parentCode').value = data.parentCode;
+            document.getElementById('parentName').value = data.parentName;
+            document.getElementById('ccName').value = data.name;
+            document.getElementById('ccDate').value = data.date;
+            document.getElementById('ccActive').checked = data.active;
+            document.getElementById('ccTarget').value = data.target;
+            var isRoot = !data.parentId;
+            document.getElementById('chkCreateRoot').checked = isRoot;
+            document.getElementById('parentSection').style.display = isRoot ? 'none' : 'flex';
+            document.getElementById('parentNameSection').style.display = isRoot ? 'none' : 'flex';
+        }
+
+        function generateCode() {
+            var isNew = document.getElementById('ccId').value === '0';
+            if (!isNew) return;
+            var parentId = document.getElementById('parentCcId').value;
+            var url = '/CostCenters/GetNextCode' + (parentId ? '?parentId=' + parentId : '');
+            fetch(url).then(r => r.json()).then(d => { document.getElementById('ccCode').value = d.code || ''; });
+        }
+
+        function toggleRootMode() {
+            var isRoot = document.getElementById('chkCreateRoot').checked;
+            document.getElementById('parentSection').style.display = isRoot ? 'none' : 'flex';
+            document.getElementById('parentNameSection').style.display = isRoot ? 'none' : 'flex';
+            if (isRoot) {
+                document.getElementById('parentCcId').value = '';
+                document.getElementById('parentCode').value = '';
+                document.getElementById('parentName').value = '';
+            }
+            generateCode();
+        }
+
+        function newCostCenter() {
+            selectedId = 0;
+            document.querySelectorAll('.tree-node.selected').forEach(el => el.classList.remove('selected'));
+            document.getElementById('ccId').value = '0';
+            document.getElementById('ccCode').value = '';
+            document.getElementById('parentCcId').value = '';
+            document.getElementById('parentCode').value = '';
+            document.getElementById('parentName').value = '';
+            document.getElementById('ccName').value = '';
+            document.getElementById('ccDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('ccActive').checked = true;
+            document.getElementById('ccTarget').value = '';
+            document.getElementById('chkCreateRoot').checked = true;
+            document.getElementById('parentSection').style.display = 'none';
+            document.getElementById('parentNameSection').style.display = 'none';
+            generateCode();
+        }
+
+        function newSubCC(parentId, parentCode, parentName) {
+            selectedId = 0;
+            document.querySelectorAll('.tree-node.selected').forEach(el => el.classList.remove('selected'));
+            document.getElementById('ccId').value = '0';
+            document.getElementById('ccCode').value = '';
+            document.getElementById('parentCcId').value = parentId;
+            document.getElementById('parentCode').value = parentCode;
+            document.getElementById('parentName').value = parentName;
+            document.getElementById('ccName').value = '';
+            document.getElementById('ccDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('ccActive').checked = true;
+            document.getElementById('ccTarget').value = '';
+            document.getElementById('chkCreateRoot').checked = false;
+            document.getElementById('parentSection').style.display = 'flex';
+            document.getElementById('parentNameSection').style.display = 'flex';
+            generateCode();
+            document.getElementById('ccName').focus();
+        }
+
+        function saveCostCenter() {
+            var token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            var parentId = document.getElementById('parentCcId').value;
+            var body = new URLSearchParams({
+                __RequestVerificationToken: token,
+                id: document.getElementById('ccId').value,
+                code: document.getElementById('ccCode').value,
+                name: document.getElementById('ccName').value,
+                parentCostCenterId: parentId || '',
+                date: document.getElementById('ccDate').value,
+                active: document.getElementById('ccActive').checked,
+                target: document.getElementById('ccTarget').value
+            });
+            fetch('/CostCenters/Save', { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body: body.toString() })
+                .then(r => r.json())
+                .then(data => {
+                    showAlert(data.message, data.success);
+                    if (data.success) {
+                        if (document.getElementById('ccId').value === '0') document.getElementById('ccId').value = data.id;
+                        selectedId = data.id;
+                        loadTree();
+                    }
+                });
+        }
+
+        function deleteCostCenter() {
+            var id = document.getElementById('ccId').value;
+            if (id === '0' || !id) { showAlert('Please select a cost center.', false); return; }
+            if (!confirm('Delete this cost center?')) return;
+            var token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            fetch('/CostCenters/Delete/' + id, {
+                method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'},
+                body: new URLSearchParams({ __RequestVerificationToken: token, id }).toString()
+            }).then(r => r.json()).then(data => {
+                showAlert(data.message, data.success);
+                if (data.success) { newCostCenter(); loadTree(); }
+            });
+        }
+
+        function showAlert(msg, success) {
+            var el = document.getElementById('alertBanner');
+            el.textContent = msg;
+            el.className = 'alert-banner ' + (success ? 'alert-success' : 'alert-danger');
+            el.style.display = 'block';
+            setTimeout(() => el.style.display = 'none', 4000);
+        }
+    </script>
+}

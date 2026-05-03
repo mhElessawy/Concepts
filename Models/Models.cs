@@ -405,9 +405,18 @@ namespace Concept.Models
         [Required]
         public string CostCenterName { get; set; }
         public bool Active { get; set; } = true;
+        public DateTime Date { get; set; } = DateTime.Now;
+        public string? Target { get; set; }
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public DateTime ModifiedDate { get; set; } = DateTime.Now;
-        public string Description { get; set; }
+        public string? Description { get; set; }
+
+        public int? ParentCostCenterId { get; set; }
+
+        [ForeignKey("ParentCostCenterId")]
+        public virtual DeffCostCenter? ParentCostCenter { get; set; }
+
+        public virtual ICollection<DeffCostCenter> Children { get; set; } = new List<DeffCostCenter>();
     }
     public class DeffLocation
     {
@@ -760,6 +769,90 @@ namespace Concept.Models
         public virtual UserInfo? User { get; set; }
 
     }
+    public class ChildAccount
+    {
+        [Key]
+        public int Id { get; set; }
+
+        [Required]
+        public string AccountNo { get; set; } = string.Empty;
+
+        [Required]
+        public int ParentAccountId { get; set; }
+
+        [Required]
+        public string AccountName { get; set; } = string.Empty;
+
+        public string AccountType { get; set; } = string.Empty;
+
+        public string AccountEffect { get; set; } = "Debit";
+
+        public string NatureOfAccount { get; set; } = string.Empty;
+
+        public bool TreatsAsBankAccount { get; set; } = false;
+
+        public int? CostCenterId { get; set; }
+        public bool FixedCostCenter { get; set; } = false;
+
+        public string? Address { get; set; }
+        public string? Tel { get; set; }
+        public string? Mobile { get; set; }
+        public string? EmailAddress { get; set; }
+        public string? CivilId { get; set; }
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal AccountLimit { get; set; } = 0;
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal ReceiptLimit { get; set; } = 0;
+
+        public string? Name { get; set; }
+        public string? Note { get; set; }
+
+        public bool Active { get; set; } = true;
+
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime ModifiedDate { get; set; } = DateTime.Now;
+
+        [ForeignKey("ParentAccountId")]
+        public virtual MainAccount ParentAccount { get; set; } = null!;
+
+        [ForeignKey("CostCenterId")]
+        public virtual DeffCostCenter? CostCenter { get; set; }
+    }
+
+    public class MainAccount
+    {
+        [Key]
+        public int Id { get; set; }
+
+        [Required]
+        public string AccountNo { get; set; } = string.Empty;
+
+        [Required]
+        public string AccountName { get; set; } = string.Empty;
+
+        public string AccountEffect { get; set; } = "Debit";
+
+        public bool TreatsAsCashAccount { get; set; } = false;
+
+        public bool Active { get; set; } = true;
+
+        public DateTime OpenAccountDate { get; set; } = DateTime.Now;
+
+        public string? Note { get; set; }
+
+        public int? ParentAccountId { get; set; }
+
+        [ForeignKey("ParentAccountId")]
+        public virtual MainAccount? ParentAccount { get; set; }
+
+        public virtual ICollection<MainAccount> Children { get; set; } = new List<MainAccount>();
+
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime ModifiedDate { get; set; } = DateTime.Now;
+    }
+
     public class StoreReturnDetails
     {
         [Key]

@@ -4,6 +4,7 @@ using Concept.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Concept.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260503102211_accountTree")]
+    partial class accountTree
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,94 +24,6 @@ namespace Concept.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("Concept.Models.ChildAccount", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AccountEffect")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("AccountLimit")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("AccountName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AccountNo")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("AccountType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("Active")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CivilId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("CostCenterId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("EmailAddress")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("FixedCostCenter")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Mobile")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("ModifiedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NatureOfAccount")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Note")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ParentAccountId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("ReceiptLimit")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("Tel")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("TreatsAsBankAccount")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AccountNo")
-                        .IsUnique();
-
-                    b.HasIndex("CostCenterId");
-
-                    b.HasIndex("ParentAccountId");
-
-                    b.ToTable("Child_Account", (string)null);
-                });
 
             modelBuilder.Entity("Concept.Models.DefBank", b =>
                 {
@@ -320,27 +235,17 @@ namespace Concept.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("ModifiedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("ParentCostCenterId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Target")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CostCenterCode")
                         .IsUnique();
-
-                    b.HasIndex("ParentCostCenterId");
 
                     b.ToTable("Deff_CostCenter", (string)null);
                 });
@@ -1579,24 +1484,6 @@ namespace Concept.Migrations
                     b.ToTable("Warehouse", (string)null);
                 });
 
-            modelBuilder.Entity("Concept.Models.ChildAccount", b =>
-                {
-                    b.HasOne("Concept.Models.DeffCostCenter", "CostCenter")
-                        .WithMany()
-                        .HasForeignKey("CostCenterId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("Concept.Models.MainAccount", "ParentAccount")
-                        .WithMany()
-                        .HasForeignKey("ParentAccountId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("CostCenter");
-
-                    b.Navigation("ParentAccount");
-                });
-
             modelBuilder.Entity("Concept.Models.DefSubUOM", b =>
                 {
                     b.HasOne("Concept.Models.DefUOM", "UOM")
@@ -1617,16 +1504,6 @@ namespace Concept.Migrations
                         .IsRequired();
 
                     b.Navigation("Country");
-                });
-
-            modelBuilder.Entity("Concept.Models.DeffCostCenter", b =>
-                {
-                    b.HasOne("Concept.Models.DeffCostCenter", "ParentCostCenter")
-                        .WithMany("Children")
-                        .HasForeignKey("ParentCostCenterId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("ParentCostCenter");
                 });
 
             modelBuilder.Entity("Concept.Models.DeffSubCategory", b =>
@@ -2085,11 +1962,6 @@ namespace Concept.Migrations
             modelBuilder.Entity("Concept.Models.DeffCategory", b =>
                 {
                     b.Navigation("SubCategories");
-                });
-
-            modelBuilder.Entity("Concept.Models.DeffCostCenter", b =>
-                {
-                    b.Navigation("Children");
                 });
 
             modelBuilder.Entity("Concept.Models.DeffCountry", b =>
