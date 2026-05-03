@@ -67,6 +67,7 @@ namespace Concept.Controllers
                 natureOfAccount = account.NatureOfAccount,
                 treatsAsBankAccount = account.TreatsAsBankAccount,
                 costCenterId = account.CostCenterId,
+                costCenterCode = account.CostCenter?.CostCenterCode ?? "",
                 costCenterName = account.CostCenter?.CostCenterName ?? "",
                 fixedCostCenter = account.FixedCostCenter,
                 address = account.Address ?? "",
@@ -110,6 +111,25 @@ namespace Concept.Controllers
 
             string nextSuffix = (maxSuffix + 1).ToString("D3");
             return Json(new { accountNo = parentNo + nextSuffix });
+        }
+
+        // GET: ChildAccounts/GetCostCenterTree - for popup in Child Account form
+        [HttpGet]
+        public async Task<IActionResult> GetCostCenterTree()
+        {
+            var list = await _context.DeffCostCenters
+                .OrderBy(c => c.CostCenterCode)
+                .Select(c => new
+                {
+                    id = c.Id,
+                    code = c.CostCenterCode,
+                    name = c.CostCenterName,
+                    active = c.Active,
+                    parentId = c.ParentCostCenterId,
+                    hasChildren = c.Children.Any()
+                })
+                .ToListAsync();
+            return Json(list);
         }
 
         // GET: ChildAccounts/Search?accountNo=xxx&accountName=xxx

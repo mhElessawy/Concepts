@@ -405,9 +405,18 @@ namespace Concept.Models
         [Required]
         public string CostCenterName { get; set; }
         public bool Active { get; set; } = true;
+        public DateTime Date { get; set; } = DateTime.Now;
+        public string? Target { get; set; }
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public DateTime ModifiedDate { get; set; } = DateTime.Now;
-        public string Description { get; set; }
+        public string? Description { get; set; }
+
+        public int? ParentCostCenterId { get; set; }
+
+        [ForeignKey("ParentCostCenterId")]
+        public virtual DeffCostCenter? ParentCostCenter { get; set; }
+
+        public virtual ICollection<DeffCostCenter> Children { get; set; } = new List<DeffCostCenter>();
     }
     public class DeffLocation
     {

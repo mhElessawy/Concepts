@@ -327,12 +327,17 @@
                 <!-- Cost Center -->
                 <div class="frow">
                     <label>Cost Name</label>
-                    <input type="text" id="costName" class="finput-sm finput-ro" readonly />
-                    <label style="min-width:50px;">Cost Id</label>
-                    <input type="text" id="costCenterId" class="finput-sm"
-                           onblur="lookupCostCenter()"
-                           placeholder="Cost Center ID" />
-                    <input type="checkbox" id="fixedCostCenter" style="margin-left:8px;" />
+                    <input type="text" id="costName" class="finput-md finput-ro" readonly />
+                    <button type="button" onclick="openCostCenterModal()"
+                            style="padding:2px 8px; font-size:0.78rem; border:1px solid #888; background:#e8e8e8; cursor:pointer; margin-left:4px;"
+                            title="Select Cost Center">...</button>
+                    <button type="button" onclick="clearCostCenter()"
+                            style="padding:2px 6px; font-size:0.72rem; border:1px solid #ccc; background:#f5f5f5; cursor:pointer; color:#c00;" title="Clear">✕</button>
+                </div>
+                <div class="frow">
+                    <label>Cost Id</label>
+                    <input type="text" id="costCenterId" class="finput-sm finput-ro" readonly />
+                    <input type="checkbox" id="fixedCostCenter" style="margin-left:12px;" />
                     <label for="fixedCostCenter" style="font-size:0.8rem; min-width:auto;">Fixed Cost Center</label>
                 </div>
 
@@ -401,6 +406,25 @@
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<!-- Cost Center Picker Modal -->
+<div id="ccModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:9999; align-items:center; justify-content:center;">
+    <div style="background:white; border:1px solid #999; width:420px; max-height:560px; display:flex; flex-direction:column; box-shadow:0 4px 20px rgba(0,0,0,0.3);">
+        <div style="background:#8b0000; color:white; padding:7px 12px; font-size:0.85rem; font-weight:bold; display:flex; justify-content:space-between; align-items:center;">
+            <span><i class="bi bi-diagram-3"></i> Select Cost Center</span>
+            <span onclick="closeCostCenterModal()" style="cursor:pointer; font-size:1rem;">&#10005;</span>
+        </div>
+        <div style="padding:6px 8px; border-bottom:1px solid #ddd;">
+            <input type="text" id="ccSearchInput" placeholder="Search by code or name..."
+                   oninput="filterCCTree()"
+                   style="width:100%; padding:3px 7px; font-size:0.8rem; border:1px solid #ccc;" />
+        </div>
+        <div id="ccModalTree" style="flex:1; overflow-y:auto; min-height:200px; max-height:400px; padding:4px 0;"></div>
+        <div style="padding:6px 10px; border-top:1px solid #ddd; display:flex; justify-content:flex-end; gap:8px;">
+            <button type="button" onclick="closeCostCenterModal()" style="padding:3px 14px; font-size:0.8rem; border:1px solid #999; background:#eee; cursor:pointer;">Cancel</button>
         </div>
     </div>
 </div>
@@ -582,7 +606,9 @@
         document.getElementById('natureOfAccount').value = data.natureOfAccount;
         document.getElementById('treatsAsBankAccount').checked = data.treatsAsBankAccount;
         document.getElementById('costCenterId').value = data.costCenterId || '';
-        document.getElementById('costName').value = data.costCenterName || '';
+        document.getElementById('costName').value = data.costCenterId
+            ? (data.costCenterCode + ' — ' + data.costCenterName)
+            : '';
         document.getElementById('fixedCostCenter').checked = data.fixedCostCenter;
         document.getElementById('address').value = data.address;
         document.getElementById('tel').value = data.tel;
@@ -597,15 +623,78 @@
         selectedChildId = data.id;
     }
 
-    // ============ COST CENTER LOOKUP ============
-    function lookupCostCenter() {
-        var val = document.getElementById('costCenterId').value.trim();
+    // ============ COST CENTER MODAL ============
+    var allCostCenters = [];
+
+    function openCostCenterModal() {
+        document.getElementById('ccModal').style.display = 'flex';
+        document.getElementById('ccSearchInput').value = '';
+        if (allCostCenters.length === 0) {
+            fetch('/ChildAccounts/GetCostCenterTree')
+                .then(r => r.json())
+                .then(data => { allCostCenters = data; renderCCModalTree(allCostCenters); });
+        } else {
+            renderCCModalTree(allCostCenters);
+        }
+    }
+
+    function closeCostCenterModal() {
+        document.getElementById('ccModal').style.display = 'none';
+    }
+
+    function filterCCTree() {
+        var q = document.getElementById('ccSearchInput').value.trim().toLowerCase();
+        if (!q) { renderCCModalTree(allCostCenters); return; }
+        var filtered = allCostCenters.filter(c =>
+            c.code.toLowerCase().includes(q) || c.name.toLowerCase().includes(q));
+        renderCCModalFlat(filtered);
+    }
+
+    function renderCCModalTree(list) {
+        var container = document.getElementById('ccModalTree');
+        container.innerHTML = '';
+        var roots = list.filter(c => !c.parentId);
+        roots.forEach(c => renderCCNode(container, c, 0, list));
+    }
+
+    function renderCCModalFlat(list) {
+        var container = document.getElementById('ccModalTree');
+        container.innerHTML = '';
+        list.forEach(c => {
+            var row = buildCCRow(c, 0);
+            container.appendChild(row);
+        });
+    }
+
+    function renderCCNode(container, cc, depth, list) {
+        var row = buildCCRow(cc, depth);
+        container.appendChild(row);
+        var children = list.filter(c => c.parentId === cc.id);
+        children.forEach(child => renderCCNode(container, child, depth + 1, list));
+    }
+
+    function buildCCRow(cc, depth) {
+        var row = document.createElement('div');
+        row.style.cssText = 'padding:4px 8px 4px ' + (depth * 16 + 8) + 'px; font-size:0.8rem; cursor:pointer; ' +
+                            'border-bottom:1px solid #f5f5f5; display:flex; align-items:center; gap:6px;' +
+                            (cc.active ? '' : 'color:#aaa;');
+        row.innerHTML = '<i class="bi bi-diagram-3" style="color:#cc7700; font-size:0.72rem;"></i>' +
+                        '<strong>' + cc.code + '</strong> — ' + cc.name;
+        row.onmouseover = () => row.style.background = '#eff6ff';
+        row.onmouseout  = () => row.style.background = '';
+        row.onclick = () => selectCostCenter(cc.id, cc.code, cc.name);
+        return row;
+    }
+
+    function selectCostCenter(id, code, name) {
+        document.getElementById('costCenterId').value = id;
+        document.getElementById('costName').value = code + ' — ' + name;
+        closeCostCenterModal();
+    }
+
+    function clearCostCenter() {
+        document.getElementById('costCenterId').value = '';
         document.getElementById('costName').value = '';
-        if (!val) return;
-        // If numeric, treat as ID; otherwise leave blank
-        if (isNaN(val)) return;
-        // Simple fetch (we just display ID - full lookup would need an endpoint)
-        document.getElementById('costName').value = 'ID: ' + val;
     }
 
     // ============ SEARCH ============

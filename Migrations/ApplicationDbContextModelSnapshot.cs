@@ -371,17 +371,27 @@ namespace Concept.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("ModifiedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("ParentCostCenterId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Target")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CostCenterCode")
                         .IsUnique();
+
+                    b.HasIndex("ParentCostCenterId");
 
                     b.ToTable("Deff_CostCenter", (string)null);
                 });
@@ -2044,6 +2054,21 @@ namespace Concept.Migrations
                     b.Navigation("Cities");
 
                     b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("Concept.Models.DeffCostCenter", b =>
+                {
+                    b.HasOne("Concept.Models.DeffCostCenter", "ParentCostCenter")
+                        .WithMany("Children")
+                        .HasForeignKey("ParentCostCenterId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("ParentCostCenter");
+                });
+
+            modelBuilder.Entity("Concept.Models.DeffCostCenter", b =>
+                {
+                    b.Navigation("Children");
                 });
 
             modelBuilder.Entity("Concept.Models.ChildAccount", b =>

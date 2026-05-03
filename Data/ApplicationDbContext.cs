@@ -140,6 +140,12 @@ namespace Concept.Data
             modelBuilder.Entity<DeffCostCenter>().ToTable("Deff_CostCenter");
             modelBuilder.Entity<DeffCostCenter>().HasIndex(cc => cc.CostCenterCode).IsUnique();
 
+            modelBuilder.Entity<DeffCostCenter>()
+                .HasOne(cc => cc.ParentCostCenter)
+                .WithMany(cc => cc.Children)
+                .HasForeignKey(cc => cc.ParentCostCenterId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<Vender>()
                 .HasOne(v => v.CostCenter)
                 .WithMany()
