@@ -100,7 +100,7 @@ namespace Concept.Controllers
             int maxSuffix = 0;
             foreach (var no in existingNos)
             {
-                if (no.StartsWith(parentNo) && no.Length == parentNo.Length + 2)
+                if (no.StartsWith(parentNo) && no.Length == parentNo.Length + 3)
                 {
                     string suffix = no.Substring(parentNo.Length);
                     if (int.TryParse(suffix, out int s) && s > maxSuffix)
@@ -108,7 +108,7 @@ namespace Concept.Controllers
                 }
             }
 
-            string nextSuffix = (maxSuffix + 1).ToString("D2");
+            string nextSuffix = (maxSuffix + 1).ToString("D3");
             return Json(new { accountNo = parentNo + nextSuffix });
         }
 
