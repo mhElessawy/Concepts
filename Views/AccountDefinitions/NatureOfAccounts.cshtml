@@ -55,7 +55,7 @@
 
 @section Scripts {
 <script>
-    var items = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Select(x => new { x.Id, x.Code, x.Name, x.Active })));
+    var items = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Select(x => new { id = x.Id, code = x.Code, name = x.Name, active = x.Active })));
     var selectedId = 0;
     var nextCode = @(Model.Any() ? Model.Max(x => { int n; return int.TryParse(x.Code, out n) ? n : 0; }) + 1 : 1);
 
