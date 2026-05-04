@@ -30,9 +30,8 @@ namespace Concept.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AccountEffect")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("AccountEffectId")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("AccountLimit")
                         .HasColumnType("decimal(18,2)");
@@ -45,9 +44,8 @@ namespace Concept.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("AccountType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("AccountTypeId")
+                        .HasColumnType("int");
 
                     b.Property<bool>("Active")
                         .HasColumnType("bit");
@@ -79,9 +77,8 @@ namespace Concept.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("NatureOfAccount")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("NatureOfAccountId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Note")
                         .HasColumnType("nvarchar(max)");
@@ -100,10 +97,16 @@ namespace Concept.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AccountEffectId");
+
                     b.HasIndex("AccountNo")
                         .IsUnique();
 
+                    b.HasIndex("AccountTypeId");
+
                     b.HasIndex("CostCenterId");
+
+                    b.HasIndex("NatureOfAccountId");
 
                     b.HasIndex("ParentAccountId");
 
@@ -159,6 +162,96 @@ namespace Concept.Migrations
                     b.HasIndex("ParentAccountId");
 
                     b.ToTable("Main_Account", (string)null);
+                });
+
+            modelBuilder.Entity("Concept.Models.DefAccountEffect", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.ToTable("Def_AccountEffect", (string)null);
+                });
+
+            modelBuilder.Entity("Concept.Models.DefAccountType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.ToTable("Def_AccountType", (string)null);
+                });
+
+            modelBuilder.Entity("Concept.Models.DefNatureOfAccount", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.ToTable("Def_NatureOfAccount", (string)null);
                 });
 
             modelBuilder.Entity("Concept.Models.DefBank", b =>
@@ -2084,8 +2177,26 @@ namespace Concept.Migrations
                         .HasForeignKey("CostCenterId")
                         .OnDelete(DeleteBehavior.SetNull);
 
+                    b.HasOne("Concept.Models.DefAccountType", "AccountType")
+                        .WithMany()
+                        .HasForeignKey("AccountTypeId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Concept.Models.DefAccountEffect", "AccountEffect")
+                        .WithMany()
+                        .HasForeignKey("AccountEffectId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Concept.Models.DefNatureOfAccount", "NatureOfAccount")
+                        .WithMany()
+                        .HasForeignKey("NatureOfAccountId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.Navigation("ParentAccount");
                     b.Navigation("CostCenter");
+                    b.Navigation("AccountType");
+                    b.Navigation("AccountEffect");
+                    b.Navigation("NatureOfAccount");
                 });
 
             modelBuilder.Entity("Concept.Models.MainAccount", b =>

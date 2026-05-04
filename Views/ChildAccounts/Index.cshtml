@@ -286,13 +286,8 @@
                 <!-- Account Type -->
                 <div class="frow">
                     <label>Account Type</label>
-                    <select id="accountType" class="fselect-md">
-                        <option value=""></option>
-                        <option value="Asset">Asset</option>
-                        <option value="Liability">Liability</option>
-                        <option value="Equity">Equity</option>
-                        <option value="Revenue">Revenue</option>
-                        <option value="Expense">Expense</option>
+                    <select id="accountTypeId" class="fselect-md">
+                        <option value="">-- Select --</option>
                     </select>
                     <span class="important-note">Very important to select</span>
                 </div>
@@ -300,21 +295,16 @@
                 <!-- Account Effect -->
                 <div class="frow">
                     <label>Account Effect</label>
-                    <select id="accountEffect" class="fselect-md">
-                        <option value="Debit">Debit</option>
-                        <option value="Credit">Credit</option>
+                    <select id="accountEffectId" class="fselect-md">
+                        <option value="">-- Select --</option>
                     </select>
                 </div>
 
                 <!-- Nature of Account -->
                 <div class="frow">
                     <label>Nature of account</label>
-                    <select id="natureOfAccount" class="fselect-md">
-                        <option value=""></option>
-                        <option value="Current">Current</option>
-                        <option value="Fixed">Fixed</option>
-                        <option value="Accrued">Accrued</option>
-                        <option value="Prepaid">Prepaid</option>
+                    <select id="natureOfAccountId" class="fselect-md">
+                        <option value="">-- Select --</option>
                     </select>
                     <span style="margin-left:20px;">
                         <input type="checkbox" id="treatsAsBankAccount" />
@@ -438,7 +428,31 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         loadMainTree();
+        loadDropdowns();
     });
+
+    // ============ LOAD DROPDOWN DEFINITIONS ============
+    function loadDropdowns() {
+        fetch('/AccountDefinitions/GetAccountTypes')
+            .then(r => r.json()).then(data => populateSelect('accountTypeId', data));
+        fetch('/AccountDefinitions/GetAccountEffects')
+            .then(r => r.json()).then(data => populateSelect('accountEffectId', data));
+        fetch('/AccountDefinitions/GetNatureOfAccounts')
+            .then(r => r.json()).then(data => populateSelect('natureOfAccountId', data));
+    }
+
+    function populateSelect(selectId, items) {
+        var sel = document.getElementById(selectId);
+        var currentVal = sel.value;
+        while (sel.options.length > 1) sel.remove(1);
+        items.forEach(item => {
+            var opt = document.createElement('option');
+            opt.value = item.Id;
+            opt.textContent = item.Code + ' - ' + item.Name;
+            sel.appendChild(opt);
+        });
+        if (currentVal) sel.value = currentVal;
+    }
 
     // ============ TREE ============
     function loadMainTree() {
@@ -601,9 +615,9 @@
         document.getElementById('parentAccountIdDisplay').value = data.parentAccountId;
         document.getElementById('parentAccountName').value = data.parentAccountName;
         document.getElementById('accountName').value = data.accountName;
-        document.getElementById('accountType').value = data.accountType;
-        document.getElementById('accountEffect').value = data.accountEffect;
-        document.getElementById('natureOfAccount').value = data.natureOfAccount;
+        document.getElementById('accountTypeId').value = data.accountTypeId || '';
+        document.getElementById('accountEffectId').value = data.accountEffectId || '';
+        document.getElementById('natureOfAccountId').value = data.natureOfAccountId || '';
         document.getElementById('treatsAsBankAccount').checked = data.treatsAsBankAccount;
         document.getElementById('costCenterId').value = data.costCenterId || '';
         document.getElementById('costName').value = data.costCenterId
@@ -747,9 +761,9 @@
         document.getElementById('childId').value = '0';
         document.getElementById('accountNo').value = '';
         document.getElementById('accountName').value = '';
-        document.getElementById('accountType').value = '';
-        document.getElementById('accountEffect').value = 'Debit';
-        document.getElementById('natureOfAccount').value = '';
+        document.getElementById('accountTypeId').value = '';
+        document.getElementById('accountEffectId').value = '';
+        document.getElementById('natureOfAccountId').value = '';
         document.getElementById('treatsAsBankAccount').checked = false;
         document.getElementById('costCenterId').value = '';
         document.getElementById('costName').value = '';
@@ -793,9 +807,9 @@
             accountNo: document.getElementById('accountNo').value,
             parentAccountId: parentId,
             accountName: document.getElementById('accountName').value,
-            accountType: document.getElementById('accountType').value,
-            accountEffect: document.getElementById('accountEffect').value,
-            natureOfAccount: document.getElementById('natureOfAccount').value,
+            accountTypeId: document.getElementById('accountTypeId').value || '',
+            accountEffectId: document.getElementById('accountEffectId').value || '',
+            natureOfAccountId: document.getElementById('natureOfAccountId').value || '',
             treatsAsBankAccount: document.getElementById('treatsAsBankAccount').checked,
             costCenterId: document.getElementById('costCenterId').value || '',
             fixedCostCenter: document.getElementById('fixedCostCenter').checked,

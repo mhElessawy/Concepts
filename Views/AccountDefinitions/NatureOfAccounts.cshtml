@@ -1,0 +1,130 @@
+@model IEnumerable<Concept.Models.DefNatureOfAccount>
+@{
+    ViewData["Title"] = "Nature of Accounts";
+    string saveUrl   = "/AccountDefinitions/SaveNatureOfAccount";
+    string deleteUrl = "/AccountDefinitions/DeleteNatureOfAccount";
+    string pageTitle = "Nature of Accounts";
+    string infoTitle = "Nature of Account INFO";
+}
+@await Html.PartialAsync("_DefPage")
+
+<div class="def-page">
+    <div class="def-title">@pageTitle</div>
+    <div id="alertBanner" class="alert-banner"></div>
+
+    <div class="def-layout">
+        <!-- List -->
+        <div class="def-list-panel">
+            <div class="def-list-header"><i class="bi bi-list-ul"></i> @pageTitle List</div>
+            <div class="def-list-body">
+                <table class="def-table">
+                    <thead><tr><th>Code</th><th>Name</th><th>Active</th></tr></thead>
+                    <tbody id="defTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Form -->
+        <div class="def-form-panel">
+            <div class="def-form-title">@infoTitle</div>
+            <form id="defForm">
+                @Html.AntiForgeryToken()
+                <input type="hidden" id="defId" value="0" />
+                <div class="frow">
+                    <label>Code</label>
+                    <input type="text" id="defCode" class="ro" readonly />
+                </div>
+                <div class="frow">
+                    <label>Name</label>
+                    <input type="text" id="defName" />
+                </div>
+                <div class="frow">
+                    <label>Status</label>
+                    <input type="checkbox" id="defActive" checked />
+                    <label for="defActive" style="min-width:auto;">Active</label>
+                </div>
+                <div style="display:flex; gap:8px; margin-top:10px;">
+                    <button type="button" class="btn btn-sm btn-primary" onclick="saveDef()"><i class="bi bi-save"></i> Save</button>
+                    <button type="button" class="btn btn-sm btn-secondary" onclick="newDef()"><i class="bi bi-plus"></i> New</button>
+                    <button type="button" class="btn btn-sm btn-danger" onclick="deleteDef()"><i class="bi bi-trash"></i> Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    var items = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Select(x => new { x.Id, x.Code, x.Name, x.Active })));
+    var selectedId = 0;
+    var nextCode = @(Model.Any() ? Model.Max(x => { int n; return int.TryParse(x.Code, out n) ? n : 0; }) + 1 : 1);
+
+    document.addEventListener('DOMContentLoaded', () => { renderList(); newDef(); });
+
+    function renderList() {
+        var tbody = document.getElementById('defTableBody');
+        tbody.innerHTML = items.map(x =>
+            '<tr class="' + (x.id === selectedId ? 'selected' : '') + (x.active ? '' : ' inactive-row') + '" onclick="selectItem(' + x.id + ')">' +
+            '<td>' + x.code + '</td><td>' + x.name + '</td>' +
+            '<td>' + (x.active ? '<i class="bi bi-check-circle text-success"></i>' : '<i class="bi bi-x-circle text-secondary"></i>') + '</td></tr>'
+        ).join('');
+    }
+
+    function selectItem(id) {
+        selectedId = id;
+        var item = items.find(x => x.id === id);
+        if (!item) return;
+        document.getElementById('defId').value = item.id;
+        document.getElementById('defCode').value = item.code;
+        document.getElementById('defName').value = item.name;
+        document.getElementById('defActive').checked = item.active;
+        renderList();
+    }
+
+    function newDef() {
+        selectedId = 0;
+        document.getElementById('defId').value = '0';
+        document.getElementById('defCode').value = nextCode;
+        document.getElementById('defName').value = '';
+        document.getElementById('defActive').checked = true;
+        renderList();
+        document.getElementById('defName').focus();
+    }
+
+    function saveDef() {
+        var token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+        var body = new URLSearchParams({
+            __RequestVerificationToken: token,
+            id: document.getElementById('defId').value,
+            code: document.getElementById('defCode').value,
+            name: document.getElementById('defName').value,
+            active: document.getElementById('defActive').checked
+        });
+        fetch('@saveUrl', { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body: body.toString() })
+            .then(r => r.json())
+            .then(data => {
+                showAlert(data.message, data.success);
+                if (data.success) location.reload();
+            });
+    }
+
+    function deleteDef() {
+        var id = parseInt(document.getElementById('defId').value);
+        if (!id) { showAlert('Please select a record to delete.', false); return; }
+        if (!confirm('Delete this record?')) return;
+        var token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+        fetch('@deleteUrl', { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'},
+            body: new URLSearchParams({ __RequestVerificationToken: token, id }).toString() })
+            .then(r => r.json())
+            .then(data => { showAlert(data.message, data.success); if (data.success) location.reload(); });
+    }
+
+    function showAlert(msg, success) {
+        var el = document.getElementById('alertBanner');
+        el.textContent = msg;
+        el.className = 'alert-banner ' + (success ? 'alert-success' : 'alert-danger');
+        el.style.display = 'block';
+        setTimeout(() => el.style.display = 'none', 4000);
+    }
+</script>
+}
