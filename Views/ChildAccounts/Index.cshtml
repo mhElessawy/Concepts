@@ -447,8 +447,8 @@
         while (sel.options.length > 1) sel.remove(1);
         items.forEach(item => {
             var opt = document.createElement('option');
-            opt.value = item.Id;
-            opt.textContent = item.Code + ' - ' + item.Name;
+            opt.value = item.id;
+            opt.textContent = item.code + ' - ' + item.name;
             sel.appendChild(opt);
         });
         if (currentVal) sel.value = currentVal;
