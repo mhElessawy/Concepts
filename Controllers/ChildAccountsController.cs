@@ -50,6 +50,9 @@ namespace Concept.Controllers
             var account = await _context.ChildAccounts
                 .Include(a => a.ParentAccount)
                 .Include(a => a.CostCenter)
+                .Include(a => a.AccountType)
+                .Include(a => a.AccountEffect)
+                .Include(a => a.NatureOfAccount)
                 .FirstOrDefaultAsync(a => a.Id == id);
 
             if (account == null) return NotFound();
@@ -62,9 +65,12 @@ namespace Concept.Controllers
                 parentAccountNo = account.ParentAccount?.AccountNo ?? "",
                 parentAccountName = account.ParentAccount?.AccountName ?? "",
                 accountName = account.AccountName,
-                accountType = account.AccountType,
-                accountEffect = account.AccountEffect,
-                natureOfAccount = account.NatureOfAccount,
+                accountTypeId = account.AccountTypeId,
+                accountTypeName = account.AccountType?.Name ?? "",
+                accountEffectId = account.AccountEffectId,
+                accountEffectName = account.AccountEffect?.Name ?? "",
+                natureOfAccountId = account.NatureOfAccountId,
+                natureOfAccountName = account.NatureOfAccount?.Name ?? "",
                 treatsAsBankAccount = account.TreatsAsBankAccount,
                 costCenterId = account.CostCenterId,
                 costCenterCode = account.CostCenter?.CostCenterCode ?? "",
@@ -188,9 +194,9 @@ namespace Concept.Controllers
             string accountNo,
             int parentAccountId,
             string accountName,
-            string accountType,
-            string accountEffect,
-            string natureOfAccount,
+            int? accountTypeId,
+            int? accountEffectId,
+            int? natureOfAccountId,
             bool treatsAsBankAccount,
             int? costCenterId,
             bool fixedCostCenter,
@@ -213,7 +219,7 @@ namespace Concept.Controllers
                     return Json(new { success = false, message = "Account Name is required." });
                 if (parentAccountId == 0)
                     return Json(new { success = false, message = "Please select a Parent Account from the tree." });
-                if (string.IsNullOrWhiteSpace(accountType))
+                if (accountTypeId == null)
                     return Json(new { success = false, message = "Account Type is required." });
 
                 var duplicate = await _context.ChildAccounts
@@ -228,9 +234,9 @@ namespace Concept.Controllers
                         AccountNo = accountNo,
                         ParentAccountId = parentAccountId,
                         AccountName = accountName,
-                        AccountType = accountType,
-                        AccountEffect = accountEffect,
-                        NatureOfAccount = natureOfAccount,
+                        AccountTypeId = accountTypeId,
+                        AccountEffectId = accountEffectId,
+                        NatureOfAccountId = natureOfAccountId,
                         TreatsAsBankAccount = treatsAsBankAccount,
                         CostCenterId = costCenterId,
                         FixedCostCenter = fixedCostCenter,
@@ -260,9 +266,9 @@ namespace Concept.Controllers
                     account.AccountNo = accountNo;
                     account.ParentAccountId = parentAccountId;
                     account.AccountName = accountName;
-                    account.AccountType = accountType;
-                    account.AccountEffect = accountEffect;
-                    account.NatureOfAccount = natureOfAccount;
+                    account.AccountTypeId = accountTypeId;
+                    account.AccountEffectId = accountEffectId;
+                    account.NatureOfAccountId = natureOfAccountId;
                     account.TreatsAsBankAccount = treatsAsBankAccount;
                     account.CostCenterId = costCenterId;
                     account.FixedCostCenter = fixedCostCenter;

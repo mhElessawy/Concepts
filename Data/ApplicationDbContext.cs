@@ -44,6 +44,10 @@ namespace Concept.Data
         public DbSet<MainAccount> MainAccounts { get; set; }
         public DbSet<ChildAccount> ChildAccounts { get; set; }
 
+        public DbSet<DefAccountType> DefAccountTypes { get; set; }
+        public DbSet<DefAccountEffect> DefAccountEffects { get; set; }
+        public DbSet<DefNatureOfAccount> DefNatureOfAccounts { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -394,6 +398,16 @@ namespace Concept.Data
                 .HasForeignKey(r => r.SubUOMId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // Account Definition Tables
+            modelBuilder.Entity<DefAccountType>().ToTable("Def_AccountType");
+            modelBuilder.Entity<DefAccountType>().HasIndex(a => a.Code).IsUnique();
+
+            modelBuilder.Entity<DefAccountEffect>().ToTable("Def_AccountEffect");
+            modelBuilder.Entity<DefAccountEffect>().HasIndex(a => a.Code).IsUnique();
+
+            modelBuilder.Entity<DefNatureOfAccount>().ToTable("Def_NatureOfAccount");
+            modelBuilder.Entity<DefNatureOfAccount>().HasIndex(a => a.Code).IsUnique();
+
             // ChildAccount Configuration
             modelBuilder.Entity<ChildAccount>().ToTable("Child_Account");
             modelBuilder.Entity<ChildAccount>().HasIndex(a => a.AccountNo).IsUnique();
@@ -408,6 +422,24 @@ namespace Concept.Data
                 .HasOne(a => a.CostCenter)
                 .WithMany()
                 .HasForeignKey(a => a.CostCenterId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<ChildAccount>()
+                .HasOne(a => a.AccountType)
+                .WithMany()
+                .HasForeignKey(a => a.AccountTypeId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<ChildAccount>()
+                .HasOne(a => a.AccountEffect)
+                .WithMany()
+                .HasForeignKey(a => a.AccountEffectId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<ChildAccount>()
+                .HasOne(a => a.NatureOfAccount)
+                .WithMany()
+                .HasForeignKey(a => a.NatureOfAccountId)
                 .OnDelete(DeleteBehavior.SetNull);
 
             // MainAccount (Chart of Accounts) Configuration

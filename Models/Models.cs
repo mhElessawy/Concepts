@@ -6,6 +6,42 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Concept.Models
 {
+    public class DefAccountType
+    {
+        [Key]
+        public int Id { get; set; }
+        [Required]
+        public string Code { get; set; } = string.Empty;
+        [Required]
+        public string Name { get; set; } = string.Empty;
+        public bool Active { get; set; } = true;
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
+    }
+
+    public class DefAccountEffect
+    {
+        [Key]
+        public int Id { get; set; }
+        [Required]
+        public string Code { get; set; } = string.Empty;
+        [Required]
+        public string Name { get; set; } = string.Empty;
+        public bool Active { get; set; } = true;
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
+    }
+
+    public class DefNatureOfAccount
+    {
+        [Key]
+        public int Id { get; set; }
+        [Required]
+        public string Code { get; set; } = string.Empty;
+        [Required]
+        public string Name { get; set; } = string.Empty;
+        public bool Active { get; set; } = true;
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
+    }
+
     public class DeffCountry
     {
         [Key]
@@ -783,11 +819,11 @@ namespace Concept.Models
         [Required]
         public string AccountName { get; set; } = string.Empty;
 
-        public string AccountType { get; set; } = string.Empty;
+        public int? AccountTypeId { get; set; }
 
-        public string AccountEffect { get; set; } = "Debit";
+        public int? AccountEffectId { get; set; }
 
-        public string NatureOfAccount { get; set; } = string.Empty;
+        public int? NatureOfAccountId { get; set; }
 
         public bool TreatsAsBankAccount { get; set; } = false;
 
@@ -819,6 +855,15 @@ namespace Concept.Models
 
         [ForeignKey("CostCenterId")]
         public virtual DeffCostCenter? CostCenter { get; set; }
+
+        [ForeignKey("AccountTypeId")]
+        public virtual DefAccountType? AccountType { get; set; }
+
+        [ForeignKey("AccountEffectId")]
+        public virtual DefAccountEffect? AccountEffect { get; set; }
+
+        [ForeignKey("NatureOfAccountId")]
+        public virtual DefNatureOfAccount? NatureOfAccount { get; set; }
     }
 
     public class MainAccount
