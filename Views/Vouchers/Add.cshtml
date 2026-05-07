@@ -360,6 +360,7 @@
         <input type="text" id="searchVoucherNo" placeholder="" />
         <button class="v-btn" onclick="searchVoucher()">Search</button>
         <button class="v-btn" onclick="copyVoucher()">Copy Voucher</button>
+        <button class="v-btn" onclick="newVoucher()" style="background:#d4edda; border-color:#28a745; color:#155724; font-weight:bold;">New Voucher</button>
     </div>
 
     <!-- Voucher Info -->
@@ -722,6 +723,26 @@
         rows[i].costCenterId = c.id;
         rows[i].costCenterName = c.name;
         closeCCPopup();
+        renderGrid();
+    }
+
+    // ── New Voucher ───────────────────────────────────────────────────────────
+    async function newVoucher() {
+        currentVoucherId = 0;
+        selectedRowIndex = -1;
+
+        await loadNextVoucherNo();
+
+        const today = new Date();
+        document.getElementById('voucherDate').value = today.toISOString().split('T')[0];
+        document.getElementById('settlementYear').value = today.getFullYear();
+        document.getElementById('accountingSettlement').checked = false;
+        document.getElementById('statement').value = '';
+        document.getElementById('posting').checked = false;
+        document.getElementById('approved').checked = false;
+        document.getElementById('searchVoucherNo').value = '';
+
+        rows = [{ childAccountId: 0, accountNumber: '', accountName: '', natureOfAccount: '', debit: 0, credit: 0, description: '', costCenterId: 0, costCenterName: '' }];
         renderGrid();
     }
 
