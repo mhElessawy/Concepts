@@ -4,7 +4,7 @@
 
 <style>
     .voucher-page {
-        background: #f0f0f0;
+        background: #fff;
         min-height: calc(100vh - 70px);
         padding: 10px 14px;
         font-size: 0.82rem;
@@ -54,7 +54,7 @@
         border: 1px solid #bbb;
         padding: 6px 10px;
         margin-bottom: 6px;
-        background: #f5f5f5;
+        background: #fff;
     }
 
     .voucher-info-section legend {
@@ -233,7 +233,7 @@
         padding: 2px 5px;
         font-size: 0.82rem;
         height: 24px;
-        background: #f5f5f5;
+        background: #fff;
         text-align: right;
     }
 
@@ -606,14 +606,14 @@
         rows[i].debit = parseFloat(val) || 0;
         if (rows[i].debit > 0) rows[i].credit = 0;
         checkAddRow(i);
-        updateTotals();
+        renderGrid();
     }
 
     function onCreditChange(i, val) {
         rows[i].credit = parseFloat(val) || 0;
         if (rows[i].credit > 0) rows[i].debit = 0;
         checkAddRow(i);
-        updateTotals();
+        renderGrid();
     }
 
     function checkAddRow(i) {
@@ -788,6 +788,14 @@
 
         if (dataRows.length === 0) {
             showAlert('Please add at least one account line.', false);
+            return;
+        }
+
+        const totalDebit  = dataRows.reduce((s, r) => s + (parseFloat(r.debit)  || 0), 0);
+        const totalCredit = dataRows.reduce((s, r) => s + (parseFloat(r.credit) || 0), 0);
+        const diff = Math.round((totalDebit - totalCredit) * 1e6) / 1e6;
+        if (diff !== 0) {
+            showAlert(`Cannot save: Difference must be zero. Current difference = ${diff.toFixed(2)}`, false);
             return;
         }
 
