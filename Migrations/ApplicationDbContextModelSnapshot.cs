@@ -2242,6 +2242,139 @@ namespace Concept.Migrations
                 {
                     b.Navigation("Items");
                 });
+
+            modelBuilder.Entity("Concept.Models.VoucherHeader", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("AccountingSettlement")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Approved")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("Posting")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("SettlementYear")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Statement")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("TotalCredit")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TotalDebit")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("VoucherDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("VoucherNo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VoucherNo")
+                        .IsUnique();
+
+                    b.ToTable("Voucher_Header");
+                });
+
+            modelBuilder.Entity("Concept.Models.VoucherDetails", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AccountName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AccountNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ChildAccountId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("CostCenterId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CostCenterName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Credit")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Debit")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NatureOfAccount")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("VoucherHeaderId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChildAccountId");
+
+                    b.HasIndex("CostCenterId");
+
+                    b.HasIndex("VoucherHeaderId");
+
+                    b.ToTable("Voucher_Details");
+                });
+
+            modelBuilder.Entity("Concept.Models.VoucherDetails", b =>
+                {
+                    b.HasOne("Concept.Models.ChildAccount", "ChildAccount")
+                        .WithMany()
+                        .HasForeignKey("ChildAccountId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Concept.Models.DeffCostCenter", "CostCenter")
+                        .WithMany()
+                        .HasForeignKey("CostCenterId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Concept.Models.VoucherHeader", "VoucherHeader")
+                        .WithMany("Details")
+                        .HasForeignKey("VoucherHeaderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ChildAccount");
+                    b.Navigation("CostCenter");
+                    b.Navigation("VoucherHeader");
+                });
+
+            modelBuilder.Entity("Concept.Models.VoucherHeader", b =>
+                {
+                    b.Navigation("Details");
+                });
 #pragma warning restore 612, 618
         }
     }
