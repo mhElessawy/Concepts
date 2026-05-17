@@ -51,6 +51,9 @@ namespace Concept.Data
         public DbSet<VoucherHeader> VoucherHeaders { get; set; }
         public DbSet<VoucherDetails> VoucherDetails { get; set; }
 
+        public DbSet<OpeningVoucherHeader> OpeningVoucherHeaders { get; set; }
+        public DbSet<OpeningVoucherDetails> OpeningVoucherDetails { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -454,6 +457,30 @@ namespace Concept.Data
                 .WithMany(a => a.Children)
                 .HasForeignKey(a => a.ParentAccountId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // Opening Voucher Configuration
+            modelBuilder.Entity<OpeningVoucherHeader>().ToTable("OpeningVoucher_Header");
+            modelBuilder.Entity<OpeningVoucherHeader>().HasIndex(v => v.VoucherNo).IsUnique();
+
+            modelBuilder.Entity<OpeningVoucherDetails>().ToTable("OpeningVoucher_Details");
+
+            modelBuilder.Entity<OpeningVoucherDetails>()
+                .HasOne(d => d.OpeningVoucherHeader)
+                .WithMany(h => h.Details)
+                .HasForeignKey(d => d.OpeningVoucherHeaderId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<OpeningVoucherDetails>()
+                .HasOne(d => d.ChildAccount)
+                .WithMany()
+                .HasForeignKey(d => d.ChildAccountId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<OpeningVoucherDetails>()
+                .HasOne(d => d.CostCenter)
+                .WithMany()
+                .HasForeignKey(d => d.CostCenterId)
+                .OnDelete(DeleteBehavior.SetNull);
 
             // Voucher Configuration
             modelBuilder.Entity<VoucherHeader>().ToTable("Voucher_Header");
