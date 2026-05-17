@@ -898,6 +898,71 @@ namespace Concept.Models
         public DateTime ModifiedDate { get; set; } = DateTime.Now;
     }
 
+    public class VoucherHeader
+    {
+        [Key]
+        public int Id { get; set; }
+
+        [Required]
+        public string VoucherNo { get; set; } = string.Empty;
+
+        public DateTime VoucherDate { get; set; } = DateTime.Now;
+
+        [Required]
+        public string VoucherType { get; set; } = string.Empty;
+
+        public string? Description { get; set; }
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal TotalDebit { get; set; } = 0;
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal TotalCredit { get; set; } = 0;
+
+        public int Status { get; set; } = 0;
+
+        public int UserId { get; set; }
+
+        public bool Active { get; set; } = true;
+
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime ModifiedDate { get; set; } = DateTime.Now;
+
+        [ForeignKey("UserId")]
+        public virtual UserInfo? User { get; set; }
+
+        public virtual ICollection<VoucherDetails> Details { get; set; } = new List<VoucherDetails>();
+    }
+
+    public class VoucherDetails
+    {
+        [Key]
+        public int Id { get; set; }
+
+        public int VoucherHeaderId { get; set; }
+
+        public int AccountId { get; set; }
+
+        public int? CostCenterId { get; set; }
+
+        public string? Description { get; set; }
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal Debit { get; set; } = 0;
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal Credit { get; set; } = 0;
+
+        [ForeignKey("VoucherHeaderId")]
+        public virtual VoucherHeader? VoucherHeader { get; set; }
+
+        [ForeignKey("AccountId")]
+        public virtual ChildAccount? Account { get; set; }
+
+        [ForeignKey("CostCenterId")]
+        public virtual DeffCostCenter? CostCenter { get; set; }
+    }
+
     public class StoreReturnDetails
     {
         [Key]

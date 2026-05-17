@@ -1,0 +1,74 @@
+@model Concept.Models.VoucherHeader
+
+@{
+    ViewData["Title"] = "Delete Voucher";
+}
+
+<div class="page-header">
+    <h2 class="text-danger"><i class="bi bi-exclamation-triangle"></i> Delete Voucher</h2>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card border-danger">
+            <div class="card-body p-4">
+                <div class="alert alert-danger">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    Are you sure you want to delete this voucher?
+                </div>
+
+                <dl class="row">
+                    <dt class="col-sm-4">Voucher No:</dt>
+                    <dd class="col-sm-8"><strong>@Model.VoucherNo</strong></dd>
+
+                    <dt class="col-sm-4">Date:</dt>
+                    <dd class="col-sm-8">@Model.VoucherDate.ToString("dd/MM/yyyy")</dd>
+
+                    <dt class="col-sm-4">Type:</dt>
+                    <dd class="col-sm-8">
+                        @{
+                            var typeClass = Model.VoucherType switch
+                            {
+                                "Receipt" => "bg-success",
+                                "Payment" => "bg-danger",
+                                _ => "bg-info"
+                            };
+                        }
+                        <span class="badge @typeClass">@Model.VoucherType</span>
+                    </dd>
+
+                    <dt class="col-sm-4">Description:</dt>
+                    <dd class="col-sm-8">@Model.Description</dd>
+
+                    <dt class="col-sm-4">Total Debit:</dt>
+                    <dd class="col-sm-8">@Model.TotalDebit.ToString("N2")</dd>
+
+                    <dt class="col-sm-4">Total Credit:</dt>
+                    <dd class="col-sm-8">@Model.TotalCredit.ToString("N2")</dd>
+
+                    <dt class="col-sm-4">Status:</dt>
+                    <dd class="col-sm-8">
+                        @if (Model.Status == 0)
+                        {
+                            <span class="badge bg-warning text-dark">Draft</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-success">Posted</span>
+                        }
+                    </dd>
+                </dl>
+
+                <form asp-action="Delete" method="post" class="mt-4">
+                    <input type="hidden" asp-for="Id" />
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash"></i> Delete
+                    </button>
+                    <a href="/Vouchers" class="btn btn-secondary">
+                        <i class="bi bi-x-circle"></i> Cancel
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

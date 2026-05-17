@@ -48,6 +48,9 @@ namespace Concept.Data
         public DbSet<DefAccountEffect> DefAccountEffects { get; set; }
         public DbSet<DefNatureOfAccount> DefNatureOfAccounts { get; set; }
 
+        public DbSet<VoucherHeader> VoucherHeaders { get; set; }
+        public DbSet<VoucherDetails> VoucherDetails { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -451,6 +454,36 @@ namespace Concept.Data
                 .WithMany(a => a.Children)
                 .HasForeignKey(a => a.ParentAccountId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // Voucher Configuration
+            modelBuilder.Entity<VoucherHeader>().ToTable("Voucher_Header");
+            modelBuilder.Entity<VoucherHeader>().HasIndex(v => v.VoucherNo).IsUnique();
+
+            modelBuilder.Entity<VoucherHeader>()
+                .HasOne(v => v.User)
+                .WithMany()
+                .HasForeignKey(v => v.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<VoucherDetails>().ToTable("Voucher_Details");
+
+            modelBuilder.Entity<VoucherDetails>()
+                .HasOne(d => d.VoucherHeader)
+                .WithMany(v => v.Details)
+                .HasForeignKey(d => d.VoucherHeaderId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<VoucherDetails>()
+                .HasOne(d => d.Account)
+                .WithMany()
+                .HasForeignKey(d => d.AccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<VoucherDetails>()
+                .HasOne(d => d.CostCenter)
+                .WithMany()
+                .HasForeignKey(d => d.CostCenterId)
+                .OnDelete(DeleteBehavior.SetNull);
 
             // Configure decimal precision for Return Details
             modelBuilder.Entity<StoreReturnDetails>()
