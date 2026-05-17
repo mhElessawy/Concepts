@@ -5,11 +5,13 @@
 }
 
 <div class="page-header d-flex justify-content-between align-items-center">
-    <h2><i class="bi bi-receipt"></i> Vouchers Management</h2>
+    <h2><i class="bi bi-receipt"></i> Vouchers</h2>
     <a href="/Vouchers/Add" class="btn btn-primary">
         <i class="bi bi-plus-circle"></i> Add New Voucher
     </a>
 </div>
+
+<div id="deleteAlert" class="alert d-none mt-3" role="alert"></div>
 
 <div class="table-responsive mt-3">
     <table class="table table-hover align-middle">
@@ -17,49 +19,53 @@
             <tr>
                 <th>Voucher No</th>
                 <th>Date</th>
-                <th>Type</th>
-                <th>Description</th>
+                <th>Statement</th>
                 <th class="text-end">Total Debit</th>
                 <th class="text-end">Total Credit</th>
-                <th>Status</th>
+                <th>Posting</th>
+                <th>Approved</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var voucher in Model)
+            @foreach (var v in Model)
             {
-                <tr>
-                    <td><strong>@voucher.VoucherNo</strong></td>
-                    <td>@voucher.VoucherDate.ToString("dd/MM/yyyy")</td>
+                <tr id="row-@v.Id">
+                    <td><strong>@v.VoucherNo</strong></td>
+                    <td>@v.VoucherDate.ToString("dd/MM/yyyy")</td>
+                    <td>@v.Statement</td>
+                    <td class="text-end">@v.TotalDebit.ToString("N2")</td>
+                    <td class="text-end">@v.TotalCredit.ToString("N2")</td>
                     <td>
-                        @{
-                            var typeClass = voucher.VoucherType switch
-                            {
-                                "Receipt" => "bg-success",
-                                "Payment" => "bg-danger",
-                                _ => "bg-info"
-                            };
-                        }
-                        <span class="badge @typeClass">@voucher.VoucherType</span>
-                    </td>
-                    <td>@voucher.Description</td>
-                    <td class="text-end">@voucher.TotalDebit.ToString("N2")</td>
-                    <td class="text-end">@voucher.TotalCredit.ToString("N2")</td>
-                    <td>
-                        @if (voucher.Status == 0)
+                        @if (v.Posting)
                         {
-                            <span class="badge bg-warning text-dark">Draft</span>
+                            <span class="badge bg-success">Posted</span>
                         }
                         else
                         {
-                            <span class="badge bg-success">Posted</span>
+                            <span class="badge bg-warning text-dark">Draft</span>
+                        }
+                    </td>
+                    <td>
+                        @if (v.Approved)
+                        {
+                            <span class="badge bg-success">Approved</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Pending</span>
                         }
                     </td>
                     <td>
                         <div class="d-flex gap-2">
-                            <a href="/Vouchers/Delete/@voucher.Id" class="btn btn-sm btn-danger">
-                                <i class="bi bi-trash"></i> Delete
+                            <a href="/Vouchers/Add" onclick="sessionStorage.setItem('loadVoucher','@v.VoucherNo'); return true;"
+                               class="btn btn-sm btn-warning">
+                                <i class="bi bi-pencil"></i> Edit
                             </a>
+                            <button class="btn btn-sm btn-danger"
+                                    onclick="confirmDelete(@v.Id, '@v.VoucherNo')">
+                                <i class="bi bi-trash"></i> Delete
+                            </button>
                         </div>
                     </td>
                 </tr>
@@ -73,4 +79,70 @@
     <div class="alert alert-info mt-4">
         <i class="bi bi-info-circle"></i> No vouchers found. Click "Add New Voucher" to create one.
     </div>
+}
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="bi bi-exclamation-triangle"></i> Delete Voucher</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete Voucher No. <strong id="deleteVoucherNo"></strong>?
+                <br><small class="text-danger">This action cannot be undone.</small>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn" onclick="executeDelete()">
+                    <i class="bi bi-trash"></i> Delete
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Html.AntiForgeryToken()
+
+@section Scripts {
+<script>
+    let deleteId = 0;
+
+    function confirmDelete(id, voucherNo) {
+        deleteId = id;
+        document.getElementById('deleteVoucherNo').textContent = voucherNo;
+        new bootstrap.Modal(document.getElementById('deleteModal')).show();
+    }
+
+    async function executeDelete() {
+        const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value ?? '';
+
+        const res = await fetch('/Vouchers/Delete', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'RequestVerificationToken': token
+            },
+            body: `id=${deleteId}`
+        });
+
+        bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
+
+        const result = await res.json();
+        const alertEl = document.getElementById('deleteAlert');
+
+        if (result.success) {
+            document.getElementById(`row-${deleteId}`)?.remove();
+            alertEl.className = 'alert alert-success mt-3';
+            alertEl.textContent = result.message;
+        } else {
+            alertEl.className = 'alert alert-danger mt-3';
+            alertEl.textContent = result.message;
+        }
+
+        alertEl.classList.remove('d-none');
+        setTimeout(() => alertEl.classList.add('d-none'), 4000);
+    }
+</script>
 }

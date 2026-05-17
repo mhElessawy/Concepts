@@ -1,83 +1,931 @@
-@model Concept.Models.VoucherHeader
-
 @{
     ViewData["Title"] = "Add Voucher";
 }
 
-<div class="page-header">
-    <h2><i class="bi bi-plus-circle"></i> Add New Voucher</h2>
+<style>
+    .voucher-page {
+        background: #fff;
+        min-height: calc(100vh - 70px);
+        padding: 10px 14px;
+        font-size: 0.82rem;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .page-title {
+        color: #8b0000;
+        font-weight: bold;
+        font-size: 1.1rem;
+        margin-bottom: 8px;
+    }
+
+    /* Search bar */
+    .search-bar {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 6px;
+        font-size: 0.82rem;
+    }
+
+    .search-bar label { white-space: nowrap; }
+
+    .search-bar input[type="text"] {
+        width: 160px;
+        border: 1px solid #999;
+        padding: 2px 5px;
+        font-size: 0.82rem;
+        height: 24px;
+    }
+
+    .v-btn {
+        padding: 2px 14px;
+        font-size: 0.82rem;
+        background: #e0e0e0;
+        border: 1px solid #999;
+        cursor: pointer;
+        height: 24px;
+        white-space: nowrap;
+    }
+
+    .v-btn:hover { background: #ccc; }
+
+    /* Voucher info section */
+    .voucher-info-section {
+        border: 1px solid #bbb;
+        padding: 6px 10px;
+        margin-bottom: 6px;
+        background: #fff;
+    }
+
+    .voucher-info-section legend {
+        font-size: 0.8rem;
+        padding: 0 4px;
+        color: #333;
+        width: auto;
+        font-weight: normal;
+    }
+
+    .info-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .info-row label { white-space: nowrap; }
+
+    .info-row input[type="text"],
+    .info-row input[type="number"] {
+        border: 1px solid #999;
+        padding: 2px 5px;
+        font-size: 0.82rem;
+        height: 24px;
+    }
+
+    .info-row input[type="date"] {
+        border: 1px solid #999;
+        padding: 2px 5px;
+        font-size: 0.82rem;
+        height: 24px;
+    }
+
+    /* Grid */
+    .grid-wrapper {
+        border: 1px solid #bbb;
+        overflow: auto;
+        height: 340px;
+        background: #fff;
+        margin-bottom: 6px;
+    }
+
+    .voucher-grid {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.8rem;
+        min-width: 900px;
+    }
+
+    .voucher-grid thead th {
+        background: #ddd;
+        border: 1px solid #bbb;
+        padding: 3px 6px;
+        text-align: center;
+        font-weight: normal;
+        white-space: nowrap;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+
+    .voucher-grid tbody td {
+        border: 1px solid #ccc;
+        padding: 0;
+    }
+
+    .voucher-grid tbody tr.selected-row td {
+        background: #cce5ff;
+    }
+
+    .voucher-grid tbody tr:hover td {
+        background: #eef;
+    }
+
+    .voucher-grid tbody tr.selected-row:hover td {
+        background: #b8d9ff;
+    }
+
+    .row-indicator {
+        width: 20px;
+        text-align: center;
+        font-size: 0.9rem;
+        color: #555;
+        background: #e8e8e8;
+        border-right: 1px solid #bbb;
+        padding: 2px;
+    }
+
+    .grid-cell-input {
+        width: 100%;
+        border: none;
+        outline: none;
+        padding: 2px 4px;
+        font-size: 0.8rem;
+        background: transparent;
+        height: 22px;
+        box-sizing: border-box;
+    }
+
+    .grid-cell-input:focus {
+        background: #fffbe6;
+        outline: 1px solid #f90;
+    }
+
+    .grid-cell-readonly {
+        padding: 2px 4px;
+        height: 22px;
+        display: block;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    /* Column widths */
+    .col-acct-no  { width: 110px; min-width: 90px; }
+    .col-acct-nm  { width: 180px; min-width: 140px; }
+    .col-nature   { width: 100px; min-width: 80px; }
+    .col-debit    { width: 110px; min-width: 90px; }
+    .col-credit   { width: 110px; min-width: 90px; }
+    .col-desc     { min-width: 160px; }
+    .col-cc       { width: 130px; min-width: 110px; }
+
+    /* Bottom actions */
+    .delete-row-bar {
+        text-align: center;
+        margin-bottom: 6px;
+    }
+
+    /* Footer */
+    .footer-section {
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 6px;
+    }
+
+    .statement-label { white-space: nowrap; margin-top: 3px; }
+
+    .statement-textarea {
+        width: 320px;
+        height: 60px;
+        border: 1px solid #999;
+        font-size: 0.82rem;
+        padding: 3px 5px;
+        resize: none;
+    }
+
+    .chk-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-top: 4px;
+    }
+
+    .chk-group label {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    /* Totals */
+    .totals-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        font-size: 0.82rem;
+    }
+
+    .totals-row label { white-space: nowrap; }
+
+    .totals-row input[type="text"] {
+        width: 130px;
+        border: 1px solid #999;
+        padding: 2px 5px;
+        font-size: 0.82rem;
+        height: 24px;
+        background: #fff;
+        text-align: right;
+    }
+
+    .diff-value {
+        font-weight: bold;
+        color: #8b0000;
+    }
+
+    /* Alert */
+    .alert-banner {
+        padding: 4px 10px;
+        font-size: 0.82rem;
+        border-radius: 3px;
+        margin-bottom: 5px;
+        display: none;
+    }
+
+    .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .alert-danger  { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+    /* Account Search Popup */
+    .popup-overlay {
+        display: none;
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0,0,0,0.35);
+        z-index: 9000;
+    }
+
+    .popup-box {
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        background: #fff;
+        border: 1px solid #999;
+        width: 580px;
+        max-height: 420px;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+    }
+
+    .popup-header {
+        background: #8b0000;
+        color: #fff;
+        padding: 5px 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.85rem;
+        font-weight: bold;
+    }
+
+    .popup-header button {
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 1rem;
+        cursor: pointer;
+        padding: 0;
+    }
+
+    .popup-search {
+        display: flex;
+        gap: 6px;
+        padding: 6px 8px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .popup-search input {
+        flex: 1;
+        border: 1px solid #999;
+        padding: 2px 5px;
+        font-size: 0.82rem;
+        height: 24px;
+    }
+
+    .popup-table-wrap {
+        flex: 1;
+        overflow: auto;
+    }
+
+    .popup-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.8rem;
+    }
+
+    .popup-table thead th {
+        background: #e0e0e0;
+        border: 1px solid #bbb;
+        padding: 3px 6px;
+        text-align: left;
+        position: sticky;
+        top: 0;
+    }
+
+    .popup-table tbody tr { cursor: pointer; }
+
+    .popup-table tbody tr:hover td { background: #cce5ff; }
+
+    .popup-table tbody td {
+        border: 1px solid #ddd;
+        padding: 2px 6px;
+    }
+
+    /* Cost Center Popup */
+    .cc-popup-box {
+        width: 380px;
+    }
+
+    .no-data { color: #888; text-align: center; padding: 10px; }
+</style>
+
+<div class="voucher-page">
+    <div class="page-title">Add Voucher</div>
+
+    <div id="alertBanner" class="alert-banner"></div>
+
+    <!-- Search Row -->
+    <div class="search-bar">
+        <label>Search For Voucher NO.</label>
+        <input type="text" id="searchVoucherNo" placeholder="" />
+        <button class="v-btn" onclick="searchVoucher()">Search</button>
+        <button class="v-btn" onclick="copyVoucher()">Copy Voucher</button>
+        <button class="v-btn" onclick="newVoucher()" style="background:#d4edda; border-color:#28a745; color:#155724; font-weight:bold;">New Voucher</button>
+    </div>
+
+    <!-- Voucher Info -->
+    <fieldset class="voucher-info-section">
+        <legend>Voucher Info</legend>
+        <div class="info-row">
+            <label>Voucher NO.</label>
+            <input type="text" id="voucherNo" style="width:160px;" readonly />
+
+            <label style="margin-left:10px;">Date</label>
+            <input type="date" id="voucherDate" style="width:140px;" />
+
+            <label style="margin-left:10px;">
+                <input type="checkbox" id="accountingSettlement" />
+                Accounting Settlement
+            </label>
+            <input type="number" id="settlementYear" style="width:70px;" min="2000" max="2099" />
+
+            <div style="margin-left:auto; display:flex; gap:6px;">
+                <button class="v-btn" id="deleteVoucherBtn" style="display:none; background:#f8d7da; border-color:#dc3545; color:#721c24; font-weight:bold;" onclick="deleteVoucher()">Delete Voucher</button>
+                <button class="v-btn" style="padding: 2px 20px;" onclick="saveVoucher()">Add Voucher</button>
+            </div>
+        </div>
+    </fieldset>
+
+    <!-- Grid -->
+    <div class="grid-wrapper">
+        <table class="voucher-grid" id="voucherGrid">
+            <thead>
+                <tr>
+                    <th style="width:20px;"></th>
+                    <th class="col-acct-no">Account Number</th>
+                    <th class="col-acct-nm">Account Name</th>
+                    <th class="col-nature">Nature of Account</th>
+                    <th class="col-debit">Debit</th>
+                    <th class="col-credit">Credit</th>
+                    <th class="col-desc">Descreption</th>
+                    <th class="col-cc">Cost Center</th>
+                </tr>
+            </thead>
+            <tbody id="voucherGridBody">
+                <!-- rows added dynamically -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Delete Row -->
+    <div class="delete-row-bar">
+        <button class="v-btn" onclick="deleteSelectedRow()">Delete Row</button>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer-section">
+        <label class="statement-label">Statement</label>
+        <textarea class="statement-textarea" id="statement"></textarea>
+
+        <div class="chk-group">
+            <label><input type="checkbox" id="posting" /> Posting</label>
+            <label><input type="checkbox" id="approved" /> Approved</label>
+        </div>
+    </div>
+
+    <!-- Totals -->
+    <div class="totals-row">
+        <label>Total Debit</label>
+        <input type="text" id="totalDebit" readonly />
+
+        <label style="margin-left:10px;">Total credit</label>
+        <input type="text" id="totalCredit" readonly />
+
+        <label style="margin-left:10px;">Deffrence :</label>
+        <span class="diff-value" id="diffValue"></span>
+    </div>
 </div>
 
-<div class="row">
-    <div class="col-md-8 mx-auto">
-        <div class="card">
-            <div class="card-body p-4">
-                <form asp-action="Add" method="post">
-                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+<!-- Account Search Popup -->
+<div class="popup-overlay" id="acctPopup">
+    <div class="popup-box">
+        <div class="popup-header">
+            <span>Search Account</span>
+            <button onclick="closeAcctPopup()">&times;</button>
+        </div>
+        <div class="popup-search">
+            <input type="text" id="acctSearchInput" placeholder="Account No or Name..." onkeyup="searchAccountsPopup()" />
+            <button class="v-btn" onclick="searchAccountsPopup()">Search</button>
+        </div>
+        <div class="popup-table-wrap">
+            <table class="popup-table">
+                <thead>
+                    <tr>
+                        <th>Account No</th>
+                        <th>Account Name</th>
+                        <th>Nature</th>
+                    </tr>
+                </thead>
+                <tbody id="acctPopupBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label asp-for="VoucherNo" class="form-label">Voucher No <span class="text-danger">*</span></label>
-                            <input asp-for="VoucherNo" class="form-control" readonly />
-                            <span asp-validation-for="VoucherNo" class="text-danger"></span>
-                        </div>
-                        <div class="col-md-6">
-                            <label asp-for="VoucherDate" class="form-label">Voucher Date <span class="text-danger">*</span></label>
-                            <input asp-for="VoucherDate" type="date" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
-                            <span asp-validation-for="VoucherDate" class="text-danger"></span>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label asp-for="VoucherType" class="form-label">Voucher Type <span class="text-danger">*</span></label>
-                        <select asp-for="VoucherType" class="form-select">
-                            <option value="">-- Select Type --</option>
-                            <option value="Receipt">Receipt</option>
-                            <option value="Payment">Payment</option>
-                            <option value="Journal">Journal</option>
-                        </select>
-                        <span asp-validation-for="VoucherType" class="text-danger"></span>
-                    </div>
-
-                    <div class="mb-3">
-                        <label asp-for="Description" class="form-label">Description</label>
-                        <textarea asp-for="Description" class="form-control" rows="3" placeholder="Voucher description..."></textarea>
-                        <span asp-validation-for="Description" class="text-danger"></span>
-                    </div>
-
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label asp-for="TotalDebit" class="form-label">Total Debit</label>
-                            <input asp-for="TotalDebit" type="number" step="0.01" class="form-control" />
-                            <span asp-validation-for="TotalDebit" class="text-danger"></span>
-                        </div>
-                        <div class="col-md-6">
-                            <label asp-for="TotalCredit" class="form-label">Total Credit</label>
-                            <input asp-for="TotalCredit" type="number" step="0.01" class="form-control" />
-                            <span asp-validation-for="TotalCredit" class="text-danger"></span>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label asp-for="UserId" class="form-label">User ID <span class="text-danger">*</span></label>
-                        <input asp-for="UserId" type="number" class="form-control" />
-                        <span asp-validation-for="UserId" class="text-danger"></span>
-                    </div>
-
-                    <div class="mt-4">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-save"></i> Save
-                        </button>
-                        <a href="/Vouchers" class="btn btn-secondary">
-                            <i class="bi bi-x-circle"></i> Cancel
-                        </a>
-                    </div>
-                </form>
-            </div>
+<!-- Cost Center Popup -->
+<div class="popup-overlay" id="ccPopup">
+    <div class="popup-box cc-popup-box">
+        <div class="popup-header">
+            <span>Select Cost Center</span>
+            <button onclick="closeCCPopup()">&times;</button>
+        </div>
+        <div class="popup-search">
+            <input type="text" id="ccSearchInput" placeholder="Cost Center..." onkeyup="filterCostCenters()" />
+        </div>
+        <div class="popup-table-wrap">
+            <table class="popup-table">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Name</th>
+                    </tr>
+                </thead>
+                <tbody id="ccPopupBody"></tbody>
+            </table>
         </div>
     </div>
 </div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+<script>
+    // ── State ────────────────────────────────────────────────────────────────
+    let currentVoucherId = 0;
+    let selectedRowIndex = -1;
+    let acctTargetRow = -1;
+    let ccTargetRow = -1;
+    let allCostCenters = [];
+    let rows = []; // array of row data objects
+
+    // ── Init ─────────────────────────────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', async function () {
+        const today = new Date();
+        document.getElementById('voucherDate').value = today.toISOString().split('T')[0];
+        document.getElementById('settlementYear').value = today.getFullYear();
+
+        await loadNextVoucherNo();
+        await loadCostCenters();
+        addEmptyRow();
+    });
+
+    async function loadNextVoucherNo() {
+        const res = await fetch('/Vouchers/GetNextVoucherNo');
+        const data = await res.json();
+        document.getElementById('voucherNo').value = data.voucherNo;
+    }
+
+    async function loadCostCenters() {
+        const res = await fetch('/Vouchers/GetCostCenters');
+        allCostCenters = await res.json();
+    }
+
+    // ── Rows ─────────────────────────────────────────────────────────────────
+    function addEmptyRow() {
+        rows.push({ childAccountId: 0, accountNumber: '', accountName: '', natureOfAccount: '', debit: 0, credit: 0, description: '', costCenterId: 0, costCenterName: '' });
+        renderGrid();
+    }
+
+    function renderGrid() {
+        const tbody = document.getElementById('voucherGridBody');
+        tbody.innerHTML = '';
+
+        rows.forEach((row, i) => {
+            const tr = document.createElement('tr');
+            if (i === selectedRowIndex) tr.classList.add('selected-row');
+
+            tr.onclick = () => selectRow(i);
+
+            tr.innerHTML = `
+                <td class="row-indicator">${i === rows.length - 1 ? '*' : (i + 1)}</td>
+                <td class="col-acct-no">
+                    <input type="text" class="grid-cell-input" value="${esc(row.accountNumber)}"
+                        data-row="${i}" data-field="accountNumber"
+                        onchange="onAccountNoChange(${i}, this.value)"
+                        onfocus="selectRow(${i})"
+                        ondblclick="openAcctPopup(${i})"
+                        title="Double-click to search" />
+                </td>
+                <td class="col-acct-nm">
+                    <span class="grid-cell-readonly">${esc(row.accountName)}</span>
+                </td>
+                <td class="col-nature">
+                    <span class="grid-cell-readonly">${esc(row.natureOfAccount)}</span>
+                </td>
+                <td class="col-debit">
+                    <input type="number" class="grid-cell-input" value="${row.debit || ''}" min="0" step="0.01"
+                        data-row="${i}" onchange="onDebitChange(${i}, this.value)" onfocus="selectRow(${i})" />
+                </td>
+                <td class="col-credit">
+                    <input type="number" class="grid-cell-input" value="${row.credit || ''}" min="0" step="0.01"
+                        data-row="${i}" onchange="onCreditChange(${i}, this.value)" onfocus="selectRow(${i})" />
+                </td>
+                <td class="col-desc">
+                    <input type="text" class="grid-cell-input" value="${esc(row.description)}"
+                        data-row="${i}" onchange="rows[${i}].description = this.value; checkAddRow(${i});" onfocus="selectRow(${i})" />
+                </td>
+                <td class="col-cc">
+                    <input type="text" class="grid-cell-input" value="${esc(row.costCenterName)}" readonly
+                        data-row="${i}" ondblclick="openCCPopup(${i})" onfocus="selectRow(${i})"
+                        title="Double-click to select" style="cursor:pointer;" />
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        updateTotals();
+    }
+
+    function selectRow(i) {
+        selectedRowIndex = i;
+        document.querySelectorAll('#voucherGridBody tr').forEach((tr, idx) => {
+            tr.classList.toggle('selected-row', idx === i);
+        });
+    }
+
+    function onAccountNoChange(i, val) {
+        rows[i].accountNumber = val;
+        if (val.trim()) {
+            lookupAccount(i, val.trim());
+        } else {
+            rows[i].accountName = '';
+            rows[i].natureOfAccount = '';
+            rows[i].childAccountId = 0;
+            renderGrid();
+        }
+    }
+
+    async function lookupAccount(i, accountNo) {
+        const res = await fetch(`/Vouchers/SearchAccounts?term=${encodeURIComponent(accountNo)}`);
+        const list = await res.json();
+        const match = list.find(a => a.accountNo === accountNo);
+        if (match) {
+            rows[i].childAccountId = match.id;
+            rows[i].accountName = match.accountName;
+            rows[i].natureOfAccount = match.natureOfAccount;
+            checkAddRow(i);
+            renderGrid();
+        }
+    }
+
+    function onDebitChange(i, val) {
+        rows[i].debit = parseFloat(val) || 0;
+        if (rows[i].debit > 0) rows[i].credit = 0;
+        checkAddRow(i);
+        renderGrid();
+    }
+
+    function onCreditChange(i, val) {
+        rows[i].credit = parseFloat(val) || 0;
+        if (rows[i].credit > 0) rows[i].debit = 0;
+        checkAddRow(i);
+        renderGrid();
+    }
+
+    function checkAddRow(i) {
+        if (i === rows.length - 1 && rows[i].accountNumber.trim()) {
+            addEmptyRow();
+        }
+    }
+
+    function deleteSelectedRow() {
+        if (selectedRowIndex < 0 || rows.length <= 1) return;
+        rows.splice(selectedRowIndex, 1);
+        selectedRowIndex = Math.min(selectedRowIndex, rows.length - 1);
+        renderGrid();
+    }
+
+    function updateTotals() {
+        const debit = rows.reduce((s, r) => s + (parseFloat(r.debit) || 0), 0);
+        const credit = rows.reduce((s, r) => s + (parseFloat(r.credit) || 0), 0);
+        document.getElementById('totalDebit').value = debit.toFixed(2);
+        document.getElementById('totalCredit').value = credit.toFixed(2);
+        const diff = debit - credit;
+        document.getElementById('diffValue').textContent = diff.toFixed(2);
+        document.getElementById('diffValue').style.color = diff === 0 ? '#155724' : '#8b0000';
+    }
+
+    // ── Account Popup ─────────────────────────────────────────────────────────
+    function openAcctPopup(rowIndex) {
+        acctTargetRow = rowIndex;
+        document.getElementById('acctSearchInput').value = rows[rowIndex].accountNumber || '';
+        document.getElementById('acctPopupBody').innerHTML = '';
+        document.getElementById('acctPopup').style.display = 'block';
+        document.getElementById('acctSearchInput').focus();
+        searchAccountsPopup();
+    }
+
+    function closeAcctPopup() {
+        document.getElementById('acctPopup').style.display = 'none';
+    }
+
+    let acctSearchTimer;
+    function searchAccountsPopup() {
+        clearTimeout(acctSearchTimer);
+        acctSearchTimer = setTimeout(async () => {
+            const term = document.getElementById('acctSearchInput').value;
+            const res = await fetch(`/Vouchers/SearchAccounts?term=${encodeURIComponent(term)}`);
+            const list = await res.json();
+            const tbody = document.getElementById('acctPopupBody');
+            tbody.innerHTML = '';
+            if (list.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" class="no-data">No accounts found.</td></tr>';
+                return;
+            }
+            list.forEach(a => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${esc(a.accountNo)}</td><td>${esc(a.accountName)}</td><td>${esc(a.natureOfAccount)}</td>`;
+                tr.onclick = () => selectAccount(a);
+                tbody.appendChild(tr);
+            });
+        }, 250);
+    }
+
+    function selectAccount(a) {
+        const i = acctTargetRow;
+        rows[i].childAccountId = a.id;
+        rows[i].accountNumber = a.accountNo;
+        rows[i].accountName = a.accountName;
+        rows[i].natureOfAccount = a.natureOfAccount;
+        checkAddRow(i);
+        closeAcctPopup();
+        renderGrid();
+    }
+
+    // ── Cost Center Popup ─────────────────────────────────────────────────────
+    function openCCPopup(rowIndex) {
+        ccTargetRow = rowIndex;
+        document.getElementById('ccSearchInput').value = '';
+        document.getElementById('ccPopup').style.display = 'block';
+        filterCostCenters();
+    }
+
+    function closeCCPopup() {
+        document.getElementById('ccPopup').style.display = 'none';
+    }
+
+    function filterCostCenters() {
+        const term = document.getElementById('ccSearchInput').value.toLowerCase();
+        const filtered = allCostCenters.filter(c =>
+            c.code.toLowerCase().includes(term) || c.name.toLowerCase().includes(term)
+        );
+        const tbody = document.getElementById('ccPopupBody');
+        tbody.innerHTML = '';
+        if (filtered.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="2" class="no-data">No cost centers found.</td></tr>';
+            return;
+        }
+        filtered.forEach(c => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td>${esc(c.code)}</td><td>${esc(c.name)}</td>`;
+            tr.onclick = () => selectCostCenter(c);
+            tbody.appendChild(tr);
+        });
+    }
+
+    function selectCostCenter(c) {
+        const i = ccTargetRow;
+        rows[i].costCenterId = c.id;
+        rows[i].costCenterName = c.name;
+        closeCCPopup();
+        renderGrid();
+    }
+
+    // ── Delete Voucher ────────────────────────────────────────────────────────
+    async function deleteVoucher() {
+        if (currentVoucherId === 0) return;
+
+        const voucherNo = document.getElementById('voucherNo').value;
+        if (!confirm(`Are you sure you want to delete Voucher No. "${voucherNo}"?\nThis action cannot be undone.`)) return;
+
+        const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value ?? '';
+
+        const res = await fetch('/Vouchers/Delete', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'RequestVerificationToken': token
+            },
+            body: `id=${currentVoucherId}`
+        });
+
+        const result = await res.json();
+        if (result.success) {
+            showAlert(`Voucher "${voucherNo}" deleted successfully.`, true);
+            await newVoucher();
+        } else {
+            showAlert(result.message, false);
+        }
+    }
+
+    // ── New Voucher ───────────────────────────────────────────────────────────
+    async function newVoucher() {
+        currentVoucherId = 0;
+        selectedRowIndex = -1;
+        document.getElementById('deleteVoucherBtn').style.display = 'none';
+
+        await loadNextVoucherNo();
+
+        const today = new Date();
+        document.getElementById('voucherDate').value = today.toISOString().split('T')[0];
+        document.getElementById('settlementYear').value = today.getFullYear();
+        document.getElementById('accountingSettlement').checked = false;
+        document.getElementById('statement').value = '';
+        document.getElementById('posting').checked = false;
+        document.getElementById('approved').checked = false;
+        document.getElementById('searchVoucherNo').value = '';
+
+        rows = [{ childAccountId: 0, accountNumber: '', accountName: '', natureOfAccount: '', debit: 0, credit: 0, description: '', costCenterId: 0, costCenterName: '' }];
+        renderGrid();
+    }
+
+    // ── Search / Copy Voucher ─────────────────────────────────────────────────
+    async function searchVoucher() {
+        const no = document.getElementById('searchVoucherNo').value.trim();
+        if (!no) { showAlert('Please enter a Voucher No to search.', false); return; }
+
+        const res = await fetch(`/Vouchers/GetVoucher?voucherNo=${encodeURIComponent(no)}`);
+        const data = await res.json();
+        if (!data.success) { showAlert(data.message, false); return; }
+
+        loadVoucherData(data);
+        showAlert('Voucher loaded successfully.', true);
+    }
+
+    async function copyVoucher() {
+        const no = document.getElementById('searchVoucherNo').value.trim();
+        if (!no) { showAlert('Please enter a Voucher No to copy.', false); return; }
+
+        const res = await fetch(`/Vouchers/GetVoucher?voucherNo=${encodeURIComponent(no)}`);
+        const data = await res.json();
+        if (!data.success) { showAlert(data.message, false); return; }
+
+        loadVoucherData(data, true);
+        showAlert('Voucher copied. A new Voucher No has been assigned.', true);
+    }
+
+    async function loadVoucherData(data, asNew = false) {
+        if (!asNew) {
+            currentVoucherId = data.id;
+            document.getElementById('voucherNo').value = data.voucherNo;
+            document.getElementById('deleteVoucherBtn').style.display = 'inline-block';
+        } else {
+            currentVoucherId = 0;
+            document.getElementById('deleteVoucherBtn').style.display = 'none';
+            await loadNextVoucherNo();
+        }
+
+        document.getElementById('voucherDate').value = data.voucherDate;
+        document.getElementById('accountingSettlement').checked = data.accountingSettlement;
+        document.getElementById('settlementYear').value = data.settlementYear;
+        document.getElementById('statement').value = data.statement;
+        document.getElementById('posting').checked = data.posting;
+        document.getElementById('approved').checked = data.approved;
+
+        rows = data.details.map(d => ({
+            childAccountId: d.childAccountId || 0,
+            accountNumber: d.accountNumber,
+            accountName: d.accountName,
+            natureOfAccount: d.natureOfAccount,
+            debit: d.debit,
+            credit: d.credit,
+            description: d.description,
+            costCenterId: d.costCenterId || 0,
+            costCenterName: d.costCenterName || ''
+        }));
+        rows.push({ childAccountId: 0, accountNumber: '', accountName: '', natureOfAccount: '', debit: 0, credit: 0, description: '', costCenterId: 0, costCenterName: '' });
+        selectedRowIndex = -1;
+        renderGrid();
+    }
+
+    // ── Save ─────────────────────────────────────────────────────────────────
+    async function saveVoucher() {
+        const dataRows = rows.filter(r => r.accountNumber.trim() !== '');
+
+        if (dataRows.length === 0) {
+            showAlert('Please add at least one account line.', false);
+            return;
+        }
+
+        const totalDebit  = dataRows.reduce((s, r) => s + (parseFloat(r.debit)  || 0), 0);
+        const totalCredit = dataRows.reduce((s, r) => s + (parseFloat(r.credit) || 0), 0);
+        const diff = Math.round((totalDebit - totalCredit) * 1e6) / 1e6;
+        if (diff !== 0) {
+            showAlert(`Cannot save: Difference must be zero. Current difference = ${diff.toFixed(2)}`, false);
+            return;
+        }
+
+        const payload = {
+            id: currentVoucherId,
+            voucherNo: document.getElementById('voucherNo').value,
+            voucherDate: document.getElementById('voucherDate').value,
+            accountingSettlement: document.getElementById('accountingSettlement').checked,
+            settlementYear: parseInt(document.getElementById('settlementYear').value) || new Date().getFullYear(),
+            statement: document.getElementById('statement').value,
+            posting: document.getElementById('posting').checked,
+            approved: document.getElementById('approved').checked,
+            details: dataRows.map(r => ({
+                childAccountId: r.childAccountId,
+                accountNumber: r.accountNumber,
+                accountName: r.accountName,
+                natureOfAccount: r.natureOfAccount,
+                debit: parseFloat(r.debit) || 0,
+                credit: parseFloat(r.credit) || 0,
+                description: r.description,
+                costCenterId: r.costCenterId,
+                costCenterName: r.costCenterName
+            }))
+        };
+
+        const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value ?? '';
+
+        const res = await fetch('/Vouchers/Save', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': token
+            },
+            body: JSON.stringify(payload)
+        });
+
+        const result = await res.json();
+        if (result.success) {
+            currentVoucherId = result.id;
+            showAlert(result.message, true);
+            if (payload.id === 0) {
+                await loadNextVoucherNo();
+                rows = [{ childAccountId: 0, accountNumber: '', accountName: '', natureOfAccount: '', debit: 0, credit: 0, description: '', costCenterId: 0, costCenterName: '' }];
+                document.getElementById('statement').value = '';
+                document.getElementById('posting').checked = false;
+                document.getElementById('approved').checked = false;
+                document.getElementById('accountingSettlement').checked = false;
+                currentVoucherId = 0;
+                renderGrid();
+            }
+        } else {
+            showAlert(result.message, false);
+        }
+    }
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
+    function showAlert(msg, success) {
+        const el = document.getElementById('alertBanner');
+        el.className = 'alert-banner ' + (success ? 'alert-success' : 'alert-danger');
+        el.textContent = msg;
+        el.style.display = 'block';
+        setTimeout(() => el.style.display = 'none', 4000);
+    }
+
+    function esc(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // Close popups on overlay click
+    document.getElementById('acctPopup').addEventListener('click', function (e) {
+        if (e.target === this) closeAcctPopup();
+    });
+    document.getElementById('ccPopup').addEventListener('click', function (e) {
+        if (e.target === this) closeCCPopup();
+    });
+</script>
+@Html.AntiForgeryToken()
 }

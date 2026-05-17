@@ -19,12 +19,13 @@ namespace Concept.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     VoucherNo = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     VoucherDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    VoucherType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AccountingSettlement = table.Column<bool>(type: "bit", nullable: false),
+                    SettlementYear = table.Column<int>(type: "int", nullable: false),
+                    Statement = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Posting = table.Column<bool>(type: "bit", nullable: false),
+                    Approved = table.Column<bool>(type: "bit", nullable: false),
                     TotalDebit = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     TotalCredit = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false),
                     Active = table.Column<bool>(type: "bit", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
@@ -32,12 +33,6 @@ namespace Concept.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Voucher_Header", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Voucher_Header_UserInfo_UserId",
-                        column: x => x.UserId,
-                        principalTable: "UserInfo",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -47,33 +42,37 @@ namespace Concept.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     VoucherHeaderId = table.Column<int>(type: "int", nullable: false),
-                    AccountId = table.Column<int>(type: "int", nullable: false),
-                    CostCenterId = table.Column<int>(type: "int", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ChildAccountId = table.Column<int>(type: "int", nullable: true),
+                    AccountNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AccountName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NatureOfAccount = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Debit = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Credit = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    Credit = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CostCenterId = table.Column<int>(type: "int", nullable: true),
+                    CostCenterName = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Voucher_Details", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Voucher_Details_Voucher_Header_VoucherHeaderId",
-                        column: x => x.VoucherHeaderId,
-                        principalTable: "Voucher_Header",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Voucher_Details_Child_Account_AccountId",
-                        column: x => x.AccountId,
+                        name: "FK_Voucher_Details_Child_Account_ChildAccountId",
+                        column: x => x.ChildAccountId,
                         principalTable: "Child_Account",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
                         name: "FK_Voucher_Details_Deff_CostCenter_CostCenterId",
                         column: x => x.CostCenterId,
                         principalTable: "Deff_CostCenter",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_Voucher_Details_Voucher_Header_VoucherHeaderId",
+                        column: x => x.VoucherHeaderId,
+                        principalTable: "Voucher_Header",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -83,24 +82,19 @@ namespace Concept.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Voucher_Header_UserId",
-                table: "Voucher_Header",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Voucher_Details_VoucherHeaderId",
+                name: "IX_Voucher_Details_ChildAccountId",
                 table: "Voucher_Details",
-                column: "VoucherHeaderId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Voucher_Details_AccountId",
-                table: "Voucher_Details",
-                column: "AccountId");
+                column: "ChildAccountId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Voucher_Details_CostCenterId",
                 table: "Voucher_Details",
                 column: "CostCenterId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Voucher_Details_VoucherHeaderId",
+                table: "Voucher_Details",
+                column: "VoucherHeaderId");
         }
 
         /// <inheritdoc />

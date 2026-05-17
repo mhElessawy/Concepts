@@ -908,10 +908,15 @@ namespace Concept.Models
 
         public DateTime VoucherDate { get; set; } = DateTime.Now;
 
-        [Required]
-        public string VoucherType { get; set; } = string.Empty;
+        public bool AccountingSettlement { get; set; } = false;
 
-        public string? Description { get; set; }
+        public int SettlementYear { get; set; } = DateTime.Now.Year;
+
+        public string? Statement { get; set; }
+
+        public bool Posting { get; set; } = false;
+
+        public bool Approved { get; set; } = false;
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal TotalDebit { get; set; } = 0;
@@ -919,17 +924,9 @@ namespace Concept.Models
         [Column(TypeName = "decimal(18,2)")]
         public decimal TotalCredit { get; set; } = 0;
 
-        public int Status { get; set; } = 0;
-
-        public int UserId { get; set; }
-
         public bool Active { get; set; } = true;
-
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public DateTime ModifiedDate { get; set; } = DateTime.Now;
-
-        [ForeignKey("UserId")]
-        public virtual UserInfo? User { get; set; }
 
         public virtual ICollection<VoucherDetails> Details { get; set; } = new List<VoucherDetails>();
     }
@@ -941,11 +938,13 @@ namespace Concept.Models
 
         public int VoucherHeaderId { get; set; }
 
-        public int AccountId { get; set; }
+        public int? ChildAccountId { get; set; }
 
-        public int? CostCenterId { get; set; }
+        public string AccountNumber { get; set; } = string.Empty;
 
-        public string? Description { get; set; }
+        public string AccountName { get; set; } = string.Empty;
+
+        public string NatureOfAccount { get; set; } = string.Empty;
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal Debit { get; set; } = 0;
@@ -953,11 +952,17 @@ namespace Concept.Models
         [Column(TypeName = "decimal(18,2)")]
         public decimal Credit { get; set; } = 0;
 
+        public string? Description { get; set; }
+
+        public int? CostCenterId { get; set; }
+
+        public string? CostCenterName { get; set; }
+
         [ForeignKey("VoucherHeaderId")]
         public virtual VoucherHeader? VoucherHeader { get; set; }
 
-        [ForeignKey("AccountId")]
-        public virtual ChildAccount? Account { get; set; }
+        [ForeignKey("ChildAccountId")]
+        public virtual ChildAccount? ChildAccount { get; set; }
 
         [ForeignKey("CostCenterId")]
         public virtual DeffCostCenter? CostCenter { get; set; }

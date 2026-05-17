@@ -2251,29 +2251,35 @@ namespace Concept.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("AccountingSettlement")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("Active")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Approved")
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("ModifiedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Status")
+                    b.Property<bool>("Posting")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("SettlementYear")
                         .HasColumnType("int");
+
+                    b.Property<string>("Statement")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("TotalCredit")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("TotalDebit")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
 
                     b.Property<DateTime>("VoucherDate")
                         .HasColumnType("datetime2");
@@ -2282,18 +2288,12 @@ namespace Concept.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("VoucherType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("VoucherNo")
                         .IsUnique();
 
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Voucher_Header", (string)null);
+                    b.ToTable("Voucher_Header");
                 });
 
             modelBuilder.Entity("Concept.Models.VoucherDetails", b =>
@@ -2304,11 +2304,22 @@ namespace Concept.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AccountId")
+                    b.Property<string>("AccountName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AccountNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ChildAccountId")
                         .HasColumnType("int");
 
                     b.Property<int?>("CostCenterId")
                         .HasColumnType("int");
+
+                    b.Property<string>("CostCenterName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Credit")
                         .HasColumnType("decimal(18,2)");
@@ -2319,54 +2330,44 @@ namespace Concept.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("NatureOfAccount")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("VoucherHeaderId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AccountId");
+                    b.HasIndex("ChildAccountId");
 
                     b.HasIndex("CostCenterId");
 
                     b.HasIndex("VoucherHeaderId");
 
-                    b.ToTable("Voucher_Details", (string)null);
-                });
-
-            modelBuilder.Entity("Concept.Models.VoucherHeader", b =>
-                {
-                    b.HasOne("Concept.Models.UserInfo", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("User");
+                    b.ToTable("Voucher_Details");
                 });
 
             modelBuilder.Entity("Concept.Models.VoucherDetails", b =>
                 {
-                    b.HasOne("Concept.Models.VoucherHeader", "VoucherHeader")
-                        .WithMany("Details")
-                        .HasForeignKey("VoucherHeaderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Concept.Models.ChildAccount", "Account")
+                    b.HasOne("Concept.Models.ChildAccount", "ChildAccount")
                         .WithMany()
-                        .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("ChildAccountId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("Concept.Models.DeffCostCenter", "CostCenter")
                         .WithMany()
                         .HasForeignKey("CostCenterId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.Navigation("Account");
+                    b.HasOne("Concept.Models.VoucherHeader", "VoucherHeader")
+                        .WithMany("Details")
+                        .HasForeignKey("VoucherHeaderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
+                    b.Navigation("ChildAccount");
                     b.Navigation("CostCenter");
-
                     b.Navigation("VoucherHeader");
                 });
 

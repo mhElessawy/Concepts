@@ -459,25 +459,19 @@ namespace Concept.Data
             modelBuilder.Entity<VoucherHeader>().ToTable("Voucher_Header");
             modelBuilder.Entity<VoucherHeader>().HasIndex(v => v.VoucherNo).IsUnique();
 
-            modelBuilder.Entity<VoucherHeader>()
-                .HasOne(v => v.User)
-                .WithMany()
-                .HasForeignKey(v => v.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
-
             modelBuilder.Entity<VoucherDetails>().ToTable("Voucher_Details");
 
             modelBuilder.Entity<VoucherDetails>()
                 .HasOne(d => d.VoucherHeader)
-                .WithMany(v => v.Details)
+                .WithMany(h => h.Details)
                 .HasForeignKey(d => d.VoucherHeaderId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<VoucherDetails>()
-                .HasOne(d => d.Account)
+                .HasOne(d => d.ChildAccount)
                 .WithMany()
-                .HasForeignKey(d => d.AccountId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .HasForeignKey(d => d.ChildAccountId)
+                .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<VoucherDetails>()
                 .HasOne(d => d.CostCenter)
