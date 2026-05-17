@@ -898,6 +898,76 @@ namespace Concept.Models
         public DateTime ModifiedDate { get; set; } = DateTime.Now;
     }
 
+    public class VoucherHeader
+    {
+        [Key]
+        public int Id { get; set; }
+
+        [Required]
+        public string VoucherNo { get; set; } = string.Empty;
+
+        public DateTime VoucherDate { get; set; } = DateTime.Now;
+
+        public bool AccountingSettlement { get; set; } = false;
+
+        public int SettlementYear { get; set; } = DateTime.Now.Year;
+
+        public string? Statement { get; set; }
+
+        public bool Posting { get; set; } = false;
+
+        public bool Approved { get; set; } = false;
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal TotalDebit { get; set; } = 0;
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal TotalCredit { get; set; } = 0;
+
+        public bool Active { get; set; } = true;
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime ModifiedDate { get; set; } = DateTime.Now;
+
+        public virtual ICollection<VoucherDetails> Details { get; set; } = new List<VoucherDetails>();
+    }
+
+    public class VoucherDetails
+    {
+        [Key]
+        public int Id { get; set; }
+
+        public int VoucherHeaderId { get; set; }
+
+        public int? ChildAccountId { get; set; }
+
+        public string AccountNumber { get; set; } = string.Empty;
+
+        public string AccountName { get; set; } = string.Empty;
+
+        public string NatureOfAccount { get; set; } = string.Empty;
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal Debit { get; set; } = 0;
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal Credit { get; set; } = 0;
+
+        public string? Description { get; set; }
+
+        public int? CostCenterId { get; set; }
+
+        public string? CostCenterName { get; set; }
+
+        [ForeignKey("VoucherHeaderId")]
+        public virtual VoucherHeader? VoucherHeader { get; set; }
+
+        [ForeignKey("ChildAccountId")]
+        public virtual ChildAccount? ChildAccount { get; set; }
+
+        [ForeignKey("CostCenterId")]
+        public virtual DeffCostCenter? CostCenter { get; set; }
+    }
+
     public class StoreReturnDetails
     {
         [Key]
