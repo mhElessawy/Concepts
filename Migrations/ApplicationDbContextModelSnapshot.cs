@@ -2494,6 +2494,130 @@ namespace Concept.Migrations
                 b.Navigation("Details");
             });
 
+            modelBuilder.Entity("Concept.Models.OpeningVoucherHeader", b =>
+            {
+                b.Property<int>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("int");
+
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                b.Property<string>("VoucherNo")
+                    .IsRequired()
+                    .HasColumnType("nvarchar(450)");
+
+                b.Property<DateTime>("VoucherDate")
+                    .HasColumnType("datetime2");
+
+                b.Property<bool>("RelayVoucher")
+                    .HasColumnType("bit");
+
+                b.Property<string>("Statement")
+                    .HasColumnType("nvarchar(max)");
+
+                b.Property<string>("Document")
+                    .HasColumnType("nvarchar(max)");
+
+                b.Property<string>("Note")
+                    .HasColumnType("nvarchar(max)");
+
+                b.Property<decimal>("TotalDebit")
+                    .HasColumnType("decimal(18,2)");
+
+                b.Property<decimal>("TotalCredit")
+                    .HasColumnType("decimal(18,2)");
+
+                b.Property<bool>("Active")
+                    .HasColumnType("bit");
+
+                b.Property<DateTime>("CreatedDate")
+                    .HasColumnType("datetime2");
+
+                b.Property<DateTime>("ModifiedDate")
+                    .HasColumnType("datetime2");
+
+                b.HasKey("Id");
+
+                b.HasIndex("VoucherNo")
+                    .IsUnique();
+
+                b.ToTable("OpeningVoucher_Header");
+            });
+
+            modelBuilder.Entity("Concept.Models.OpeningVoucherDetails", b =>
+            {
+                b.Property<int>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("int");
+
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                b.Property<int>("OpeningVoucherHeaderId")
+                    .HasColumnType("int");
+
+                b.Property<int?>("ChildAccountId")
+                    .HasColumnType("int");
+
+                b.Property<string>("AccountNumber")
+                    .IsRequired()
+                    .HasColumnType("nvarchar(max)");
+
+                b.Property<string>("AccountName")
+                    .IsRequired()
+                    .HasColumnType("nvarchar(max)");
+
+                b.Property<decimal>("Debit")
+                    .HasColumnType("decimal(18,2)");
+
+                b.Property<decimal>("Credit")
+                    .HasColumnType("decimal(18,2)");
+
+                b.Property<int?>("CostCenterId")
+                    .HasColumnType("int");
+
+                b.Property<string>("CostCenterName")
+                    .HasColumnType("nvarchar(max)");
+
+                b.Property<string>("Description")
+                    .HasColumnType("nvarchar(max)");
+
+                b.HasKey("Id");
+
+                b.HasIndex("ChildAccountId");
+                b.HasIndex("CostCenterId");
+                b.HasIndex("OpeningVoucherHeaderId");
+
+                b.ToTable("OpeningVoucher_Details");
+            });
+
+            modelBuilder.Entity("Concept.Models.OpeningVoucherDetails", b =>
+            {
+                b.HasOne("Concept.Models.OpeningVoucherHeader", "OpeningVoucherHeader")
+                    .WithMany("Details")
+                    .HasForeignKey("OpeningVoucherHeaderId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
+
+                b.HasOne("Concept.Models.ChildAccount", "ChildAccount")
+                    .WithMany()
+                    .HasForeignKey("ChildAccountId")
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                b.HasOne("Concept.Models.DeffCostCenter", "CostCenter")
+                    .WithMany()
+                    .HasForeignKey("CostCenterId")
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                b.Navigation("ChildAccount");
+                b.Navigation("CostCenter");
+                b.Navigation("OpeningVoucherHeader");
+            });
+
+            modelBuilder.Entity("Concept.Models.OpeningVoucherHeader", b =>
+            {
+                b.Navigation("Details");
+            });
+
 #pragma warning restore 612, 618
         }
     }
