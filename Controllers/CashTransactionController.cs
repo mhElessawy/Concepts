@@ -24,23 +24,30 @@ namespace Concept.Controllers
         [HttpGet]
         public async Task<IActionResult> GetNextInvoiceNo()
         {
-            int year     = DateTime.Now.Year;
-            string prefix = $"CT{(year % 100):D2}";   // e.g.  CT26
-
-            var existing = await _context.CashTransactionHeaders
-                .Where(h => h.InvoiceNo.StartsWith(prefix))
-                .Select(h => h.InvoiceNo)
-                .ToListAsync();
-
-            int maxSeq = 0;
-            foreach (var no in existing)
+            try
             {
-                string suffix = no.Substring(prefix.Length);
-                if (int.TryParse(suffix, out int seq) && seq > maxSeq)
-                    maxSeq = seq;
-            }
+                int year      = DateTime.Now.Year;
+                string prefix = $"CT{(year % 100):D2}";   // e.g.  CT26
 
-            return Json(new { invoiceNo = $"{prefix}{(maxSeq + 1):D4}" }); // CT260001, CT260002 …
+                var existing = await _context.CashTransactionHeaders
+                    .Where(h => h.InvoiceNo.StartsWith(prefix))
+                    .Select(h => h.InvoiceNo)
+                    .ToListAsync();
+
+                int maxSeq = 0;
+                foreach (var no in existing)
+                {
+                    string suffix = no.Substring(prefix.Length);
+                    if (int.TryParse(suffix, out int seq) && seq > maxSeq)
+                        maxSeq = seq;
+                }
+
+                return Json(new { success = true, invoiceNo = $"{prefix}{(maxSeq + 1):D4}" }); // CT260001, CT260002 …
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, invoiceNo = (string?)null, message = ex.Message });
+            }
         }
 
         // GET: CashTransaction/GetTransaction?invoiceNo=CW260001

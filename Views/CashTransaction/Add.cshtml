@@ -634,7 +634,8 @@
     document.addEventListener('DOMContentLoaded', async function () {
         const today = new Date();
         document.getElementById('transactionDate').value = today.toISOString().split('T')[0];
-        await Promise.all([
+        // Use allSettled so one failure does not block the others
+        await Promise.allSettled([
             loadNextInvoiceNo(),
             loadNextRelatedVoucherNo(),
             loadCashTypes()
@@ -644,28 +645,44 @@
     });
 
     async function loadNextInvoiceNo() {
-        const res  = await fetch('/CashTransaction/GetNextInvoiceNo');
-        const data = await res.json();
-        document.getElementById('invoiceNo').value = data.invoiceNo;
+        try {
+            const res  = await fetch('/CashTransaction/GetNextInvoiceNo');
+            const data = await res.json();
+            if (data.invoiceNo) {
+                document.getElementById('invoiceNo').value = data.invoiceNo;
+            }
+        } catch (e) {
+            console.error('Failed to load Invoice No:', e);
+        }
     }
 
     async function loadNextRelatedVoucherNo() {
-        const res  = await fetch('/CashTransaction/GetNextRelatedVoucherNo');
-        const data = await res.json();
-        document.getElementById('relatedVoucherNo').value = data.voucherNo;
+        try {
+            const res  = await fetch('/CashTransaction/GetNextRelatedVoucherNo');
+            const data = await res.json();
+            if (data.voucherNo) {
+                document.getElementById('relatedVoucherNo').value = data.voucherNo;
+            }
+        } catch (e) {
+            console.error('Failed to load Related Voucher No:', e);
+        }
     }
 
     async function loadCashTypes() {
-        const res  = await fetch('/CashTransaction/GetAccountTypes');
-        const list = await res.json();
-        const sel  = document.getElementById('cashName');
-        sel.innerHTML = '<option value="">-- Select --</option>';
-        list.forEach(a => {
-            const opt = document.createElement('option');
-            opt.value = a.id;
-            opt.textContent = `${a.code} - ${a.name}`;
-            sel.appendChild(opt);
-        });
+        try {
+            const res  = await fetch('/CashTransaction/GetAccountTypes');
+            const list = await res.json();
+            const sel  = document.getElementById('cashName');
+            sel.innerHTML = '<option value="">-- Select --</option>';
+            list.forEach(a => {
+                const opt = document.createElement('option');
+                opt.value = a.id;
+                opt.textContent = `${a.code} - ${a.name}`;
+                sel.appendChild(opt);
+            });
+        } catch (e) {
+            console.error('Failed to load Cash Types:', e);
+        }
     }
 
     async function onTypeChange() {
@@ -931,7 +948,6 @@
     async function newTransaction() {
         currentId = 0;
         selectedRowIndex = -1;
-        await loadNextInvoiceNo();
 
         const today = new Date();
         document.getElementById('transactionDate').value = today.toISOString().split('T')[0];
@@ -942,7 +958,7 @@
         document.getElementById('payTo').value          = 'Suppliers';
         document.getElementById('paymentMethod').value  = 'Cash';
         document.getElementById('note').value           = '';
-        await loadNextRelatedVoucherNo();
+        await Promise.allSettled([loadNextInvoiceNo(), loadNextRelatedVoucherNo()]);
         document.getElementById('amount').value         = '0';
         document.getElementById('discountPct').value    = '0';
         document.getElementById('discountKwd').value    = '0';
