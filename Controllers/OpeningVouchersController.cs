@@ -5,19 +5,18 @@ using Concept.Models;
 
 namespace Concept.Controllers
 {
-    public class VouchersController : Controller
+    public class OpeningVouchersController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public VouchersController(ApplicationDbContext context)
+        public OpeningVouchersController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: Vouchers
         public async Task<IActionResult> Index()
         {
-            var vouchers = await _context.VoucherHeaders
+            var vouchers = await _context.OpeningVoucherHeaders
                 .Where(v => v.Active)
                 .OrderByDescending(v => v.VoucherDate)
                 .ThenByDescending(v => v.VoucherNo)
@@ -25,22 +24,19 @@ namespace Concept.Controllers
             return View(vouchers);
         }
 
-        // GET: Vouchers/Add
         public IActionResult Add()
         {
             return View();
         }
 
-        // GET: Vouchers/GetNextVoucherNo
         [HttpGet]
         public async Task<IActionResult> GetNextVoucherNo()
         {
             int year = DateTime.Now.Year;
-            string yearPart = (year % 100).ToString("D2"); // "26" from 2026
+            string yearPart = (year % 100).ToString("D2");
+            var prefix = $"OV{yearPart}";
 
-            var prefix = $"V{yearPart}";
-
-            var existing = await _context.VoucherHeaders
+            var existing = await _context.OpeningVoucherHeaders
                 .Where(v => v.VoucherNo.StartsWith(prefix))
                 .Select(v => v.VoucherNo)
                 .ToListAsync();
@@ -57,17 +53,16 @@ namespace Concept.Controllers
             return Json(new { voucherNo = nextNo });
         }
 
-        // GET: Vouchers/GetVoucher?voucherNo=V260001
         [HttpGet]
         public async Task<IActionResult> GetVoucher(string voucherNo)
         {
-            var header = await _context.VoucherHeaders
+            var header = await _context.OpeningVoucherHeaders
                 .Include(v => v.Details)
                     .ThenInclude(d => d.CostCenter)
                 .FirstOrDefaultAsync(v => v.VoucherNo == voucherNo);
 
             if (header == null)
-                return Json(new { success = false, message = "Voucher not found." });
+                return Json(new { success = false, message = "Opening Voucher not found." });
 
             return Json(new
             {
@@ -75,11 +70,10 @@ namespace Concept.Controllers
                 id = header.Id,
                 voucherNo = header.VoucherNo,
                 voucherDate = header.VoucherDate.ToString("yyyy-MM-dd"),
-                accountingSettlement = header.AccountingSettlement,
-                settlementYear = header.SettlementYear,
+                relayVoucher = header.RelayVoucher,
                 statement = header.Statement ?? "",
-                posting = header.Posting,
-                approved = header.Approved,
+                document = header.Document ?? "",
+                note = header.Note ?? "",
                 totalDebit = header.TotalDebit,
                 totalCredit = header.TotalCredit,
                 details = header.Details.Select(d => new
@@ -87,7 +81,6 @@ namespace Concept.Controllers
                     id = d.Id,
                     accountNumber = d.AccountNumber,
                     accountName = d.AccountName,
-                    natureOfAccount = d.NatureOfAccount,
                     debit = d.Debit,
                     credit = d.Credit,
                     description = d.Description ?? "",
@@ -97,13 +90,10 @@ namespace Concept.Controllers
             });
         }
 
-        // GET: Vouchers/SearchAccounts?term=xxx
         [HttpGet]
         public async Task<IActionResult> SearchAccounts(string? term)
         {
-            var query = _context.ChildAccounts
-                .Include(a => a.NatureOfAccount)
-                .AsQueryable();
+            var query = _context.ChildAccounts.AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(term))
                 query = query.Where(a => a.AccountNo.Contains(term) || a.AccountName.Contains(term));
@@ -116,15 +106,13 @@ namespace Concept.Controllers
                 {
                     id = a.Id,
                     accountNo = a.AccountNo,
-                    accountName = a.AccountName,
-                    natureOfAccount = a.NatureOfAccount != null ? a.NatureOfAccount.Name : ""
+                    accountName = a.AccountName
                 })
                 .ToListAsync();
 
             return Json(results);
         }
 
-        // GET: Vouchers/GetCostCenters
         [HttpGet]
         public async Task<IActionResult> GetCostCenters()
         {
@@ -141,10 +129,9 @@ namespace Concept.Controllers
             return Json(list);
         }
 
-        // POST: Vouchers/Save
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Save([FromBody] VoucherSaveRequest request)
+        public async Task<IActionResult> Save([FromBody] OpeningVoucherSaveRequest request)
         {
             try
             {
@@ -159,19 +146,18 @@ namespace Concept.Controllers
 
                 if (request.Id == 0)
                 {
-                    var duplicate = await _context.VoucherHeaders.AnyAsync(v => v.VoucherNo == request.VoucherNo);
+                    var duplicate = await _context.OpeningVoucherHeaders.AnyAsync(v => v.VoucherNo == request.VoucherNo);
                     if (duplicate)
                         return Json(new { success = false, message = $"Voucher No '{request.VoucherNo}' already exists." });
 
-                    var header = new VoucherHeader
+                    var header = new OpeningVoucherHeader
                     {
                         VoucherNo = request.VoucherNo,
                         VoucherDate = request.VoucherDate,
-                        AccountingSettlement = request.AccountingSettlement,
-                        SettlementYear = request.SettlementYear,
+                        RelayVoucher = request.RelayVoucher,
                         Statement = request.Statement,
-                        Posting = request.Posting,
-                        Approved = request.Approved,
+                        Document = request.Document,
+                        Note = request.Note,
                         TotalDebit = totalDebit,
                         TotalCredit = totalCredit,
                         CreatedDate = DateTime.Now,
@@ -180,11 +166,10 @@ namespace Concept.Controllers
 
                     foreach (var d in request.Details)
                     {
-                        header.Details.Add(new VoucherDetails
+                        header.Details.Add(new OpeningVoucherDetails
                         {
                             AccountNumber = d.AccountNumber,
                             AccountName = d.AccountName,
-                            NatureOfAccount = d.NatureOfAccount,
                             Debit = d.Debit,
                             Credit = d.Credit,
                             Description = d.Description,
@@ -194,47 +179,45 @@ namespace Concept.Controllers
                         });
                     }
 
-                    _context.VoucherHeaders.Add(header);
+                    _context.OpeningVoucherHeaders.Add(header);
                     await _context.SaveChangesAsync();
-                    return Json(new { success = true, message = "Voucher saved successfully.", id = header.Id });
+                    return Json(new { success = true, message = "Opening Voucher saved successfully.", id = header.Id });
                 }
                 else
                 {
-                    var header = await _context.VoucherHeaders
+                    var header = await _context.OpeningVoucherHeaders
                         .Include(v => v.Details)
                         .FirstOrDefaultAsync(v => v.Id == request.Id);
 
                     if (header == null)
-                        return Json(new { success = false, message = "Voucher not found." });
+                        return Json(new { success = false, message = "Opening Voucher not found." });
 
                     if (header.VoucherNo != request.VoucherNo)
                     {
-                        var duplicate = await _context.VoucherHeaders.AnyAsync(v => v.VoucherNo == request.VoucherNo && v.Id != request.Id);
+                        var duplicate = await _context.OpeningVoucherHeaders.AnyAsync(v => v.VoucherNo == request.VoucherNo && v.Id != request.Id);
                         if (duplicate)
                             return Json(new { success = false, message = $"Voucher No '{request.VoucherNo}' already exists." });
                     }
 
                     header.VoucherNo = request.VoucherNo;
                     header.VoucherDate = request.VoucherDate;
-                    header.AccountingSettlement = request.AccountingSettlement;
-                    header.SettlementYear = request.SettlementYear;
+                    header.RelayVoucher = request.RelayVoucher;
                     header.Statement = request.Statement;
-                    header.Posting = request.Posting;
-                    header.Approved = request.Approved;
+                    header.Document = request.Document;
+                    header.Note = request.Note;
                     header.TotalDebit = totalDebit;
                     header.TotalCredit = totalCredit;
                     header.ModifiedDate = DateTime.Now;
 
-                    _context.VoucherDetails.RemoveRange(header.Details);
+                    _context.OpeningVoucherDetails.RemoveRange(header.Details);
                     header.Details.Clear();
 
                     foreach (var d in request.Details)
                     {
-                        header.Details.Add(new VoucherDetails
+                        header.Details.Add(new OpeningVoucherDetails
                         {
                             AccountNumber = d.AccountNumber,
                             AccountName = d.AccountName,
-                            NatureOfAccount = d.NatureOfAccount,
                             Debit = d.Debit,
                             Credit = d.Credit,
                             Description = d.Description,
@@ -246,7 +229,7 @@ namespace Concept.Controllers
 
                     _context.Update(header);
                     await _context.SaveChangesAsync();
-                    return Json(new { success = true, message = "Voucher updated successfully.", id = header.Id });
+                    return Json(new { success = true, message = "Opening Voucher updated successfully.", id = header.Id });
                 }
             }
             catch (Exception ex)
@@ -255,20 +238,19 @@ namespace Concept.Controllers
             }
         }
 
-        // POST: Vouchers/Delete
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
             try
             {
-                var header = await _context.VoucherHeaders.FindAsync(id);
+                var header = await _context.OpeningVoucherHeaders.FindAsync(id);
                 if (header == null)
-                    return Json(new { success = false, message = "Voucher not found." });
+                    return Json(new { success = false, message = "Opening Voucher not found." });
 
-                _context.VoucherHeaders.Remove(header);
+                _context.OpeningVoucherHeaders.Remove(header);
                 await _context.SaveChangesAsync();
-                return Json(new { success = true, message = "Voucher deleted successfully." });
+                return Json(new { success = true, message = "Opening Voucher deleted successfully." });
             }
             catch (Exception ex)
             {
@@ -277,25 +259,23 @@ namespace Concept.Controllers
         }
     }
 
-    public class VoucherSaveRequest
+    public class OpeningVoucherSaveRequest
     {
         public int Id { get; set; }
         public string VoucherNo { get; set; } = string.Empty;
         public DateTime VoucherDate { get; set; }
-        public bool AccountingSettlement { get; set; }
-        public int SettlementYear { get; set; }
+        public bool RelayVoucher { get; set; }
         public string? Statement { get; set; }
-        public bool Posting { get; set; }
-        public bool Approved { get; set; }
-        public List<VoucherDetailRequest> Details { get; set; } = new();
+        public string? Document { get; set; }
+        public string? Note { get; set; }
+        public List<OpeningVoucherDetailRequest> Details { get; set; } = new();
     }
 
-    public class VoucherDetailRequest
+    public class OpeningVoucherDetailRequest
     {
         public int ChildAccountId { get; set; }
         public string AccountNumber { get; set; } = string.Empty;
         public string AccountName { get; set; } = string.Empty;
-        public string NatureOfAccount { get; set; } = string.Empty;
         public decimal Debit { get; set; }
         public decimal Credit { get; set; }
         public string? Description { get; set; }

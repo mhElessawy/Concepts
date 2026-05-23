@@ -1,0 +1,8 @@
+Cash Transaction
+
+Cash with drow
+
+Invoice no ->  Trs No.
+PV260001
+
+cash name -> Cash in Hand

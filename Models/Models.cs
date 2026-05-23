@@ -968,6 +968,72 @@ namespace Concept.Models
         public virtual DeffCostCenter? CostCenter { get; set; }
     }
 
+    public class OpeningVoucherHeader
+    {
+        [Key]
+        public int Id { get; set; }
+
+        [Required]
+        public string VoucherNo { get; set; } = string.Empty;
+
+        public DateTime VoucherDate { get; set; } = DateTime.Now;
+
+        public bool RelayVoucher { get; set; } = false;
+
+        public string? Statement { get; set; }
+
+        public string? Document { get; set; }
+
+        public string? Note { get; set; }
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal TotalDebit { get; set; } = 0;
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal TotalCredit { get; set; } = 0;
+
+        public bool Active { get; set; } = true;
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime ModifiedDate { get; set; } = DateTime.Now;
+
+        public virtual ICollection<OpeningVoucherDetails> Details { get; set; } = new List<OpeningVoucherDetails>();
+    }
+
+    public class OpeningVoucherDetails
+    {
+        [Key]
+        public int Id { get; set; }
+
+        public int OpeningVoucherHeaderId { get; set; }
+
+        public int? ChildAccountId { get; set; }
+
+        public string AccountNumber { get; set; } = string.Empty;
+
+        public string AccountName { get; set; } = string.Empty;
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal Debit { get; set; } = 0;
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal Credit { get; set; } = 0;
+
+        public int? CostCenterId { get; set; }
+
+        public string? CostCenterName { get; set; }
+
+        public string? Description { get; set; }
+
+        [ForeignKey("OpeningVoucherHeaderId")]
+        public virtual OpeningVoucherHeader? OpeningVoucherHeader { get; set; }
+
+        [ForeignKey("ChildAccountId")]
+        public virtual ChildAccount? ChildAccount { get; set; }
+
+        [ForeignKey("CostCenterId")]
+        public virtual DeffCostCenter? CostCenter { get; set; }
+    }
+
     public class StoreReturnDetails
     {
         [Key]

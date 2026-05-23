@@ -51,6 +51,9 @@ namespace Concept.Data
         public DbSet<VoucherHeader> VoucherHeaders { get; set; }
         public DbSet<VoucherDetails> VoucherDetails { get; set; }
 
+        public DbSet<CashTransactionHeader> CashTransactionHeaders { get; set; }
+        public DbSet<CashTransactionDetail> CashTransactionDetails { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -478,6 +481,17 @@ namespace Concept.Data
                 .WithMany()
                 .HasForeignKey(d => d.CostCenterId)
                 .OnDelete(DeleteBehavior.SetNull);
+
+            // CashTransaction Configuration
+            modelBuilder.Entity<CashTransactionHeader>().ToTable("CashTransaction_Header");
+            modelBuilder.Entity<CashTransactionHeader>().HasIndex(c => c.InvoiceNo).IsUnique();
+
+            modelBuilder.Entity<CashTransactionDetail>().ToTable("CashTransaction_Details");
+            modelBuilder.Entity<CashTransactionDetail>()
+                .HasOne(d => d.Header)
+                .WithMany(h => h.Details)
+                .HasForeignKey(d => d.CashTransactionHeaderId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Configure decimal precision for Return Details
             modelBuilder.Entity<StoreReturnDetails>()
