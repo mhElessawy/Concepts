@@ -1134,4 +1134,20 @@ namespace Concept.Models
         public virtual CashTransactionHeader? Header { get; set; }
     }
 
+    public class CashType
+    {
+        [Key]
+        public int Id { get; set; }
+
+        [Required]
+        public string Code { get; set; } = string.Empty;
+
+        [Required]
+        public string Name { get; set; } = string.Empty;
+
+        public bool Active { get; set; } = true;
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime ModifiedDate { get; set; } = DateTime.Now;
+    }
+
 }

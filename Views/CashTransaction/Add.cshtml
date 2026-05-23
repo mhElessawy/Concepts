@@ -458,7 +458,7 @@
                 <div class="field-row">
                     <label>Cash Name</label>
                     <select id="cashName">
-                        <option value=""></option>
+                        <option value="">-- Select --</option>
                     </select>
                 </div>
 
@@ -474,7 +474,6 @@
                 <div class="field-row">
                     <label>Pay To</label>
                     <select id="payTo" onchange="onPayToChange()">
-                        <option value="Insurance companies">Insurance companies</option>
                         <option value="Suppliers" selected>Suppliers</option>
                         <option value="Account Tree">Account Tree</option>
                         <option value="Patient">Patient</option>
@@ -507,7 +506,7 @@
 
                 <div class="field-row">
                     <label>Related for Voucher No.</label>
-                    <input type="text" id="relatedVoucherNo" />
+                    <input type="text" id="relatedVoucherNo" readonly />
                 </div>
 
                 <div class="field-row">
@@ -532,14 +531,6 @@
                             Activat Discount
                         </label>
                     </div>
-                </div>
-
-                <!-- Dynamic entity selector (changes based on Pay To) -->
-                <div class="field-row" id="entitySelectorRow">
-                    <label id="entitySelectorLabel">Insurance companies</label>
-                    <select id="entitySelector" style="flex:1;" onchange="onEntitySelectorChange()">
-                        <option value=""></option>
-                    </select>
                 </div>
 
                 <div class="field-row">
@@ -643,16 +634,39 @@
     document.addEventListener('DOMContentLoaded', async function () {
         const today = new Date();
         document.getElementById('transactionDate').value = today.toISOString().split('T')[0];
-        await loadNextInvoiceNo();
+        await Promise.all([
+            loadNextInvoiceNo(),
+            loadNextRelatedVoucherNo(),
+            loadCashTypes()
+        ]);
         applyPayToLayout();
         addEmptyRow();
     });
 
     async function loadNextInvoiceNo() {
         const type = document.querySelector('input[name="transactionType"]:checked').value;
-        const res = await fetch(`/CashTransaction/GetNextInvoiceNo?type=${encodeURIComponent(type)}`);
+        const res  = await fetch(`/CashTransaction/GetNextInvoiceNo?type=${encodeURIComponent(type)}`);
         const data = await res.json();
         document.getElementById('invoiceNo').value = data.invoiceNo;
+    }
+
+    async function loadNextRelatedVoucherNo() {
+        const res  = await fetch('/CashTransaction/GetNextRelatedVoucherNo');
+        const data = await res.json();
+        document.getElementById('relatedVoucherNo').value = data.voucherNo;
+    }
+
+    async function loadCashTypes() {
+        const res  = await fetch('/CashTransaction/GetCashTypes');
+        const list = await res.json();
+        const sel  = document.getElementById('cashName');
+        sel.innerHTML = '<option value="">-- Select --</option>';
+        list.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c.id;
+            opt.textContent = c.name;
+            sel.appendChild(opt);
+        });
     }
 
     async function onTypeChange() {
@@ -703,21 +717,6 @@
         btnTree.style.display     = (payTo === 'Account Tree') ? '' : 'none';
         btnSupplier.style.display = (payTo === 'Suppliers')    ? '' : 'none';
 
-        // Update entity selector row label & visibility
-        const row   = document.getElementById('entitySelectorRow');
-        const lbl   = document.getElementById('entitySelectorLabel');
-        const sel   = document.getElementById('entitySelector');
-
-        if (payTo === 'Account Tree') {
-            row.style.display = 'none'; // account tree uses popup, not dropdown
-        } else {
-            row.style.display = '';
-            lbl.textContent = payTo;
-            sel.innerHTML = '<option value=""></option>';
-            // For Suppliers load from API; for others just a text label for now
-            if (payTo === 'Suppliers') loadSuppliersIntoSelector();
-        }
-
         // Grid head
         const head = document.getElementById('ctGridHead');
         if (payTo === 'Account Tree') {
@@ -730,9 +729,7 @@
                 <th style="min-width:140px;">Note</th>
             </tr>`;
         } else {
-            const label = payTo === 'Insurance companies' ? 'Insurance Company'
-                        : payTo === 'Patient'             ? 'Patient Name'
-                        : 'Supplier Name';
+            const label = payTo === 'Patient' ? 'Patient Name' : 'Supplier Name';
             document.getElementById('gridTitle').textContent = payTo + ' Lines';
             head.innerHTML = `<tr>
                 <th style="width:20px;"></th>
@@ -743,33 +740,6 @@
                 <th style="min-width:120px;">Note</th>
             </tr>`;
         }
-    }
-
-    async function loadSuppliersIntoSelector() {
-        const res  = await fetch('/CashTransaction/GetSuppliers');
-        const list = await res.json();
-        const sel  = document.getElementById('entitySelector');
-        sel.innerHTML = '<option value=""></option>';
-        list.forEach(s => {
-            const opt = document.createElement('option');
-            opt.value = s.id;
-            opt.textContent = s.name;
-            opt.dataset.code = s.code;
-            sel.appendChild(opt);
-        });
-    }
-
-    function onEntitySelectorChange() {
-        const sel = document.getElementById('entitySelector');
-        const opt = sel.options[sel.selectedIndex];
-        if (!opt || !opt.value) return;
-        // Add as a grid row
-        const i = rows.length - 1;
-        rows[i].entityId   = parseInt(opt.value);
-        rows[i].entityCode = opt.dataset.code || '';
-        rows[i].entityName = opt.textContent;
-        checkAddRow(i);
-        renderGrid();
     }
 
     // ── Rows ──────────────────────────────────────────────────────────────
@@ -972,7 +942,7 @@
         document.getElementById('payTo').value          = 'Suppliers';
         document.getElementById('paymentMethod').value  = 'Cash';
         document.getElementById('note').value           = '';
-        document.getElementById('relatedVoucherNo').value = '';
+        await loadNextRelatedVoucherNo();
         document.getElementById('amount').value         = '0';
         document.getElementById('discountPct').value    = '0';
         document.getElementById('discountKwd').value    = '0';

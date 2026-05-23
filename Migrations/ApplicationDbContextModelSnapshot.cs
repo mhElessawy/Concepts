@@ -2406,11 +2406,20 @@ namespace Concept.Migrations
                     .IsRequired()
                     .HasColumnType("nvarchar(max)");
 
+                b.Property<string>("RelatedVoucherNo")
+                    .HasColumnType("nvarchar(max)");
+
+                b.Property<decimal>("Amount")
+                    .HasColumnType("decimal(18,2)");
+
                 b.Property<decimal>("Discount")
                     .HasColumnType("decimal(18,2)");
 
                 b.Property<decimal>("AmountAfterDiscount")
                     .HasColumnType("decimal(18,2)");
+
+                b.Property<string>("DiscountNote")
+                    .HasColumnType("nvarchar(max)");
 
                 b.Property<string>("PaymentMethod")
                     .IsRequired()
@@ -2616,6 +2625,39 @@ namespace Concept.Migrations
             modelBuilder.Entity("Concept.Models.OpeningVoucherHeader", b =>
             {
                 b.Navigation("Details");
+            });
+
+            modelBuilder.Entity("Concept.Models.CashType", b =>
+            {
+                b.Property<int>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("int");
+
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                b.Property<string>("Code")
+                    .IsRequired()
+                    .HasColumnType("nvarchar(450)");
+
+                b.Property<string>("Name")
+                    .IsRequired()
+                    .HasColumnType("nvarchar(max)");
+
+                b.Property<bool>("Active")
+                    .HasColumnType("bit");
+
+                b.Property<DateTime>("CreatedDate")
+                    .HasColumnType("datetime2");
+
+                b.Property<DateTime>("ModifiedDate")
+                    .HasColumnType("datetime2");
+
+                b.HasKey("Id");
+
+                b.HasIndex("Code")
+                    .IsUnique();
+
+                b.ToTable("Def_CashType");
             });
 
 #pragma warning restore 612, 618

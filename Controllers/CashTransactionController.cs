@@ -88,6 +88,43 @@ namespace Concept.Controllers
             });
         }
 
+        // GET: CashTransaction/GetCashTypes
+        [HttpGet]
+        public async Task<IActionResult> GetCashTypes()
+        {
+            var list = await _context.CashTypes
+                .Where(c => c.Active)
+                .OrderBy(c => c.Code)
+                .Select(c => new { id = c.Id, code = c.Code, name = c.Name })
+                .ToListAsync();
+            return Json(list);
+        }
+
+        // GET: CashTransaction/GetNextRelatedVoucherNo
+        [HttpGet]
+        public async Task<IActionResult> GetNextRelatedVoucherNo()
+        {
+            int year = DateTime.Now.Year;
+            string yearPart = (year % 100).ToString("D2");
+            var prefix = $"V{yearPart}";
+
+            var existing = await _context.VoucherHeaders
+                .Where(v => v.VoucherNo.StartsWith(prefix))
+                .Select(v => v.VoucherNo)
+                .ToListAsync();
+
+            int maxSeq = 0;
+            foreach (var no in existing)
+            {
+                string suffix = no.Substring(prefix.Length);
+                if (int.TryParse(suffix, out int seq) && seq > maxSeq)
+                    maxSeq = seq;
+            }
+
+            string nextNo = prefix + (maxSeq + 1).ToString("D4");
+            return Json(new { voucherNo = nextNo });
+        }
+
         // GET: CashTransaction/SearchAccounts?term=xxx
         [HttpGet]
         public async Task<IActionResult> SearchAccounts(string? term)

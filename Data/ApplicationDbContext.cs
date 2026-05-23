@@ -57,6 +57,8 @@ namespace Concept.Data
         public DbSet<OpeningVoucherHeader> OpeningVoucherHeaders { get; set; }
         public DbSet<OpeningVoucherDetails> OpeningVoucherDetails { get; set; }
 
+        public DbSet<CashType> CashTypes { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -495,6 +497,10 @@ namespace Concept.Data
                 .WithMany(h => h.Details)
                 .HasForeignKey(d => d.CashTransactionHeaderId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // CashType Configuration
+            modelBuilder.Entity<CashType>().ToTable("Def_CashType");
+            modelBuilder.Entity<CashType>().HasIndex(c => c.Code).IsUnique();
 
             // OpeningVoucher Configuration
             modelBuilder.Entity<OpeningVoucherHeader>().ToTable("OpeningVoucher_Header");
