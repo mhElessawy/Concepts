@@ -1145,6 +1145,8 @@ namespace Concept.Models
         [Required]
         public string Name { get; set; } = string.Empty;
 
+        public string? InvoiceNo { get; set; }
+
         public bool Active { get; set; } = true;
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public DateTime ModifiedDate { get; set; } = DateTime.Now;

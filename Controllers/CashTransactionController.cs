@@ -88,14 +88,14 @@ namespace Concept.Controllers
             });
         }
 
-        // GET: CashTransaction/GetCashTypes
+        // GET: CashTransaction/GetAccountTypes  (used for Cash Name dropdown)
         [HttpGet]
-        public async Task<IActionResult> GetCashTypes()
+        public async Task<IActionResult> GetAccountTypes()
         {
-            var list = await _context.CashTypes
-                .Where(c => c.Active)
-                .OrderBy(c => c.Code)
-                .Select(c => new { id = c.Id, code = c.Code, name = c.Name })
+            var list = await _context.DefAccountTypes
+                .Where(a => a.Active)
+                .OrderBy(a => a.Code)
+                .Select(a => new { id = a.Id, code = a.Code, name = a.Name })
                 .ToListAsync();
             return Json(list);
         }

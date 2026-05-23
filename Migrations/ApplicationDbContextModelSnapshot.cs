@@ -2643,6 +2643,9 @@ namespace Concept.Migrations
                     .IsRequired()
                     .HasColumnType("nvarchar(max)");
 
+                b.Property<string>("InvoiceNo")
+                    .HasColumnType("nvarchar(max)");
+
                 b.Property<bool>("Active")
                     .HasColumnType("bit");
 

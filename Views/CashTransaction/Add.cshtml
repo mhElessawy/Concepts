@@ -657,14 +657,14 @@
     }
 
     async function loadCashTypes() {
-        const res  = await fetch('/CashTransaction/GetCashTypes');
+        const res  = await fetch('/CashTransaction/GetAccountTypes');
         const list = await res.json();
         const sel  = document.getElementById('cashName');
         sel.innerHTML = '<option value="">-- Select --</option>';
-        list.forEach(c => {
+        list.forEach(a => {
             const opt = document.createElement('option');
-            opt.value = c.id;
-            opt.textContent = c.name;
+            opt.value = a.id;
+            opt.textContent = `${a.code} - ${a.name}`;
             sel.appendChild(opt);
         });
     }
