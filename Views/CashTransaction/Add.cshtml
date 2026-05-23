@@ -644,8 +644,7 @@
     });
 
     async function loadNextInvoiceNo() {
-        const type = document.querySelector('input[name="transactionType"]:checked').value;
-        const res  = await fetch(`/CashTransaction/GetNextInvoiceNo?type=${encodeURIComponent(type)}`);
+        const res  = await fetch('/CashTransaction/GetNextInvoiceNo');
         const data = await res.json();
         document.getElementById('invoiceNo').value = data.invoiceNo;
     }
@@ -671,8 +670,9 @@
 
     async function onTypeChange() {
         const type = document.querySelector('input[name="transactionType"]:checked').value;
-        document.getElementById('formLegend').textContent = type === 'CashWithDraw' ? 'Cash With Draw' : 'Cash Receive';
-        await loadNextInvoiceNo();
+        document.getElementById('formLegend').textContent =
+            type === 'CashWithDraw' ? 'Cash With Draw' : 'Cash Receive';
+        // Invoice No does NOT change when type changes — it is one unified sequence
     }
 
     // ── Discount calc ─────────────────────────────────────────────────────

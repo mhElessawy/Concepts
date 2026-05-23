@@ -22,28 +22,25 @@ namespace Concept.Controllers
 
         // GET: CashTransaction/GetNextInvoiceNo
         [HttpGet]
-        public async Task<IActionResult> GetNextInvoiceNo(string type)
+        public async Task<IActionResult> GetNextInvoiceNo()
         {
-            string prefix = type == "CashReceive" ? "CR" : "CW";
-            int year = DateTime.Now.Year;
-            string yearPart = (year % 100).ToString("D2");
-            string fullPrefix = $"{prefix}{yearPart}";
+            int year     = DateTime.Now.Year;
+            string prefix = $"CT{(year % 100):D2}";   // e.g.  CT26
 
             var existing = await _context.CashTransactionHeaders
-                .Where(h => h.InvoiceNo.StartsWith(fullPrefix))
+                .Where(h => h.InvoiceNo.StartsWith(prefix))
                 .Select(h => h.InvoiceNo)
                 .ToListAsync();
 
             int maxSeq = 0;
             foreach (var no in existing)
             {
-                string suffix = no.Substring(fullPrefix.Length);
+                string suffix = no.Substring(prefix.Length);
                 if (int.TryParse(suffix, out int seq) && seq > maxSeq)
                     maxSeq = seq;
             }
 
-            string nextNo = fullPrefix + (maxSeq + 1).ToString("D4");
-            return Json(new { invoiceNo = nextNo });
+            return Json(new { invoiceNo = $"{prefix}{(maxSeq + 1):D4}" }); // CT260001, CT260002 …
         }
 
         // GET: CashTransaction/GetTransaction?invoiceNo=CW260001
