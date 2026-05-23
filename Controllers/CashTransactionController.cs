@@ -66,8 +66,11 @@ namespace Concept.Controllers
                 cashName = header.CashName,
                 accountInfo = header.AccountInfo,
                 payTo = header.PayTo,
+                relatedVoucherNo = header.RelatedVoucherNo ?? "",
+                amount = header.Amount,
                 discount = header.Discount,
                 amountAfterDiscount = header.AmountAfterDiscount,
+                discountNote = header.DiscountNote ?? "",
                 paymentMethod = header.PaymentMethod,
                 transactionDate = header.TransactionDate.ToString("yyyy-MM-dd"),
                 note = header.Note ?? "",
@@ -161,8 +164,11 @@ namespace Concept.Controllers
                         CashName = request.CashName ?? "",
                         AccountInfo = request.AccountInfo ?? "",
                         PayTo = request.PayTo ?? "Suppliers",
+                        RelatedVoucherNo = request.RelatedVoucherNo,
+                        Amount = request.Amount,
                         Discount = request.Discount,
                         AmountAfterDiscount = request.AmountAfterDiscount,
+                        DiscountNote = request.DiscountNote,
                         PaymentMethod = request.PaymentMethod ?? "Cash",
                         TransactionDate = request.TransactionDate,
                         Note = request.Note,
@@ -209,8 +215,11 @@ namespace Concept.Controllers
                     header.CashName = request.CashName ?? "";
                     header.AccountInfo = request.AccountInfo ?? "";
                     header.PayTo = request.PayTo ?? "Suppliers";
+                    header.RelatedVoucherNo = request.RelatedVoucherNo;
+                    header.Amount = request.Amount;
                     header.Discount = request.Discount;
                     header.AmountAfterDiscount = request.AmountAfterDiscount;
+                    header.DiscountNote = request.DiscountNote;
                     header.PaymentMethod = request.PaymentMethod ?? "Cash";
                     header.TransactionDate = request.TransactionDate;
                     header.Note = request.Note;
@@ -274,8 +283,11 @@ namespace Concept.Controllers
         public string? CashName { get; set; }
         public string? AccountInfo { get; set; }
         public string? PayTo { get; set; }
+        public string? RelatedVoucherNo { get; set; }
+        public decimal Amount { get; set; }
         public decimal Discount { get; set; }
         public decimal AmountAfterDiscount { get; set; }
+        public string? DiscountNote { get; set; }
         public string? PaymentMethod { get; set; }
         public DateTime TransactionDate { get; set; }
         public string? Note { get; set; }

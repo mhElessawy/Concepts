@@ -1084,11 +1084,18 @@ namespace Concept.Models
 
         public string PayTo { get; set; } = "Suppliers"; // Insurance companies, Suppliers, Account Tree, Patient
 
+        public string? RelatedVoucherNo { get; set; }
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal Amount { get; set; } = 0;
+
         [Column(TypeName = "decimal(18,2)")]
         public decimal Discount { get; set; } = 0;
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal AmountAfterDiscount { get; set; } = 0;
+
+        public string? DiscountNote { get; set; }
 
         public string PaymentMethod { get; set; } = "Cash";
 
