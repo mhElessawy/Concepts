@@ -138,6 +138,8 @@ namespace Concept.Controllers
             var query = _context.ChildAccounts
                 .Include(a => a.ParentAccount)
                 .Include(a => a.NatureOfAccount)
+                .Include(a => a.CostCenter)
+                .Include(a => a.Department)
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(term))
@@ -153,7 +155,9 @@ namespace Concept.Controllers
                     accountNo = a.AccountNo,
                     accountName = a.AccountName,
                     parentName = a.ParentAccount != null ? a.ParentAccount.AccountName : "",
-                    natureOfAccount = a.NatureOfAccount != null ? a.NatureOfAccount.Name : ""
+                    natureOfAccount = a.NatureOfAccount != null ? a.NatureOfAccount.Name : "",
+                    costCenter = a.CostCenter != null ? a.CostCenter.CostCenterName : "",
+                    department = a.Department != null ? a.Department.DepartmentName : ""
                 })
                 .ToListAsync();
 

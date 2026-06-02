@@ -628,6 +628,8 @@
                         <th>Account Name</th>
                         <th>Parent Account</th>
                         <th>Nature</th>
+                        <th>Department</th>
+                        <th>Cost Center</th>
                     </tr>
                 </thead>
                 <tbody id="acctTreeBody"></tbody>
@@ -920,7 +922,7 @@
                 }
                 list.forEach(a => {
                     const tr = document.createElement('tr');
-                    tr.innerHTML = `<td>${esc(a.accountNo)}</td><td>${esc(a.accountName)}</td><td>${esc(a.parentName)}</td><td>${esc(a.natureOfAccount)}</td>`;
+                    tr.innerHTML = `<td>${esc(a.accountNo)}</td><td>${esc(a.accountName)}</td><td>${esc(a.parentName)}</td><td>${esc(a.natureOfAccount)}</td><td>${esc(a.department)}</td><td>${esc(a.costCenter)}</td>`;
                     tr.onclick = () => selectAccountFromTree(a);
                     tbody.appendChild(tr);
                 });
