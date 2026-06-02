@@ -778,6 +778,8 @@
         function onPayToChange() {
             rows = [];
             selectedRowIndex = -1;
+            document.getElementById('amount').value = '0';
+            calcAmountAfterDiscount();
             applyPayToLayout();
             addEmptyRow();
         }
@@ -817,6 +819,14 @@
         }
 
         // ── Rows ──────────────────────────────────────────────────────────────
+        function calcTotalFromRows() {
+            const payTo = document.getElementById('payTo').value;
+            if (payTo !== 'Account Tree') return;
+            const total = rows.reduce((sum, r) => sum + (parseFloat(r.amount) || 0), 0);
+            document.getElementById('amount').value = total.toFixed(2);
+            calcAmountAfterDiscount();
+        }
+
         function addEmptyRow() {
             rows.push({ entityId: 0, entityCode: '', entityName: '', invoiceNo: '', receivedDate: '', department: '', costCenter: '', amount: 0, note: '' });
             renderGrid();
@@ -858,7 +868,7 @@
                         </td>
                         <td style="width:110px;">
                             <input type="number" class="grid-cell-input" value="${row.amount || ''}" min="0" step="0.01"
-                                onchange="rows[${i}].amount = parseFloat(this.value)||0; checkAddRow(${i});" onfocus="selectRow(${i})" />
+                                onchange="rows[${i}].amount = parseFloat(this.value)||0; checkAddRow(${i}); calcTotalFromRows();" onfocus="selectRow(${i})" />
                         </td>
                         <td>
                             <input type="text" class="grid-cell-input" value="${esc(row.note)}"
@@ -915,6 +925,7 @@
             rows.splice(selectedRowIndex, 1);
             selectedRowIndex = Math.min(selectedRowIndex, rows.length - 1);
             renderGrid();
+            calcTotalFromRows();
         }
 
         // ── Account Tree Popup ────────────────────────────────────────────────
