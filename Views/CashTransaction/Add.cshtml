@@ -796,9 +796,11 @@
                 head.innerHTML = `<tr>
                     <th style="width:20px;"></th>
                     <th style="width:120px;">Account No</th>
-                    <th style="min-width:200px;">Account Name</th>
+                    <th style="min-width:160px;">Account Name</th>
+                    <th style="min-width:130px;">Department</th>
+                    <th style="min-width:130px;">Cost Center</th>
                     <th style="width:110px;">Amount (KWD)</th>
-                    <th style="min-width:140px;">Note</th>
+                    <th style="min-width:120px;">Note</th>
                 </tr>`;
             } else {
                 const label = payTo === 'Patient' ? 'Patient Name' : 'Supplier Name';
@@ -816,7 +818,7 @@
 
         // ── Rows ──────────────────────────────────────────────────────────────
         function addEmptyRow() {
-            rows.push({ entityId: 0, entityCode: '', entityName: '', invoiceNo: '', receivedDate: '', amount: 0, note: '' });
+            rows.push({ entityId: 0, entityCode: '', entityName: '', invoiceNo: '', receivedDate: '', department: '', costCenter: '', amount: 0, note: '' });
             renderGrid();
         }
 
@@ -843,6 +845,16 @@
                         </td>
                         <td>
                             <span class="grid-cell-readonly">${esc(row.entityName)}</span>
+                        </td>
+                        <td>
+                            <select class="grid-cell-input" style="width:100%;" onfocus="selectRow(${i})"
+                                onchange="rows[${i}].department = this.value; checkAddRow(${i});">
+                                <option value="">--</option>
+                                ${buildDeptOptions(row.department)}
+                            </select>
+                        </td>
+                        <td>
+                            <input type="text" class="grid-cell-input" value="${esc(row.costCenter)}" readonly />
                         </td>
                         <td style="width:110px;">
                             <input type="number" class="grid-cell-input" value="${row.amount || ''}" min="0" step="0.01"
@@ -909,6 +921,13 @@
         let acctTargetRow = -1;
         let acctSearchTimer;
         let allCostCenters = [];
+        let allDepartments = [];
+
+        function buildDeptOptions(selected) {
+            return allDepartments.map(d =>
+                `<option value="${esc(d.name)}" ${d.name === selected ? 'selected' : ''}>${esc(d.name)}</option>`
+            ).join('');
+        }
 
         async function loadPopupFilters() {
             const [deptRes, ccRes] = await Promise.all([
@@ -917,6 +936,7 @@
             ]);
             const depts = await deptRes.json();
             const ccs   = await ccRes.json();
+            allDepartments = depts;
             allCostCenters = ccs;
 
             const deptSel = document.getElementById('filterDepartment');
@@ -992,6 +1012,7 @@
             rows[i].entityId   = a.id;
             rows[i].entityCode = a.accountNo;
             rows[i].entityName = a.accountName;
+            rows[i].costCenter = a.costCenter || '';
             checkAddRow(i);
             closeAcctTreePopup();
             renderGrid();
@@ -1108,10 +1129,12 @@
                 entityName: d.entityName || '',
                 invoiceNo: d.invoiceNo || '',
                 receivedDate: d.receivedDate || '',
+                department: d.department || '',
+                costCenter: d.costCenter || '',
                 amount: d.amount || 0,
                 note: d.note || ''
             }));
-            rows.push({ entityId: 0, entityCode: '', entityName: '', invoiceNo: '', receivedDate: '', amount: 0, note: '' });
+            rows.push({ entityId: 0, entityCode: '', entityName: '', invoiceNo: '', receivedDate: '', department: '', costCenter: '', amount: 0, note: '' });
             selectedRowIndex = -1;
 
             applyPayToLayout();
@@ -1142,6 +1165,8 @@
                     entityId:     r.entityId,
                     invoiceNo:    r.invoiceNo,
                     receivedDate: r.receivedDate || null,
+                    department:   r.department || '',
+                    costCenter:   r.costCenter || '',
                     amount:       parseFloat(r.amount) || 0,
                     note:         r.note
                 }))

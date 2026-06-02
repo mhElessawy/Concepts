@@ -86,6 +86,8 @@ namespace Concept.Controllers
                     entityId = d.EntityId ?? 0,
                     invoiceNo = d.InvoiceNo ?? "",
                     receivedDate = d.ReceivedDate.HasValue ? d.ReceivedDate.Value.ToString("yyyy-MM-dd") : "",
+                    department = d.Department ?? "",
+                    costCenter = d.CostCenter ?? "",
                     amount = d.Amount,
                     note = d.Note ?? ""
                 }).ToList()
@@ -257,6 +259,8 @@ namespace Concept.Controllers
                             EntityId = d.EntityId > 0 ? d.EntityId : null,
                             InvoiceNo = d.InvoiceNo,
                             ReceivedDate = string.IsNullOrEmpty(d.ReceivedDate) ? null : DateTime.Parse(d.ReceivedDate),
+                            Department = d.Department,
+                            CostCenter = d.CostCenter,
                             Amount = d.Amount,
                             Note = d.Note
                         });
@@ -309,6 +313,8 @@ namespace Concept.Controllers
                             EntityId = d.EntityId > 0 ? d.EntityId : null,
                             InvoiceNo = d.InvoiceNo,
                             ReceivedDate = string.IsNullOrEmpty(d.ReceivedDate) ? null : DateTime.Parse(d.ReceivedDate),
+                            Department = d.Department,
+                            CostCenter = d.CostCenter,
                             Amount = d.Amount,
                             Note = d.Note
                         });
@@ -373,6 +379,8 @@ namespace Concept.Controllers
         public int EntityId { get; set; }
         public string? InvoiceNo { get; set; }
         public string? ReceivedDate { get; set; }
+        public string? Department { get; set; }
+        public string? CostCenter { get; set; }
         public decimal Amount { get; set; }
         public string? Note { get; set; }
     }

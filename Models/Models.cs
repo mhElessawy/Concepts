@@ -1125,6 +1125,9 @@ namespace Concept.Models
 
         public DateTime? ReceivedDate { get; set; }
 
+        public string? Department { get; set; }
+        public string? CostCenter { get; set; }
+
         [Column(TypeName = "decimal(18,2)")]
         public decimal Amount { get; set; } = 0;
 
