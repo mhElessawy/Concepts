@@ -54,6 +54,11 @@ namespace Concept.Data
         public DbSet<CashTransactionHeader> CashTransactionHeaders { get; set; }
         public DbSet<CashTransactionDetail> CashTransactionDetails { get; set; }
 
+        public DbSet<OpeningVoucherHeader> OpeningVoucherHeaders { get; set; }
+        public DbSet<OpeningVoucherDetails> OpeningVoucherDetails { get; set; }
+
+        public DbSet<CashType> CashTypes { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -492,6 +497,34 @@ namespace Concept.Data
                 .WithMany(h => h.Details)
                 .HasForeignKey(d => d.CashTransactionHeaderId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // CashType Configuration
+            modelBuilder.Entity<CashType>().ToTable("Def_CashType");
+            modelBuilder.Entity<CashType>().HasIndex(c => c.Code).IsUnique();
+
+            // OpeningVoucher Configuration
+            modelBuilder.Entity<OpeningVoucherHeader>().ToTable("OpeningVoucher_Header");
+            modelBuilder.Entity<OpeningVoucherHeader>().HasIndex(v => v.VoucherNo).IsUnique();
+
+            modelBuilder.Entity<OpeningVoucherDetails>().ToTable("OpeningVoucher_Details");
+
+            modelBuilder.Entity<OpeningVoucherDetails>()
+                .HasOne(d => d.OpeningVoucherHeader)
+                .WithMany(h => h.Details)
+                .HasForeignKey(d => d.OpeningVoucherHeaderId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<OpeningVoucherDetails>()
+                .HasOne(d => d.ChildAccount)
+                .WithMany()
+                .HasForeignKey(d => d.ChildAccountId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<OpeningVoucherDetails>()
+                .HasOne(d => d.CostCenter)
+                .WithMany()
+                .HasForeignKey(d => d.CostCenterId)
+                .OnDelete(DeleteBehavior.SetNull);
 
             // Configure decimal precision for Return Details
             modelBuilder.Entity<StoreReturnDetails>()

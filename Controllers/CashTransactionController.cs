@@ -22,28 +22,32 @@ namespace Concept.Controllers
 
         // GET: CashTransaction/GetNextInvoiceNo
         [HttpGet]
-        public async Task<IActionResult> GetNextInvoiceNo(string type)
+        public async Task<IActionResult> GetNextInvoiceNo()
         {
-            string prefix = type == "CashReceive" ? "CR" : "CW";
-            int year = DateTime.Now.Year;
-            string yearPart = (year % 100).ToString("D2");
-            string fullPrefix = $"{prefix}{yearPart}";
-
-            var existing = await _context.CashTransactionHeaders
-                .Where(h => h.InvoiceNo.StartsWith(fullPrefix))
-                .Select(h => h.InvoiceNo)
-                .ToListAsync();
-
-            int maxSeq = 0;
-            foreach (var no in existing)
+            try
             {
-                string suffix = no.Substring(fullPrefix.Length);
-                if (int.TryParse(suffix, out int seq) && seq > maxSeq)
-                    maxSeq = seq;
-            }
+                int year = DateTime.Now.Year;
+                string prefix = $"CT{(year % 100):D2}";   // e.g.  CT26
 
-            string nextNo = fullPrefix + (maxSeq + 1).ToString("D4");
-            return Json(new { invoiceNo = nextNo });
+                var existing = await _context.CashTransactionHeaders
+                    .Where(h => h.InvoiceNo.StartsWith(prefix))
+                    .Select(h => h.InvoiceNo)
+                    .ToListAsync();
+
+                int maxSeq = 0;
+                foreach (var no in existing)
+                {
+                    string suffix = no.Substring(prefix.Length);
+                    if (int.TryParse(suffix, out int seq) && seq > maxSeq)
+                        maxSeq = seq;
+                }
+
+                return Json(new { success = true, invoiceNo = $"{prefix}{(maxSeq + 1):D4}" }); // CT260001, CT260002 …
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, invoiceNo = (string?)null, message = ex.Message });
+            }
         }
 
         // GET: CashTransaction/GetTransaction?invoiceNo=CW260001
@@ -66,8 +70,11 @@ namespace Concept.Controllers
                 cashName = header.CashName,
                 accountInfo = header.AccountInfo,
                 payTo = header.PayTo,
+                relatedVoucherNo = header.RelatedVoucherNo ?? "",
+                amount = header.Amount,
                 discount = header.Discount,
                 amountAfterDiscount = header.AmountAfterDiscount,
+                discountNote = header.DiscountNote ?? "",
                 paymentMethod = header.PaymentMethod,
                 transactionDate = header.TransactionDate.ToString("yyyy-MM-dd"),
                 note = header.Note ?? "",
@@ -83,6 +90,43 @@ namespace Concept.Controllers
                     note = d.Note ?? ""
                 }).ToList()
             });
+        }
+
+        // GET: CashTransaction/GetAccountTypes  (used for Cash Name dropdown)
+        [HttpGet]
+        public async Task<IActionResult> GetAccountTypes()
+        {
+            var list = await _context.DefAccountTypes
+                .Where(a => a.Active)
+                .OrderBy(a => a.Code)
+                .Select(a => new { id = a.Id, code = a.Code, name = a.Name })
+                .ToListAsync();
+            return Json(list);
+        }
+
+        // GET: CashTransaction/GetNextRelatedVoucherNo
+        [HttpGet]
+        public async Task<IActionResult> GetNextRelatedVoucherNo()
+        {
+            int year = DateTime.Now.Year;
+            string yearPart = (year % 100).ToString("D2");
+            var prefix = $"V{yearPart}";
+
+            var existing = await _context.VoucherHeaders
+                .Where(v => v.VoucherNo.StartsWith(prefix))
+                .Select(v => v.VoucherNo)
+                .ToListAsync();
+
+            int maxSeq = 0;
+            foreach (var no in existing)
+            {
+                string suffix = no.Substring(prefix.Length);
+                if (int.TryParse(suffix, out int seq) && seq > maxSeq)
+                    maxSeq = seq;
+            }
+
+            string nextNo = prefix + (maxSeq + 1).ToString("D4");
+            return Json(new { voucherNo = nextNo });
         }
 
         // GET: CashTransaction/SearchAccounts?term=xxx
@@ -161,8 +205,11 @@ namespace Concept.Controllers
                         CashName = request.CashName ?? "",
                         AccountInfo = request.AccountInfo ?? "",
                         PayTo = request.PayTo ?? "Suppliers",
+                        RelatedVoucherNo = request.RelatedVoucherNo,
+                        Amount = request.Amount,
                         Discount = request.Discount,
                         AmountAfterDiscount = request.AmountAfterDiscount,
+                        DiscountNote = request.DiscountNote,
                         PaymentMethod = request.PaymentMethod ?? "Cash",
                         TransactionDate = request.TransactionDate,
                         Note = request.Note,
@@ -209,8 +256,11 @@ namespace Concept.Controllers
                     header.CashName = request.CashName ?? "";
                     header.AccountInfo = request.AccountInfo ?? "";
                     header.PayTo = request.PayTo ?? "Suppliers";
+                    header.RelatedVoucherNo = request.RelatedVoucherNo;
+                    header.Amount = request.Amount;
                     header.Discount = request.Discount;
                     header.AmountAfterDiscount = request.AmountAfterDiscount;
+                    header.DiscountNote = request.DiscountNote;
                     header.PaymentMethod = request.PaymentMethod ?? "Cash";
                     header.TransactionDate = request.TransactionDate;
                     header.Note = request.Note;
@@ -274,8 +324,11 @@ namespace Concept.Controllers
         public string? CashName { get; set; }
         public string? AccountInfo { get; set; }
         public string? PayTo { get; set; }
+        public string? RelatedVoucherNo { get; set; }
+        public decimal Amount { get; set; }
         public decimal Discount { get; set; }
         public decimal AmountAfterDiscount { get; set; }
+        public string? DiscountNote { get; set; }
         public string? PaymentMethod { get; set; }
         public DateTime TransactionDate { get; set; }
         public string? Note { get; set; }

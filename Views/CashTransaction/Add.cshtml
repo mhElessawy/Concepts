@@ -15,7 +15,7 @@
         color: #8b0000;
         font-weight: bold;
         font-size: 1.1rem;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
     }
 
     /* Top bar */
@@ -23,7 +23,7 @@
         display: flex;
         align-items: center;
         gap: 12px;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
         flex-wrap: wrap;
     }
 
@@ -35,13 +35,13 @@
         background: #f5f5f5;
     }
 
-    .radio-group label {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        cursor: pointer;
-        white-space: nowrap;
-    }
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
 
     .search-bar {
         display: flex;
@@ -50,17 +50,17 @@
         margin-left: auto;
     }
 
-    .search-bar label {
-        white-space: nowrap;
-    }
+        .search-bar label {
+            white-space: nowrap;
+        }
 
-    .search-bar input[type="text"] {
-        width: 160px;
-        border: 1px solid #999;
-        padding: 2px 5px;
-        font-size: 0.82rem;
-        height: 24px;
-    }
+        .search-bar input[type="text"] {
+            width: 160px;
+            border: 1px solid #999;
+            padding: 2px 5px;
+            font-size: 0.82rem;
+            height: 24px;
+        }
 
     .ct-btn {
         padding: 2px 14px;
@@ -72,73 +72,184 @@
         white-space: nowrap;
     }
 
-    .ct-btn:hover { background: #ccc; }
-    .ct-btn-primary { background: #d4edda; border-color: #28a745; color: #155724; font-weight: bold; }
-    .ct-btn-primary:hover { background: #c3e6cb; }
-    .ct-btn-danger { background: #f8d7da; border-color: #dc3545; color: #721c24; }
-    .ct-btn-danger:hover { background: #f5c6cb; }
+        .ct-btn:hover {
+            background: #ccc;
+        }
+
+    .ct-btn-primary {
+        background: #d4edda;
+        border-color: #28a745;
+        color: #155724;
+        font-weight: bold;
+    }
+
+        .ct-btn-primary:hover {
+            background: #c3e6cb;
+        }
+
+    .ct-btn-danger {
+        background: #f8d7da;
+        border-color: #dc3545;
+        color: #721c24;
+    }
+
+        .ct-btn-danger:hover {
+            background: #f5c6cb;
+        }
 
     /* Form section */
     .form-section {
         border: 1px solid #bbb;
-        padding: 8px 12px;
-        margin-bottom: 8px;
+        padding: 8px 10px;
+        margin-bottom: 6px;
         background: #fff;
     }
 
-    .form-section legend {
-        font-size: 0.8rem;
-        padding: 0 4px;
-        color: #333;
-        width: auto;
-        font-weight: normal;
-    }
+        .form-section legend {
+            font-size: 0.8rem;
+            padding: 0 4px;
+            color: #333;
+            width: auto;
+            font-weight: normal;
+        }
 
-    .form-grid {
+    /* Two-column body */
+    .form-body {
         display: grid;
-        grid-template-columns: auto 160px auto 160px;
-        gap: 5px 10px;
-        align-items: center;
+        grid-template-columns: 1fr 1fr;
+        gap: 0 16px;
     }
 
-    .form-grid label {
-        white-space: nowrap;
-        text-align: right;
-    }
-
-    .form-grid input[type="text"],
-    .form-grid input[type="number"],
-    .form-grid input[type="date"],
-    .form-grid select {
-        border: 1px solid #999;
-        padding: 2px 5px;
-        font-size: 0.82rem;
-        height: 24px;
-        width: 100%;
-    }
-
-    .form-grid textarea {
-        border: 1px solid #999;
-        padding: 3px 5px;
-        font-size: 0.82rem;
-        width: 100%;
-        resize: none;
-        height: 52px;
-    }
-
-    .span-full { grid-column: 1 / -1; }
-    .span-3 { grid-column: span 3; }
-
-    /* Account info row */
-    .acct-info-wrap {
+    /* Each side uses a simple table-like structure */
+    .form-col {
         display: flex;
+        flex-direction: column;
         gap: 4px;
-        align-items: center;
     }
 
-    .acct-info-wrap input {
-        flex: 1;
+    .field-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        min-height: 26px;
     }
+
+        .field-row label {
+            white-space: nowrap;
+            min-width: 110px;
+            text-align: left;
+            font-size: 0.82rem;
+        }
+
+        .field-row input[type="text"],
+        .field-row input[type="number"],
+        .field-row input[type="date"],
+        .field-row select {
+            border: 1px solid #999;
+            padding: 2px 5px;
+            font-size: 0.82rem;
+            height: 24px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .field-row textarea {
+            border: 1px solid #999;
+            padding: 3px 5px;
+            font-size: 0.82rem;
+            flex: 1;
+            resize: none;
+            height: 52px;
+            min-width: 0;
+        }
+
+        .field-row input[readonly] {
+            background: #f5f5f5;
+        }
+
+    /* Account Info: 3 sub-boxes */
+    .acct-info-group {
+        display: flex;
+        gap: 3px;
+        flex: 1;
+        min-width: 0;
+    }
+
+        .acct-info-group input {
+            flex: 1;
+            min-width: 0;
+            border: 1px solid #999;
+            padding: 2px 4px;
+            font-size: 0.82rem;
+            height: 24px;
+        }
+
+    /* Discount row: % input + KWD input + checkbox */
+    .discount-group {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        flex: 1;
+        min-width: 0;
+    }
+
+        .discount-group input[type="number"] {
+            width: 60px;
+            flex: none;
+            border: 1px solid #999;
+            padding: 2px 4px;
+            font-size: 0.82rem;
+            height: 24px;
+        }
+
+        .discount-group .kwd-input {
+            flex: 1;
+            min-width: 0;
+            border: 1px solid #999;
+            padding: 2px 4px;
+            font-size: 0.82rem;
+            height: 24px;
+        }
+
+        .discount-group .unit-label {
+            font-size: 0.78rem;
+            color: #555;
+            white-space: nowrap;
+        }
+
+        .discount-group label.chk-label {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            white-space: nowrap;
+            font-size: 0.78rem;
+            cursor: pointer;
+            min-width: unset;
+        }
+
+    /* Amount with KWD unit */
+    .amount-group {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        flex: 1;
+        min-width: 0;
+    }
+
+        .amount-group input {
+            flex: 1;
+            min-width: 0;
+            border: 1px solid #999;
+            padding: 2px 4px;
+            font-size: 0.82rem;
+            height: 24px;
+        }
+
+        .amount-group .unit-label {
+            font-size: 0.78rem;
+            color: #555;
+            white-space: nowrap;
+        }
 
     /* Grid section */
     .grid-section {
@@ -159,7 +270,7 @@
 
     .grid-wrapper {
         overflow: auto;
-        max-height: 280px;
+        max-height: 260px;
         background: #fff;
     }
 
@@ -170,26 +281,34 @@
         min-width: 700px;
     }
 
-    .ct-grid thead th {
-        background: #ddd;
-        border: 1px solid #bbb;
-        padding: 3px 6px;
-        text-align: center;
-        font-weight: normal;
-        white-space: nowrap;
-        position: sticky;
-        top: 0;
-        z-index: 1;
-    }
+        .ct-grid thead th {
+            background: #ddd;
+            border: 1px solid #bbb;
+            padding: 3px 6px;
+            text-align: center;
+            font-weight: normal;
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
 
-    .ct-grid tbody td {
-        border: 1px solid #ccc;
-        padding: 0;
-    }
+        .ct-grid tbody td {
+            border: 1px solid #ccc;
+            padding: 0;
+        }
 
-    .ct-grid tbody tr.selected-row td { background: #cce5ff; }
-    .ct-grid tbody tr:hover td { background: #eef; }
-    .ct-grid tbody tr.selected-row:hover td { background: #b8d9ff; }
+        .ct-grid tbody tr.selected-row td {
+            background: #cce5ff;
+        }
+
+        .ct-grid tbody tr:hover td {
+            background: #eef;
+        }
+
+        .ct-grid tbody tr.selected-row:hover td {
+            background: #b8d9ff;
+        }
 
     .row-indicator {
         width: 20px;
@@ -212,7 +331,10 @@
         box-sizing: border-box;
     }
 
-    .grid-cell-input:focus { background: #fffbe6; outline: 1px solid #f90; }
+        .grid-cell-input:focus {
+            background: #fffbe6;
+            outline: 1px solid #f90;
+        }
 
     .grid-cell-readonly {
         padding: 2px 4px;
@@ -240,22 +362,34 @@
         display: none;
     }
 
-    .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-    .alert-danger  { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    .alert-success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
 
-    /* Account Tree Popup */
+    .alert-danger {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
+    /* Popups */
     .popup-overlay {
         display: none;
         position: fixed;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
         background: rgba(0,0,0,0.35);
         z-index: 9000;
     }
 
     .popup-box {
         position: absolute;
-        top: 50%; left: 50%;
+        top: 50%;
+        left: 50%;
         transform: translate(-50%, -50%);
         background: #fff;
         border: 1px solid #999;
@@ -266,7 +400,9 @@
         box-shadow: 0 4px 16px rgba(0,0,0,0.25);
     }
 
-    .popup-box.sm { width: 420px; }
+        .popup-box.sm {
+            width: 420px;
+        }
 
     .popup-header {
         background: #8b0000;
@@ -279,14 +415,14 @@
         font-weight: bold;
     }
 
-    .popup-header button {
-        background: none;
-        border: none;
-        color: #fff;
-        font-size: 1rem;
-        cursor: pointer;
-        padding: 0;
-    }
+        .popup-header button {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 0;
+        }
 
     .popup-search {
         display: flex;
@@ -295,15 +431,18 @@
         border-bottom: 1px solid #ddd;
     }
 
-    .popup-search input {
-        flex: 1;
-        border: 1px solid #999;
-        padding: 2px 5px;
-        font-size: 0.82rem;
-        height: 24px;
-    }
+        .popup-search input {
+            flex: 1;
+            border: 1px solid #999;
+            padding: 2px 5px;
+            font-size: 0.82rem;
+            height: 24px;
+        }
 
-    .popup-table-wrap { flex: 1; overflow: auto; }
+    .popup-table-wrap {
+        flex: 1;
+        overflow: auto;
+    }
 
     .popup-table {
         width: 100%;
@@ -311,20 +450,33 @@
         font-size: 0.8rem;
     }
 
-    .popup-table thead th {
-        background: #e0e0e0;
-        border: 1px solid #bbb;
-        padding: 3px 6px;
-        text-align: left;
-        position: sticky;
-        top: 0;
+        .popup-table thead th {
+            background: #e0e0e0;
+            border: 1px solid #bbb;
+            padding: 3px 6px;
+            text-align: left;
+            position: sticky;
+            top: 0;
+        }
+
+        .popup-table tbody tr {
+            cursor: pointer;
+        }
+
+            .popup-table tbody tr:hover td {
+                background: #cce5ff;
+            }
+
+        .popup-table tbody td {
+            border: 1px solid #ddd;
+            padding: 2px 6px;
+        }
+
+    .no-data {
+        color: #888;
+        text-align: center;
+        padding: 10px;
     }
-
-    .popup-table tbody tr { cursor: pointer; }
-    .popup-table tbody tr:hover td { background: #cce5ff; }
-    .popup-table tbody td { border: 1px solid #ddd; padding: 2px 6px; }
-
-    .no-data { color: #888; text-align: center; padding: 10px; }
 </style>
 
 <div class="ct-page">
@@ -332,7 +484,7 @@
 
     <div id="alertBanner" class="alert-banner"></div>
 
-    <!-- Top bar: type toggle + search -->
+    <!-- Top bar -->
     <div class="top-bar">
         <div class="radio-group">
             <label>
@@ -344,10 +496,9 @@
                 Cash Receive
             </label>
         </div>
-
         <div class="search-bar">
             <label>Search For Invoice No.</label>
-            <input type="text" id="searchInvoiceNo" placeholder="" />
+            <input type="text" id="searchInvoiceNo" />
             <button class="ct-btn" onclick="searchTransaction()">Search</button>
             <button class="ct-btn ct-btn-primary" onclick="newTransaction()">New</button>
         </div>
@@ -356,83 +507,130 @@
     <!-- Header form -->
     <fieldset class="form-section">
         <legend id="formLegend">Cash With Draw</legend>
-        <div class="form-grid">
-            <!-- Row 1 -->
-            <label>Invoice No.</label>
-            <input type="text" id="invoiceNo" readonly style="background:#f5f5f5;" />
+        <div class="form-body">
 
-            <label>Cash Name</label>
-            <input type="text" id="cashName" />
+            <!-- LEFT column -->
+            <div class="form-col">
 
-            <!-- Row 2 -->
-            <label>Account Info</label>
-            <div class="acct-info-wrap" style="grid-column: span 3;">
-                <input type="text" id="accountInfo" style="width:200px;" />
-            </div>
+                <div class="field-row">
+                    <label>Invoice No.</label>
+                    <input type="text" id="invoiceNo" readonly />
+                </div>
 
-            <!-- Row 3 -->
-            <label>Pay To</label>
-            <select id="payTo" onchange="onPayToChange()">
-                <option value="Insurance companies">Insurance companies</option>
-                <option value="Suppliers" selected>Suppliers</option>
-                <option value="Account Tree">Account Tree</option>
-                <option value="Patient">Patient</option>
-            </select>
+                <div class="field-row">
+                    <label>Cash Name</label>
+                    <select id="cashName">
+                        <option value="">-- Select --</option>
+                    </select>
+                </div>
 
-            <label>Discount</label>
-            <input type="number" id="discount" value="0" min="0" step="0.01" onchange="calcAmountAfterDiscount()" />
+                <div class="field-row">
+                    <label>Account Info</label>
+                    <div class="acct-info-group">
+                        <input type="text" id="accountInfo1" placeholder="" />
+                        <input type="text" id="accountInfo2" placeholder="" />
+                        <input type="text" id="accountInfo3" placeholder="" />
+                    </div>
+                </div>
 
-            <!-- Row 4 -->
-            <label>Amount</label>
-            <input type="number" id="amount" value="0" min="0" step="0.01" onchange="calcAmountAfterDiscount()" />
+                <div class="field-row">
+                    <label>Pay To</label>
+                    <select id="payTo" onchange="onPayToChange()">
+                        <option value="Suppliers" selected>Suppliers</option>
+                        <option value="Account Tree">Account Tree</option>
+                        <option value="Patient">Patient</option>
+                    </select>
+                </div>
 
-            <label>Amount After Disc.</label>
-            <input type="number" id="amountAfterDiscount" value="0" min="0" step="0.01" readonly style="background:#f5f5f5;" />
+                <div class="field-row">
+                    <label>Payment method</label>
+                    <select id="paymentMethod">
+                        <option value="Cash">Cash</option>
+                        <option value="Bank Transfer">Bank Transfer</option>
+                        <option value="Cheque">Cheque</option>
+                    </select>
+                </div>
 
-            <!-- Row 5 -->
-            <label>Payment method</label>
-            <select id="paymentMethod">
-                <option value="Cash">Cash</option>
-                <option value="Bank Transfer">Bank Transfer</option>
-                <option value="Cheque">Cheque</option>
-            </select>
+                <div class="field-row">
+                    <label>Date</label>
+                    <input type="date" id="transactionDate" style="flex:0 0 auto; width:160px;" />
+                </div>
 
-            <label>Date</label>
-            <input type="date" id="transactionDate" />
+                <div class="field-row" style="align-items:flex-start;">
+                    <label style="margin-top:3px;">Note</label>
+                    <textarea id="note"></textarea>
+                </div>
 
-            <!-- Row 6: Note -->
-            <label>Note</label>
-            <textarea id="note" style="grid-column: span 3;"></textarea>
-        </div>
+            </div><!-- /left col -->
+            <!-- RIGHT column -->
+            <div class="form-col">
+
+                <div class="field-row">
+                    <label>Related for Voucher No.</label>
+                    <input type="text" id="relatedVoucherNo" readonly />
+                </div>
+
+                <div class="field-row">
+                    <label>Amount</label>
+                    <div class="amount-group">
+                        <input type="number" id="amount" value="0" min="0" step="0.01" onchange="calcAmountAfterDiscount()" />
+                        <span class="unit-label">KWD</span>
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <label>Discount</label>
+                    <div class="discount-group">
+                        <input type="number" id="discountPct" value="0" min="0" max="100" step="0.01"
+                               title="Discount %" onchange="calcDiscountFromPct()" />
+                        <span class="unit-label">%</span>
+                        <input type="number" id="discountKwd" value="0" min="0" step="0.01" class="kwd-input"
+                               onchange="calcAmountAfterDiscount()" />
+                        <span class="unit-label">KWD</span>
+                        <label class="chk-label">
+                            <input type="checkbox" id="activateDiscount" onchange="onActivateDiscount()" />
+                            Activat Discount
+                        </label>
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <label>Amount After Discount</label>
+                    <div class="amount-group">
+                        <input type="number" id="amountAfterDiscount" value="0" min="0" step="0.01" readonly />
+                        <span class="unit-label">KWD</span>
+                    </div>
+                </div>
+
+                <div class="field-row" style="align-items:flex-start;">
+                    <label style="margin-top:3px;">Discount Note</label>
+                    <textarea id="discountNote"></textarea>
+                </div>
+
+            </div><!-- /right col -->
+
+        </div><!-- /form-body -->
     </fieldset>
 
     <!-- Detail grid -->
     <div class="grid-section">
         <div class="grid-section-header">
             <span id="gridTitle">Details</span>
-            <button class="ct-btn" id="btnAddFromTree" onclick="openAccountTreePopup()" style="display:none;">
-                + Add Account
-            </button>
-            <button class="ct-btn" id="btnAddSupplier" onclick="openSupplierPopup()" style="display:none;">
-                + Add Supplier
-            </button>
+            <button class="ct-btn" id="btnAddFromTree" onclick="openAccountTreePopup()" style="display:none;">+ Add Account</button>
+            <button class="ct-btn" id="btnAddSupplier" onclick="openSupplierPopup()" style="display:none;">+ Add Supplier</button>
         </div>
         <div class="grid-wrapper">
             <table class="ct-grid" id="ctGrid">
-                <thead id="ctGridHead">
-                    <!-- filled dynamically -->
-                </thead>
-                <tbody id="ctGridBody">
-                    <!-- rows filled dynamically -->
-                </tbody>
+                <thead id="ctGridHead"></thead>
+                <tbody id="ctGridBody"></tbody>
             </table>
         </div>
     </div>
 
-    <!-- Bottom action bar -->
+    <!-- Actions -->
     <div class="bottom-bar">
         <button class="ct-btn ct-btn-danger" onclick="deleteSelectedRow()">Delete Row</button>
-        <button class="ct-btn ct-btn-primary" onclick="saveTransaction()" style="padding: 2px 24px;">Save</button>
+        <button class="ct-btn ct-btn-primary" onclick="saveTransaction()" style="padding:2px 24px;">Save</button>
         <button class="ct-btn ct-btn-danger" onclick="deleteTransaction()">Delete</button>
     </div>
 </div>
@@ -478,10 +676,7 @@
         <div class="popup-table-wrap">
             <table class="popup-table">
                 <thead>
-                    <tr>
-                        <th>Code</th>
-                        <th>Name</th>
-                    </tr>
+                    <tr><th>Code</th><th>Name</th></tr>
                 </thead>
                 <tbody id="supplierBody"></tbody>
             </table>
@@ -500,22 +695,89 @@
         document.addEventListener('DOMContentLoaded', async function () {
             const today = new Date();
             document.getElementById('transactionDate').value = today.toISOString().split('T')[0];
-            await loadNextInvoiceNo();
+            // Use allSettled so one failure does not block the others
+            await Promise.allSettled([
+                loadNextInvoiceNo(),
+                loadNextRelatedVoucherNo(),
+                loadCashTypes()
+            ]);
             applyPayToLayout();
             addEmptyRow();
         });
 
         async function loadNextInvoiceNo() {
-            const type = document.querySelector('input[name="transactionType"]:checked').value;
-            const res = await fetch(`/CashTransaction/GetNextInvoiceNo?type=${encodeURIComponent(type)}`);
-            const data = await res.json();
-            document.getElementById('invoiceNo').value = data.invoiceNo;
+            try {
+                const res  = await fetch('/CashTransaction/GetNextInvoiceNo');
+                const data = await res.json();
+                if (data.invoiceNo) {
+                    document.getElementById('invoiceNo').value = data.invoiceNo;
+                }
+            } catch (e) {
+                console.error('Failed to load Invoice No:', e);
+            }
+        }
+
+        async function loadNextRelatedVoucherNo() {
+            try {
+                const res  = await fetch('/CashTransaction/GetNextRelatedVoucherNo');
+                const data = await res.json();
+                if (data.voucherNo) {
+                    document.getElementById('relatedVoucherNo').value = data.voucherNo;
+                }
+            } catch (e) {
+                console.error('Failed to load Related Voucher No:', e);
+            }
+        }
+
+        async function loadCashTypes() {
+            try {
+                const res  = await fetch('/CashTransaction/GetAccountTypes');
+                const list = await res.json();
+                const sel  = document.getElementById('cashName');
+                sel.innerHTML = '<option value="">-- Select --</option>';
+                list.forEach(a => {
+                    const opt = document.createElement('option');
+                    opt.value = a.id;
+                    opt.textContent = `${a.code} - ${a.name}`;
+                    sel.appendChild(opt);
+                });
+            } catch (e) {
+                console.error('Failed to load Cash Types:', e);
+            }
         }
 
         async function onTypeChange() {
             const type = document.querySelector('input[name="transactionType"]:checked').value;
-            document.getElementById('formLegend').textContent = type === 'CashWithDraw' ? 'Cash With Draw' : 'Cash Receive';
-            await loadNextInvoiceNo();
+            document.getElementById('formLegend').textContent =
+                type === 'CashWithDraw' ? 'Cash With Draw' : 'Cash Receive';
+            // Invoice No does NOT change when type changes — it is one unified sequence
+        }
+
+        // ── Discount calc ─────────────────────────────────────────────────────
+        function calcDiscountFromPct() {
+            if (!document.getElementById('activateDiscount').checked) return;
+            const amount  = parseFloat(document.getElementById('amount').value) || 0;
+            const pct     = parseFloat(document.getElementById('discountPct').value) || 0;
+            const kwdDisc = (amount * pct / 100);
+            document.getElementById('discountKwd').value = kwdDisc.toFixed(2);
+            calcAmountAfterDiscount();
+        }
+
+        function onActivateDiscount() {
+            const active = document.getElementById('activateDiscount').checked;
+            document.getElementById('discountPct').disabled  = !active;
+            document.getElementById('discountKwd').disabled  = !active;
+            if (!active) {
+                document.getElementById('discountPct').value = '0';
+                document.getElementById('discountKwd').value = '0';
+            }
+            calcAmountAfterDiscount();
+        }
+
+        function calcAmountAfterDiscount() {
+            const amount  = parseFloat(document.getElementById('amount').value) || 0;
+            const disc    = parseFloat(document.getElementById('discountKwd').value) || 0;
+            document.getElementById('amountAfterDiscount').value = Math.max(0, amount - disc).toFixed(2);
         }
 
         // ── Pay To layout ─────────────────────────────────────────────────────
@@ -533,6 +795,7 @@
             btnTree.style.display     = (payTo === 'Account Tree') ? '' : 'none';
             btnSupplier.style.display = (payTo === 'Suppliers')    ? '' : 'none';
 
+            // Grid head
             const head = document.getElementById('ctGridHead');
             if (payTo === 'Account Tree') {
                 document.getElementById('gridTitle').textContent = 'Account Tree Lines';
@@ -540,20 +803,18 @@
                     <th style="width:20px;"></th>
                     <th style="width:120px;">Account No</th>
                     <th style="min-width:200px;">Account Name</th>
-                    <th style="width:110px;">Amount</th>
+                    <th style="width:110px;">Amount (KWD)</th>
                     <th style="min-width:140px;">Note</th>
                 </tr>`;
             } else {
-                const label = payTo === 'Insurance companies' ? 'Insurance Company'
-                            : payTo === 'Patient'             ? 'Patient Name'
-                            : 'Supplier Name';
+                const label = payTo === 'Patient' ? 'Patient Name' : 'Supplier Name';
                 document.getElementById('gridTitle').textContent = payTo + ' Lines';
                 head.innerHTML = `<tr>
                     <th style="width:20px;"></th>
                     <th style="min-width:160px;">${esc(label)}</th>
                     <th style="width:130px;">Invoice No</th>
                     <th style="width:120px;">Received Date</th>
-                    <th style="width:110px;">Amount</th>
+                    <th style="width:110px;">Amount (KWD)</th>
                     <th style="min-width:120px;">Note</th>
                 </tr>`;
             }
@@ -575,18 +836,16 @@
                 if (i === selectedRowIndex) tr.classList.add('selected-row');
                 tr.onclick = () => selectRow(i);
 
-                let cells = '';
                 const indicator = i === rows.length - 1 ? '*' : (i + 1);
+                let cells = '';
 
                 if (payTo === 'Account Tree') {
                     cells = `
                         <td class="row-indicator">${indicator}</td>
                         <td style="width:120px;">
-                            <input type="text" class="grid-cell-input" value="${esc(row.entityCode)}"
-                                data-row="${i}" readonly
-                                ondblclick="openAccountTreePopup(${i})"
-                                onfocus="selectRow(${i})"
-                                title="Double-click to select account" style="cursor:pointer;" />
+                            <input type="text" class="grid-cell-input" value="${esc(row.entityCode)}" readonly
+                                ondblclick="openAccountTreePopup(${i})" onfocus="selectRow(${i})"
+                                title="Double-click to select" style="cursor:pointer;" />
                         </td>
                         <td>
                             <span class="grid-cell-readonly">${esc(row.entityName)}</span>
@@ -604,9 +863,7 @@
                         <td class="row-indicator">${indicator}</td>
                         <td>
                             <input type="text" class="grid-cell-input" value="${esc(row.entityName)}"
-                                data-row="${i}"
-                                onchange="rows[${i}].entityName = this.value; checkAddRow(${i});"
-                                onfocus="selectRow(${i})" />
+                                onchange="rows[${i}].entityName = this.value; checkAddRow(${i});" onfocus="selectRow(${i})" />
                         </td>
                         <td style="width:130px;">
                             <input type="text" class="grid-cell-input" value="${esc(row.invoiceNo)}"
@@ -639,10 +896,10 @@
         }
 
         function checkAddRow(i) {
-            const row = rows[i];
+            const row   = rows[i];
             const payTo = document.getElementById('payTo').value;
             const hasData = payTo === 'Account Tree'
-                ? (row.entityCode.trim() !== '')
+                ? row.entityCode.trim() !== ''
                 : (row.entityName.trim() !== '' || row.invoiceNo.trim() !== '');
             if (i === rows.length - 1 && hasData) addEmptyRow();
         }
@@ -652,13 +909,6 @@
             rows.splice(selectedRowIndex, 1);
             selectedRowIndex = Math.min(selectedRowIndex, rows.length - 1);
             renderGrid();
-        }
-
-        // ── Calc ──────────────────────────────────────────────────────────────
-        function calcAmountAfterDiscount() {
-            const amount   = parseFloat(document.getElementById('amount').value) || 0;
-            const discount = parseFloat(document.getElementById('discount').value) || 0;
-            document.getElementById('amountAfterDiscount').value = Math.max(0, amount - discount).toFixed(2);
         }
 
         // ── Account Tree Popup ────────────────────────────────────────────────
@@ -682,7 +932,7 @@
             clearTimeout(acctSearchTimer);
             acctSearchTimer = setTimeout(async () => {
                 const term = document.getElementById('acctTreeSearch').value;
-                const res = await fetch(`/CashTransaction/SearchAccounts?term=${encodeURIComponent(term)}`);
+                const res  = await fetch(`/CashTransaction/SearchAccounts?term=${encodeURIComponent(term)}`);
                 const list = await res.json();
                 const tbody = document.getElementById('acctTreeBody');
                 tbody.innerHTML = '';
@@ -728,7 +978,7 @@
             clearTimeout(supplierSearchTimer);
             supplierSearchTimer = setTimeout(async () => {
                 const term = document.getElementById('supplierSearch').value;
-                const res = await fetch(`/CashTransaction/GetSuppliers?term=${encodeURIComponent(term)}`);
+                const res  = await fetch(`/CashTransaction/GetSuppliers?term=${encodeURIComponent(term)}`);
                 const list = await res.json();
                 const tbody = document.getElementById('supplierBody');
                 tbody.innerHTML = '';
@@ -759,18 +1009,23 @@
         async function newTransaction() {
             currentId = 0;
             selectedRowIndex = -1;
-            await loadNextInvoiceNo();
 
             const today = new Date();
             document.getElementById('transactionDate').value = today.toISOString().split('T')[0];
-            document.getElementById('cashName').value = '';
-            document.getElementById('accountInfo').value = '';
-            document.getElementById('payTo').value = 'Suppliers';
-            document.getElementById('discount').value = '0';
-            document.getElementById('amount').value = '0';
+            document.getElementById('cashName').value       = '';
+            document.getElementById('accountInfo1').value   = '';
+            document.getElementById('accountInfo2').value   = '';
+            document.getElementById('accountInfo3').value   = '';
+            document.getElementById('payTo').value          = 'Suppliers';
+            document.getElementById('paymentMethod').value  = 'Cash';
+            document.getElementById('note').value           = '';
+            await Promise.allSettled([loadNextInvoiceNo(), loadNextRelatedVoucherNo()]);
+            document.getElementById('amount').value         = '0';
+            document.getElementById('discountPct').value    = '0';
+            document.getElementById('discountKwd').value    = '0';
+            document.getElementById('activateDiscount').checked = false;
             document.getElementById('amountAfterDiscount').value = '0';
-            document.getElementById('paymentMethod').value = 'Cash';
-            document.getElementById('note').value = '';
+            document.getElementById('discountNote').value   = '';
             document.getElementById('searchInvoiceNo').value = '';
 
             rows = [];
@@ -782,7 +1037,7 @@
             const no = document.getElementById('searchInvoiceNo').value.trim();
             if (!no) { showAlert('Please enter an Invoice No to search.', false); return; }
 
-            const res = await fetch(`/CashTransaction/GetTransaction?invoiceNo=${encodeURIComponent(no)}`);
+            const res  = await fetch(`/CashTransaction/GetTransaction?invoiceNo=${encodeURIComponent(no)}`);
             const data = await res.json();
             if (!data.success) { showAlert(data.message, false); return; }
 
@@ -801,14 +1056,17 @@
             }
             document.getElementById('formLegend').textContent = data.transactionType === 'CashReceive' ? 'Cash Receive' : 'Cash With Draw';
 
-            document.getElementById('cashName').value = data.cashName;
-            document.getElementById('accountInfo').value = data.accountInfo;
-            document.getElementById('payTo').value = data.payTo;
-            document.getElementById('discount').value = data.discount;
-            document.getElementById('amountAfterDiscount').value = data.amountAfterDiscount;
-            document.getElementById('paymentMethod').value = data.paymentMethod;
-            document.getElementById('transactionDate').value = data.transactionDate;
-            document.getElementById('note').value = data.note;
+            document.getElementById('cashName').value          = data.cashName    || '';
+            document.getElementById('accountInfo1').value      = data.accountInfo || '';
+            document.getElementById('payTo').value             = data.payTo;
+            document.getElementById('paymentMethod').value     = data.paymentMethod;
+            document.getElementById('transactionDate').value   = data.transactionDate;
+            document.getElementById('note').value              = data.note || '';
+            document.getElementById('relatedVoucherNo').value  = data.relatedVoucherNo || '';
+            document.getElementById('amount').value            = data.amount || 0;
+            document.getElementById('discountKwd').value       = data.discount || 0;
+            document.getElementById('amountAfterDiscount').value = data.amountAfterDiscount || 0;
+            document.getElementById('discountNote').value      = data.discountNote || '';
 
             rows = data.details.map(d => ({
                 entityId: d.entityId || 0,
@@ -828,31 +1086,31 @@
 
         // ── Save / Delete ─────────────────────────────────────────────────────
         async function saveTransaction() {
-            const dataRows = rows.filter(r => {
-                const payTo = document.getElementById('payTo').value;
-                return payTo === 'Account Tree' ? r.entityCode.trim() !== '' : (r.entityName.trim() !== '' || r.invoiceNo.trim() !== '');
-            });
+            const payTo    = document.getElementById('payTo').value;
+            const dataRows = rows.filter(r =>
+                payTo === 'Account Tree' ? r.entityCode.trim() !== '' : (r.entityName.trim() !== '' || r.invoiceNo.trim() !== '')
+            );
 
             const payload = {
                 id: currentId,
-                invoiceNo: document.getElementById('invoiceNo').value,
-                transactionType: document.querySelector('input[name="transactionType"]:checked').value,
-                cashName: document.getElementById('cashName').value,
-                accountInfo: document.getElementById('accountInfo').value,
-                payTo: document.getElementById('payTo').value,
-                discount: parseFloat(document.getElementById('discount').value) || 0,
+                invoiceNo:          document.getElementById('invoiceNo').value,
+                transactionType:    document.querySelector('input[name="transactionType"]:checked').value,
+                cashName:           document.getElementById('cashName').value,
+                accountInfo:        document.getElementById('accountInfo1').value,
+                payTo:              payTo,
+                discount:           parseFloat(document.getElementById('discountKwd').value) || 0,
                 amountAfterDiscount: parseFloat(document.getElementById('amountAfterDiscount').value) || 0,
-                paymentMethod: document.getElementById('paymentMethod').value,
-                transactionDate: document.getElementById('transactionDate').value,
-                note: document.getElementById('note').value,
+                paymentMethod:      document.getElementById('paymentMethod').value,
+                transactionDate:    document.getElementById('transactionDate').value,
+                note:               document.getElementById('note').value,
                 details: dataRows.map(r => ({
-                    entityName: r.entityName,
-                    entityCode: r.entityCode,
-                    entityId: r.entityId,
-                    invoiceNo: r.invoiceNo,
+                    entityName:   r.entityName,
+                    entityCode:   r.entityCode,
+                    entityId:     r.entityId,
+                    invoiceNo:    r.invoiceNo,
                     receivedDate: r.receivedDate || null,
-                    amount: parseFloat(r.amount) || 0,
-                    note: r.note
+                    amount:       parseFloat(r.amount) || 0,
+                    note:         r.note
                 }))
             };
 
@@ -867,9 +1125,7 @@
             if (result.success) {
                 currentId = result.id;
                 showAlert(result.message, true);
-                if (payload.id === 0) {
-                    await newTransaction();
-                }
+                if (payload.id === 0) await newTransaction();
             } else {
                 showAlert(result.message, false);
             }
@@ -915,6 +1171,10 @@
         document.getElementById('supplierPopup').addEventListener('click', function(e) {
             if (e.target === this) closeSupplierPopup();
         });
+
+        // Disable discount fields initially
+        document.getElementById('discountPct').disabled = true;
+        document.getElementById('discountKwd').disabled = true;
     </script>
     @Html.AntiForgeryToken()
 }

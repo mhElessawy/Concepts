@@ -1,0 +1,14 @@
+Cash Name :   All Account has Cash in hand   Account type
+Remove Account INfo
+Invoice no -->  P.V Payment Voucher
+
+voucher NO  start JV260001
+
+
+Account tree   Selected   -> voucher Debit
+cash name - >  Credit
+
+Account tree lines  Add Department And Cost center
+
+
+

@@ -1068,4 +1068,86 @@ namespace Concept.Models
         public virtual DefSubUOM? SubUOM { get; set; }
     }
 
+    public class CashTransactionHeader
+    {
+        [Key]
+        public int Id { get; set; }
+
+        [Required]
+        public string InvoiceNo { get; set; } = string.Empty;
+
+        public string TransactionType { get; set; } = "CashWithDraw"; // CashWithDraw / CashReceive
+
+        public string CashName { get; set; } = string.Empty;
+
+        public string AccountInfo { get; set; } = string.Empty;
+
+        public string PayTo { get; set; } = "Suppliers"; // Insurance companies, Suppliers, Account Tree, Patient
+
+        public string? RelatedVoucherNo { get; set; }
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal Amount { get; set; } = 0;
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal Discount { get; set; } = 0;
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal AmountAfterDiscount { get; set; } = 0;
+
+        public string? DiscountNote { get; set; }
+
+        public string PaymentMethod { get; set; } = "Cash";
+
+        public DateTime TransactionDate { get; set; } = DateTime.Now;
+
+        public string? Note { get; set; }
+
+        public bool Active { get; set; } = true;
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime ModifiedDate { get; set; } = DateTime.Now;
+
+        public virtual ICollection<CashTransactionDetail> Details { get; set; } = new List<CashTransactionDetail>();
+    }
+
+    public class CashTransactionDetail
+    {
+        [Key]
+        public int Id { get; set; }
+
+        public int CashTransactionHeaderId { get; set; }
+
+        public string? EntityName { get; set; }
+        public string? EntityCode { get; set; }
+        public int? EntityId { get; set; }
+
+        public string? InvoiceNo { get; set; }
+
+        public DateTime? ReceivedDate { get; set; }
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal Amount { get; set; } = 0;
+
+        public string? Note { get; set; }
+
+        [ForeignKey("CashTransactionHeaderId")]
+        public virtual CashTransactionHeader? Header { get; set; }
+    }
+
+    public class CashType
+    {
+        [Key]
+        public int Id { get; set; }
+
+        [Required]
+        public string Code { get; set; } = string.Empty;
+
+        [Required]
+        public string Name { get; set; } = string.Empty;
+
+        public bool Active { get; set; } = true;
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime ModifiedDate { get; set; } = DateTime.Now;
+    }
+
 }
