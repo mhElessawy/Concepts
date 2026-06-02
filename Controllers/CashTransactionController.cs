@@ -92,14 +92,16 @@ namespace Concept.Controllers
             });
         }
 
-        // GET: CashTransaction/GetAccountTypes  (used for Cash Name dropdown)
+        // GET: CashTransaction/GetCashAccounts  (used for Cash Name dropdown - ChildAccounts where AccountType = Cash In Hand)
         [HttpGet]
-        public async Task<IActionResult> GetAccountTypes()
+        public async Task<IActionResult> GetCashAccounts()
         {
-            var list = await _context.DefAccountTypes
-                .Where(a => a.Active)
-                .OrderBy(a => a.Code)
-                .Select(a => new { id = a.Id, code = a.Code, name = a.Name })
+            var list = await _context.ChildAccounts
+                .Include(a => a.AccountType)
+                .Where(a => a.Active && a.AccountType != null &&
+                            a.AccountType.Name.ToLower() == "cash in hand")
+                .OrderBy(a => a.AccountNo)
+                .Select(a => new { id = a.Id, accountNo = a.AccountNo, accountName = a.AccountName })
                 .ToListAsync();
             return Json(list);
         }

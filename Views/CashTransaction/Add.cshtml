@@ -731,18 +731,18 @@
 
         async function loadCashTypes() {
             try {
-                const res  = await fetch('/CashTransaction/GetAccountTypes');
+                const res  = await fetch('/CashTransaction/GetCashAccounts');
                 const list = await res.json();
                 const sel  = document.getElementById('cashName');
                 sel.innerHTML = '<option value="">-- Select --</option>';
                 list.forEach(a => {
                     const opt = document.createElement('option');
-                    opt.value = a.id;
-                    opt.textContent = `${a.code} - ${a.name}`;
+                    opt.value = a.accountName;
+                    opt.textContent = `${a.accountNo} - ${a.accountName}`;
                     sel.appendChild(opt);
                 });
             } catch (e) {
-                console.error('Failed to load Cash Types:', e);
+                console.error('Failed to load Cash Accounts:', e);
             }
         }
 
