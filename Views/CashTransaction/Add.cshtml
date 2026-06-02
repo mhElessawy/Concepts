@@ -616,9 +616,23 @@
             <span>Select Account</span>
             <button onclick="closeAcctTreePopup()">&times;</button>
         </div>
-        <div class="popup-search">
-            <input type="text" id="acctTreeSearch" placeholder="Account No or Name..." onkeyup="searchAcctTree()" />
-            <button class="ct-btn" onclick="searchAcctTree()">Search</button>
+        <div class="popup-search" style="flex-direction:column; gap:4px;">
+            <div style="display:flex; gap:6px; align-items:center;">
+                <label style="white-space:nowrap; font-size:0.8rem; min-width:90px;">Department</label>
+                <select id="filterDepartment" style="flex:1; height:24px; font-size:0.8rem; border:1px solid #999;" onchange="onDeptFilterChange()">
+                    <option value="">-- All --</option>
+                </select>
+            </div>
+            <div style="display:flex; gap:6px; align-items:center;">
+                <label style="white-space:nowrap; font-size:0.8rem; min-width:90px;">Cost Center</label>
+                <select id="filterCostCenter" style="flex:1; height:24px; font-size:0.8rem; border:1px solid #999;" onchange="searchAcctTree()">
+                    <option value="">-- All --</option>
+                </select>
+            </div>
+            <div style="display:flex; gap:6px;">
+                <input type="text" id="acctTreeSearch" placeholder="Account No or Name..." onkeyup="searchAcctTree()" style="flex:1;" />
+                <button class="ct-btn" onclick="searchAcctTree()">Search</button>
+            </div>
         </div>
         <div class="popup-table-wrap">
             <table class="popup-table">
@@ -628,7 +642,6 @@
                         <th>Account Name</th>
                         <th>Parent Account</th>
                         <th>Nature</th>
-                        <th>Department</th>
                         <th>Cost Center</th>
                     </tr>
                 </thead>
@@ -675,7 +688,8 @@
             await Promise.allSettled([
                 loadNextInvoiceNo(),
                 loadNextRelatedVoucherNo(),
-                loadCashTypes()
+                loadCashTypes(),
+                loadPopupFilters()
             ]);
             applyPayToLayout();
             addEmptyRow();
@@ -894,10 +908,51 @@
         // ── Account Tree Popup ────────────────────────────────────────────────
         let acctTargetRow = -1;
         let acctSearchTimer;
+        let allCostCenters = [];
+
+        async function loadPopupFilters() {
+            const [deptRes, ccRes] = await Promise.all([
+                fetch('/CashTransaction/GetDepartments'),
+                fetch('/CashTransaction/GetCostCenters')
+            ]);
+            const depts = await deptRes.json();
+            const ccs   = await ccRes.json();
+            allCostCenters = ccs;
+
+            const deptSel = document.getElementById('filterDepartment');
+            depts.forEach(d => {
+                const o = document.createElement('option');
+                o.value = d.id;
+                o.textContent = `${d.code} - ${d.name}`;
+                deptSel.appendChild(o);
+            });
+
+            populateCostCenterFilter();
+        }
+
+        function populateCostCenterFilter(filteredCcs) {
+            const sel = document.getElementById('filterCostCenter');
+            const prev = sel.value;
+            sel.innerHTML = '<option value="">-- All --</option>';
+            (filteredCcs || allCostCenters).forEach(c => {
+                const o = document.createElement('option');
+                o.value = c.id;
+                o.textContent = `${c.code} - ${c.name}`;
+                sel.appendChild(o);
+            });
+            sel.value = prev;
+        }
+
+        function onDeptFilterChange() {
+            populateCostCenterFilter();
+            searchAcctTree();
+        }
 
         function openAccountTreePopup(rowIndex) {
             acctTargetRow = (rowIndex !== undefined) ? rowIndex : (rows.length - 1);
             document.getElementById('acctTreeSearch').value = '';
+            document.getElementById('filterDepartment').value = '';
+            document.getElementById('filterCostCenter').value = '';
             document.getElementById('acctTreeBody').innerHTML = '';
             document.getElementById('acctTreePopup').style.display = 'block';
             document.getElementById('acctTreeSearch').focus();
@@ -911,18 +966,21 @@
         function searchAcctTree() {
             clearTimeout(acctSearchTimer);
             acctSearchTimer = setTimeout(async () => {
-                const term = document.getElementById('acctTreeSearch').value;
-                const res  = await fetch(`/CashTransaction/SearchAccounts?term=${encodeURIComponent(term)}`);
+                const term       = document.getElementById('acctTreeSearch').value;
+                const costCenter = document.getElementById('filterCostCenter').value;
+                let url = `/CashTransaction/SearchAccounts?term=${encodeURIComponent(term)}`;
+                if (costCenter) url += `&costCenterId=${costCenter}`;
+                const res  = await fetch(url);
                 const list = await res.json();
                 const tbody = document.getElementById('acctTreeBody');
                 tbody.innerHTML = '';
                 if (list.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="4" class="no-data">No accounts found.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="5" class="no-data">No accounts found.</td></tr>';
                     return;
                 }
                 list.forEach(a => {
                     const tr = document.createElement('tr');
-                    tr.innerHTML = `<td>${esc(a.accountNo)}</td><td>${esc(a.accountName)}</td><td>${esc(a.parentName)}</td><td>${esc(a.natureOfAccount)}</td><td>${esc(a.department)}</td><td>${esc(a.costCenter)}</td>`;
+                    tr.innerHTML = `<td>${esc(a.accountNo)}</td><td>${esc(a.accountName)}</td><td>${esc(a.parentName)}</td><td>${esc(a.natureOfAccount)}</td><td>${esc(a.costCenter)}</td>`;
                     tr.onclick = () => selectAccountFromTree(a);
                     tbody.appendChild(tr);
                 });

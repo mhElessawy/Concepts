@@ -830,8 +830,6 @@ namespace Concept.Models
         public int? CostCenterId { get; set; }
         public bool FixedCostCenter { get; set; } = false;
 
-        public int? DepartmentId { get; set; }
-
         public string? Address { get; set; }
         public string? Tel { get; set; }
         public string? Mobile { get; set; }
@@ -857,9 +855,6 @@ namespace Concept.Models
 
         [ForeignKey("CostCenterId")]
         public virtual DeffCostCenter? CostCenter { get; set; }
-
-        [ForeignKey("DepartmentId")]
-        public virtual DeffDepartment? Department { get; set; }
 
         [ForeignKey("AccountTypeId")]
         public virtual DefAccountType? AccountType { get; set; }

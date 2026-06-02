@@ -131,19 +131,45 @@ namespace Concept.Controllers
             return Json(new { voucherNo = nextNo });
         }
 
-        // GET: CashTransaction/SearchAccounts?term=xxx
+        // GET: CashTransaction/GetDepartments
         [HttpGet]
-        public async Task<IActionResult> SearchAccounts(string? term)
+        public async Task<IActionResult> GetDepartments()
+        {
+            var list = await _context.DeffDepartments
+                .Where(d => d.Active)
+                .OrderBy(d => d.DepartmentCode)
+                .Select(d => new { id = d.Id, code = d.DepartmentCode, name = d.DepartmentName })
+                .ToListAsync();
+            return Json(list);
+        }
+
+        // GET: CashTransaction/GetCostCenters
+        [HttpGet]
+        public async Task<IActionResult> GetCostCenters()
+        {
+            var list = await _context.DeffCostCenters
+                .Where(c => c.Active)
+                .OrderBy(c => c.CostCenterCode)
+                .Select(c => new { id = c.Id, code = c.CostCenterCode, name = c.CostCenterName })
+                .ToListAsync();
+            return Json(list);
+        }
+
+        // GET: CashTransaction/SearchAccounts?term=xxx&costCenterId=0
+        [HttpGet]
+        public async Task<IActionResult> SearchAccounts(string? term, int? costCenterId)
         {
             var query = _context.ChildAccounts
                 .Include(a => a.ParentAccount)
                 .Include(a => a.NatureOfAccount)
                 .Include(a => a.CostCenter)
-                .Include(a => a.Department)
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(term))
                 query = query.Where(a => a.AccountNo.Contains(term) || a.AccountName.Contains(term));
+
+            if (costCenterId.HasValue && costCenterId.Value > 0)
+                query = query.Where(a => a.CostCenterId == costCenterId.Value);
 
             var results = await query
                 .Where(a => a.Active)
@@ -156,8 +182,7 @@ namespace Concept.Controllers
                     accountName = a.AccountName,
                     parentName = a.ParentAccount != null ? a.ParentAccount.AccountName : "",
                     natureOfAccount = a.NatureOfAccount != null ? a.NatureOfAccount.Name : "",
-                    costCenter = a.CostCenter != null ? a.CostCenter.CostCenterName : "",
-                    department = a.Department != null ? a.Department.DepartmentName : ""
+                    costCenter = a.CostCenter != null ? a.CostCenter.CostCenterName : ""
                 })
                 .ToListAsync();
 
