@@ -688,7 +688,7 @@
                 if (no) {
                     document.getElementById('invoiceNo').value = no;
                 } else {
-                    console.warn('GetNextInvoiceNo returned empty:', data);
+                    console.error('GetNextInvoiceNo server error:', data.message || JSON.stringify(data));
                 }
             } catch (e) {
                 console.error('Failed to load PV No:', e);
