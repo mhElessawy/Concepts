@@ -496,7 +496,7 @@
             <div class="form-col">
 
                 <div class="field-row">
-                    <label>Invoice No.</label>
+                    <label>PV</label>
                     <input type="text" id="invoiceNo" readonly />
                 </div>
 
@@ -682,12 +682,16 @@
         async function loadNextInvoiceNo() {
             try {
                 const res  = await fetch('/CashTransaction/GetNextInvoiceNo');
+                if (!res.ok) throw new Error('HTTP ' + res.status);
                 const data = await res.json();
-                if (data.invoiceNo) {
-                    document.getElementById('invoiceNo').value = data.invoiceNo;
+                const no   = data.invoiceNo || data.InvoiceNo || '';
+                if (no) {
+                    document.getElementById('invoiceNo').value = no;
+                } else {
+                    console.warn('GetNextInvoiceNo returned empty:', data);
                 }
             } catch (e) {
-                console.error('Failed to load Invoice No:', e);
+                console.error('Failed to load PV No:', e);
             }
         }
 
