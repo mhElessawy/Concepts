@@ -27,7 +27,7 @@ namespace Concept.Controllers
             try
             {
                 int year = DateTime.Now.Year;
-                string prefix = $"CT{(year % 100):D2}";   // e.g.  CT26
+                string prefix = $"PV{(year % 100):D2}";   // e.g.  PV26
 
                 var existing = await _context.CashTransactionHeaders
                     .Where(h => h.InvoiceNo.StartsWith(prefix))
@@ -42,7 +42,7 @@ namespace Concept.Controllers
                         maxSeq = seq;
                 }
 
-                return Json(new { success = true, invoiceNo = $"{prefix}{(maxSeq + 1):D4}" }); // CT260001, CT260002 …
+                return Json(new { success = true, invoiceNo = $"{prefix}{(maxSeq + 1):D4}" }); // PV260001, PV260002 …
             }
             catch (Exception ex)
             {

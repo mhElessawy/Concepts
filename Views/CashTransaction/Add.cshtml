@@ -167,23 +167,6 @@
             background: #f5f5f5;
         }
 
-    /* Account Info: 3 sub-boxes */
-    .acct-info-group {
-        display: flex;
-        gap: 3px;
-        flex: 1;
-        min-width: 0;
-    }
-
-        .acct-info-group input {
-            flex: 1;
-            min-width: 0;
-            border: 1px solid #999;
-            padding: 2px 4px;
-            font-size: 0.82rem;
-            height: 24px;
-        }
-
     /* Discount row: % input + KWD input + checkbox */
     .discount-group {
         display: flex;
@@ -522,15 +505,6 @@
                     <select id="cashName">
                         <option value="">-- Select --</option>
                     </select>
-                </div>
-
-                <div class="field-row">
-                    <label>Account Info</label>
-                    <div class="acct-info-group">
-                        <input type="text" id="accountInfo1" placeholder="" />
-                        <input type="text" id="accountInfo2" placeholder="" />
-                        <input type="text" id="accountInfo3" placeholder="" />
-                    </div>
                 </div>
 
                 <div class="field-row">
@@ -1013,9 +987,6 @@
             const today = new Date();
             document.getElementById('transactionDate').value = today.toISOString().split('T')[0];
             document.getElementById('cashName').value       = '';
-            document.getElementById('accountInfo1').value   = '';
-            document.getElementById('accountInfo2').value   = '';
-            document.getElementById('accountInfo3').value   = '';
             document.getElementById('payTo').value          = 'Suppliers';
             document.getElementById('paymentMethod').value  = 'Cash';
             document.getElementById('note').value           = '';
@@ -1057,7 +1028,6 @@
             document.getElementById('formLegend').textContent = data.transactionType === 'CashReceive' ? 'Cash Receive' : 'Cash With Draw';
 
             document.getElementById('cashName').value          = data.cashName    || '';
-            document.getElementById('accountInfo1').value      = data.accountInfo || '';
             document.getElementById('payTo').value             = data.payTo;
             document.getElementById('paymentMethod').value     = data.paymentMethod;
             document.getElementById('transactionDate').value   = data.transactionDate;
@@ -1096,7 +1066,6 @@
                 invoiceNo:          document.getElementById('invoiceNo').value,
                 transactionType:    document.querySelector('input[name="transactionType"]:checked').value,
                 cashName:           document.getElementById('cashName').value,
-                accountInfo:        document.getElementById('accountInfo1').value,
                 payTo:              payTo,
                 discount:           parseFloat(document.getElementById('discountKwd').value) || 0,
                 amountAfterDiscount: parseFloat(document.getElementById('amountAfterDiscount').value) || 0,
