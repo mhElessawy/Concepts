@@ -1,4 +1,4 @@
-﻿﻿@{
+﻿﻿﻿@{
 ViewData["Title"] = "Cash Transaction";
 }
 
@@ -731,7 +731,7 @@ ViewData["Title"] = "Cash Transaction";
                 sel.innerHTML = '<option value="">-- Select --</option>';
                 list.forEach(a => {
                     const opt = document.createElement('option');
-                    opt.value = a.accountName;
+                    opt.value = a.accountNo;
                     opt.textContent = `${a.accountNo} - ${a.accountName}`;
                     sel.appendChild(opt);
                 });
@@ -1165,6 +1165,8 @@ ViewData["Title"] = "Cash Transaction";
                 transactionType:    document.querySelector('input[name="transactionType"]:checked').value,
                 cashName:           document.getElementById('cashName').value,
                 payTo:              payTo,
+                relatedVoucherNo:   document.getElementById('relatedVoucherNo').value,
+                amount:             parseFloat(document.getElementById('amount').value) || 0,
                 discount:           parseFloat(document.getElementById('discountKwd').value) || 0,
                 amountAfterDiscount: parseFloat(document.getElementById('amountAfterDiscount').value) || 0,
                 paymentMethod:      document.getElementById('paymentMethod').value,

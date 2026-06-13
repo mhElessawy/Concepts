@@ -268,6 +268,17 @@ namespace Concept.Controllers
 
                     _context.CashTransactionHeaders.Add(header);
                     await _context.SaveChangesAsync();
+
+                    if (header.PayTo == "Account Tree" && !string.IsNullOrEmpty(header.RelatedVoucherNo))
+                    {
+                        var voucher = await BuildVoucherAsync(header, header.Details.ToList());
+                        if (voucher != null)
+                        {
+                            _context.VoucherHeaders.Add(voucher);
+                            await _context.SaveChangesAsync();
+                        }
+                    }
+
                     return Json(new { success = true, message = "Saved successfully.", id = header.Id });
                 }
                 else
@@ -286,12 +297,14 @@ namespace Concept.Controllers
                             return Json(new { success = false, message = $"Invoice No '{request.InvoiceNo}' already exists." });
                     }
 
+                    string? existingVoucherNo = header.RelatedVoucherNo;
+
                     header.InvoiceNo = request.InvoiceNo;
                     header.TransactionType = request.TransactionType;
                     header.CashName = request.CashName ?? "";
                     header.AccountInfo = request.AccountInfo ?? "";
                     header.PayTo = request.PayTo ?? "Suppliers";
-                    header.RelatedVoucherNo = request.RelatedVoucherNo;
+                    header.RelatedVoucherNo = request.RelatedVoucherNo ?? existingVoucherNo;
                     header.Amount = request.Amount;
                     header.Discount = request.Discount;
                     header.AmountAfterDiscount = request.AmountAfterDiscount;
@@ -322,6 +335,29 @@ namespace Concept.Controllers
 
                     _context.Update(header);
                     await _context.SaveChangesAsync();
+
+                    if (header.PayTo == "Account Tree" && !string.IsNullOrEmpty(header.RelatedVoucherNo))
+                    {
+                        // Delete old voucher then recreate with updated data
+                        if (!string.IsNullOrEmpty(existingVoucherNo))
+                        {
+                            var oldVoucher = await _context.VoucherHeaders
+                                .FirstOrDefaultAsync(v => v.VoucherNo == existingVoucherNo);
+                            if (oldVoucher != null)
+                            {
+                                _context.VoucherHeaders.Remove(oldVoucher);
+                                await _context.SaveChangesAsync();
+                            }
+                        }
+
+                        var voucher = await BuildVoucherAsync(header, header.Details.ToList());
+                        if (voucher != null)
+                        {
+                            _context.VoucherHeaders.Add(voucher);
+                            await _context.SaveChangesAsync();
+                        }
+                    }
+
                     return Json(new { success = true, message = "Updated successfully.", id = header.Id });
                 }
             }
@@ -342,6 +378,15 @@ namespace Concept.Controllers
                 if (header == null)
                     return Json(new { success = false, message = "Record not found." });
 
+                // Delete associated voucher if any
+                if (!string.IsNullOrEmpty(header.RelatedVoucherNo))
+                {
+                    var voucher = await _context.VoucherHeaders
+                        .FirstOrDefaultAsync(v => v.VoucherNo == header.RelatedVoucherNo);
+                    if (voucher != null)
+                        _context.VoucherHeaders.Remove(voucher);
+                }
+
                 _context.CashTransactionHeaders.Remove(header);
                 await _context.SaveChangesAsync();
                 return Json(new { success = true, message = "Deleted successfully." });
@@ -350,6 +395,97 @@ namespace Concept.Controllers
             {
                 return Json(new { success = false, message = ex.Message });
             }
+        }
+
+        private async Task<VoucherHeader?> BuildVoucherAsync(CashTransactionHeader header, List<CashTransactionDetail> details)
+        {
+            // CashName stores ChildAccount.AccountNo
+            ChildAccount? cashChildAcct = null;
+            if (!string.IsNullOrEmpty(header.CashName))
+                cashChildAcct = await _context.ChildAccounts
+                    .Include(a => a.NatureOfAccount)
+                    .FirstOrDefaultAsync(a => a.AccountNo == header.CashName);
+
+            // Discount account
+            ChildAccount? discountAcct = null;
+            if (header.Discount > 0)
+                discountAcct = await _context.ChildAccounts
+                    .Include(a => a.NatureOfAccount)
+                    .FirstOrDefaultAsync(a => a.AccountNo == "101010101003");
+
+            decimal totalDebit = details.Sum(d => d.Amount);
+            decimal totalCredit = header.AmountAfterDiscount + (header.Discount > 0 ? header.Discount : 0);
+
+            var voucher = new VoucherHeader
+            {
+                VoucherNo = header.RelatedVoucherNo!,
+                VoucherDate = header.TransactionDate,
+                Statement = $"Cash With Draw - {header.InvoiceNo}",
+                TotalDebit = totalDebit,
+                TotalCredit = totalCredit,
+                CreatedDate = DateTime.Now,
+                ModifiedDate = DateTime.Now
+            };
+
+            // Debit entries from Account Tree Lines
+            foreach (var d in details)
+            {
+                ChildAccount? lineAcct = d.EntityId.HasValue
+                    ? await _context.ChildAccounts
+                        .Include(a => a.NatureOfAccount)
+                        .FirstOrDefaultAsync(a => a.Id == d.EntityId.Value)
+                    : null;
+
+                int? costCenterId = null;
+                if (!string.IsNullOrEmpty(d.CostCenter))
+                {
+                    var cc = await _context.DeffCostCenters
+                        .FirstOrDefaultAsync(c => c.CostCenterName == d.CostCenter);
+                    costCenterId = cc?.Id;
+                }
+
+                voucher.Details.Add(new VoucherDetails
+                {
+                    ChildAccountId = d.EntityId,
+                    AccountNumber = d.EntityCode ?? "",
+                    AccountName = d.EntityName ?? "",
+                    NatureOfAccount = lineAcct?.NatureOfAccount?.Name ?? "",
+                    Debit = d.Amount,
+                    Credit = 0,
+                    Description = d.Note,
+                    CostCenterId = costCenterId,
+                    CostCenterName = d.CostCenter
+                });
+            }
+
+            // Credit entry: Cash Name account
+            voucher.Details.Add(new VoucherDetails
+            {
+                ChildAccountId = cashChildAcct?.Id,
+                AccountNumber = cashChildAcct?.AccountNo ?? "",
+                AccountName = cashChildAcct?.AccountName ?? "",
+                NatureOfAccount = cashChildAcct?.NatureOfAccount?.Name ?? "",
+                Debit = 0,
+                Credit = header.AmountAfterDiscount,
+                Description = header.InvoiceNo
+            });
+
+            // Credit entry: Discount account (101010101003)
+            if (header.Discount > 0)
+            {
+                voucher.Details.Add(new VoucherDetails
+                {
+                    ChildAccountId = discountAcct?.Id,
+                    AccountNumber = discountAcct?.AccountNo ?? "101010101003",
+                    AccountName = discountAcct?.AccountName ?? "Discount",
+                    NatureOfAccount = discountAcct?.NatureOfAccount?.Name ?? "",
+                    Debit = 0,
+                    Credit = header.Discount,
+                    Description = header.DiscountNote
+                });
+            }
+
+            return voucher;
         }
     }
 
