@@ -399,6 +399,8 @@ namespace Concept.Controllers
 
         private async Task<VoucherHeader?> BuildVoucherAsync(CashTransactionHeader header, List<CashTransactionDetail> details)
         {
+            bool isCashWithDraw = header.TransactionType == "CashWithDraw";
+
             // CashName stores ChildAccount.AccountNo
             ChildAccount? cashChildAcct = null;
             if (!string.IsNullOrEmpty(header.CashName))
@@ -413,21 +415,32 @@ namespace Concept.Controllers
                     .Include(a => a.NatureOfAccount)
                     .FirstOrDefaultAsync(a => a.AccountNo == "101010101003");
 
-            decimal totalDebit = details.Sum(d => d.Amount);
-            decimal totalCredit = header.AmountAfterDiscount + (header.Discount > 0 ? header.Discount : 0);
+            // Cash With Draw : Debit = detail lines,  Credit = Cash Name + Discount
+            // Cash Receive   : Credit = detail lines, Debit  = Cash Name + Discount
+            decimal detailTotal   = details.Sum(d => d.Amount);
+            decimal cashNameAmt   = header.AmountAfterDiscount;
+            decimal discountAmt   = header.Discount > 0 ? header.Discount : 0;
+
+            decimal totalDebit  = isCashWithDraw ? detailTotal  : cashNameAmt + discountAmt;
+            decimal totalCredit = isCashWithDraw ? cashNameAmt + discountAmt : detailTotal;
+
+            string statement = isCashWithDraw
+                ? $"Cash With Draw - {header.InvoiceNo}"
+                : $"Cash Receive - {header.InvoiceNo}";
 
             var voucher = new VoucherHeader
             {
                 VoucherNo = header.RelatedVoucherNo!,
                 VoucherDate = header.TransactionDate,
-                Statement = $"Cash With Draw - {header.InvoiceNo}",
+                Statement = statement,
                 TotalDebit = totalDebit,
                 TotalCredit = totalCredit,
                 CreatedDate = DateTime.Now,
                 ModifiedDate = DateTime.Now
             };
 
-            // Debit entries from Account Tree Lines
+            // Account Tree Lines:
+            //   Cash With Draw → Debit   |   Cash Receive → Credit
             foreach (var d in details)
             {
                 ChildAccount? lineAcct = d.EntityId.HasValue
@@ -450,27 +463,31 @@ namespace Concept.Controllers
                     AccountNumber = d.EntityCode ?? "",
                     AccountName = d.EntityName ?? "",
                     NatureOfAccount = lineAcct?.NatureOfAccount?.Name ?? "",
-                    Debit = d.Amount,
-                    Credit = 0,
+                    Debit  = isCashWithDraw ? d.Amount : 0,
+                    Credit = isCashWithDraw ? 0 : d.Amount,
                     Description = d.Note,
                     CostCenterId = costCenterId,
                     CostCenterName = d.CostCenter
                 });
             }
 
-            // Credit entry: Cash Name account
+            // Cash Name account:
+            //   Cash With Draw → Credit (AmountAfterDiscount)
+            //   Cash Receive   → Debit  (AmountAfterDiscount)
             voucher.Details.Add(new VoucherDetails
             {
                 ChildAccountId = cashChildAcct?.Id,
                 AccountNumber = cashChildAcct?.AccountNo ?? "",
                 AccountName = cashChildAcct?.AccountName ?? "",
                 NatureOfAccount = cashChildAcct?.NatureOfAccount?.Name ?? "",
-                Debit = 0,
-                Credit = header.AmountAfterDiscount,
+                Debit  = isCashWithDraw ? 0 : cashNameAmt,
+                Credit = isCashWithDraw ? cashNameAmt : 0,
                 Description = header.InvoiceNo
             });
 
-            // Credit entry: Discount account (101010101003)
+            // Discount account (101010101003):
+            //   Cash With Draw → Credit (Discount)
+            //   Cash Receive   → Debit  (Discount)
             if (header.Discount > 0)
             {
                 voucher.Details.Add(new VoucherDetails
@@ -479,8 +496,8 @@ namespace Concept.Controllers
                     AccountNumber = discountAcct?.AccountNo ?? "101010101003",
                     AccountName = discountAcct?.AccountName ?? "Discount",
                     NatureOfAccount = discountAcct?.NatureOfAccount?.Name ?? "",
-                    Debit = 0,
-                    Credit = header.Discount,
+                    Debit  = isCashWithDraw ? 0 : discountAmt,
+                    Credit = isCashWithDraw ? discountAmt : 0,
                     Description = header.DiscountNote
                 });
             }
