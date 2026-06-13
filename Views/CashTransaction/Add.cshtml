@@ -731,7 +731,7 @@ ViewData["Title"] = "Cash Transaction";
                 sel.innerHTML = '<option value="">-- Select --</option>';
                 list.forEach(a => {
                     const opt = document.createElement('option');
-                    opt.value = a.accountName;
+                    opt.value = a.accountNo;
                     opt.textContent = `${a.accountNo} - ${a.accountName}`;
                     sel.appendChild(opt);
                 });

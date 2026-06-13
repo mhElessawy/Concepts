@@ -399,12 +399,12 @@ namespace Concept.Controllers
 
         private async Task<VoucherHeader?> BuildVoucherAsync(CashTransactionHeader header, List<CashTransactionDetail> details)
         {
-            // CashName stores ChildAccount.Id directly
+            // CashName stores ChildAccount.AccountNo
             ChildAccount? cashChildAcct = null;
-            if (int.TryParse(header.CashName, out int cashNameId))
+            if (!string.IsNullOrEmpty(header.CashName))
                 cashChildAcct = await _context.ChildAccounts
                     .Include(a => a.NatureOfAccount)
-                    .FirstOrDefaultAsync(a => a.Id == cashNameId);
+                    .FirstOrDefaultAsync(a => a.AccountNo == header.CashName);
 
             // Discount account
             ChildAccount? discountAcct = null;
