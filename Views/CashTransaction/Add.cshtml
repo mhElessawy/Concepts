@@ -1165,6 +1165,8 @@ ViewData["Title"] = "Cash Transaction";
                 transactionType:    document.querySelector('input[name="transactionType"]:checked').value,
                 cashName:           document.getElementById('cashName').value,
                 payTo:              payTo,
+                relatedVoucherNo:   document.getElementById('relatedVoucherNo').value,
+                amount:             parseFloat(document.getElementById('amount').value) || 0,
                 discount:           parseFloat(document.getElementById('discountKwd').value) || 0,
                 amountAfterDiscount: parseFloat(document.getElementById('amountAfterDiscount').value) || 0,
                 paymentMethod:      document.getElementById('paymentMethod').value,
