@@ -1,5 +1,5 @@
-﻿@{
-    ViewData["Title"] = "Cash Transaction";
+﻿﻿@{
+ViewData["Title"] = "Cash Transaction";
 }
 
 <style>
@@ -165,23 +165,6 @@
 
         .field-row input[readonly] {
             background: #f5f5f5;
-        }
-
-    /* Account Info: 3 sub-boxes */
-    .acct-info-group {
-        display: flex;
-        gap: 3px;
-        flex: 1;
-        min-width: 0;
-    }
-
-        .acct-info-group input {
-            flex: 1;
-            min-width: 0;
-            border: 1px solid #999;
-            padding: 2px 4px;
-            font-size: 0.82rem;
-            height: 24px;
         }
 
     /* Discount row: % input + KWD input + checkbox */
@@ -513,7 +496,7 @@
             <div class="form-col">
 
                 <div class="field-row">
-                    <label>Invoice No.</label>
+                    <label>PV</label>
                     <input type="text" id="invoiceNo" readonly />
                 </div>
 
@@ -522,15 +505,6 @@
                     <select id="cashName">
                         <option value="">-- Select --</option>
                     </select>
-                </div>
-
-                <div class="field-row">
-                    <label>Account Info</label>
-                    <div class="acct-info-group">
-                        <input type="text" id="accountInfo1" placeholder="" />
-                        <input type="text" id="accountInfo2" placeholder="" />
-                        <input type="text" id="accountInfo3" placeholder="" />
-                    </div>
                 </div>
 
                 <div class="field-row">
@@ -642,9 +616,23 @@
             <span>Select Account</span>
             <button onclick="closeAcctTreePopup()">&times;</button>
         </div>
-        <div class="popup-search">
-            <input type="text" id="acctTreeSearch" placeholder="Account No or Name..." onkeyup="searchAcctTree()" />
-            <button class="ct-btn" onclick="searchAcctTree()">Search</button>
+        <div class="popup-search" style="flex-direction:column; gap:4px;">
+            <div style="display:flex; gap:6px; align-items:center;">
+                <label style="white-space:nowrap; font-size:0.8rem; min-width:90px;">Department</label>
+                <select id="filterDepartment" style="flex:1; height:24px; font-size:0.8rem; border:1px solid #999;" onchange="onDeptFilterChange()">
+                    <option value="">-- All --</option>
+                </select>
+            </div>
+            <div style="display:flex; gap:6px; align-items:center;">
+                <label style="white-space:nowrap; font-size:0.8rem; min-width:90px;">Cost Center</label>
+                <select id="filterCostCenter" style="flex:1; height:24px; font-size:0.8rem; border:1px solid #999;" onchange="searchAcctTree()">
+                    <option value="">-- All --</option>
+                </select>
+            </div>
+            <div style="display:flex; gap:6px;">
+                <input type="text" id="acctTreeSearch" placeholder="Account No or Name..." onkeyup="searchAcctTree()" style="flex:1;" />
+                <button class="ct-btn" onclick="searchAcctTree()">Search</button>
+            </div>
         </div>
         <div class="popup-table-wrap">
             <table class="popup-table">
@@ -654,6 +642,7 @@
                         <th>Account Name</th>
                         <th>Parent Account</th>
                         <th>Nature</th>
+                        <th>Cost Center</th>
                     </tr>
                 </thead>
                 <tbody id="acctTreeBody"></tbody>
@@ -699,7 +688,8 @@
             await Promise.allSettled([
                 loadNextInvoiceNo(),
                 loadNextRelatedVoucherNo(),
-                loadCashTypes()
+                loadCashTypes(),
+                loadPopupFilters()
             ]);
             applyPayToLayout();
             addEmptyRow();
@@ -708,12 +698,16 @@
         async function loadNextInvoiceNo() {
             try {
                 const res  = await fetch('/CashTransaction/GetNextInvoiceNo');
+                if (!res.ok) throw new Error('HTTP ' + res.status);
                 const data = await res.json();
-                if (data.invoiceNo) {
-                    document.getElementById('invoiceNo').value = data.invoiceNo;
+                const no   = data.invoiceNo || data.InvoiceNo || '';
+                if (no) {
+                    document.getElementById('invoiceNo').value = no;
+                } else {
+                    console.error('GetNextInvoiceNo server error:', data.message || JSON.stringify(data));
                 }
             } catch (e) {
-                console.error('Failed to load Invoice No:', e);
+                console.error('Failed to load PV No:', e);
             }
         }
 
@@ -731,18 +725,18 @@
 
         async function loadCashTypes() {
             try {
-                const res  = await fetch('/CashTransaction/GetAccountTypes');
+                const res  = await fetch('/CashTransaction/GetCashAccounts');
                 const list = await res.json();
                 const sel  = document.getElementById('cashName');
                 sel.innerHTML = '<option value="">-- Select --</option>';
                 list.forEach(a => {
                     const opt = document.createElement('option');
-                    opt.value = a.id;
-                    opt.textContent = `${a.code} - ${a.name}`;
+                    opt.value = a.accountName;
+                    opt.textContent = `${a.accountNo} - ${a.accountName}`;
                     sel.appendChild(opt);
                 });
             } catch (e) {
-                console.error('Failed to load Cash Types:', e);
+                console.error('Failed to load Cash Accounts:', e);
             }
         }
 
@@ -784,6 +778,8 @@
         function onPayToChange() {
             rows = [];
             selectedRowIndex = -1;
+            document.getElementById('amount').value = '0';
+            calcAmountAfterDiscount();
             applyPayToLayout();
             addEmptyRow();
         }
@@ -802,9 +798,11 @@
                 head.innerHTML = `<tr>
                     <th style="width:20px;"></th>
                     <th style="width:120px;">Account No</th>
-                    <th style="min-width:200px;">Account Name</th>
+                    <th style="min-width:160px;">Account Name</th>
+                    <th style="min-width:130px;">Department</th>
+                    <th style="min-width:130px;">Cost Center</th>
                     <th style="width:110px;">Amount (KWD)</th>
-                    <th style="min-width:140px;">Note</th>
+                    <th style="min-width:120px;">Note</th>
                 </tr>`;
             } else {
                 const label = payTo === 'Patient' ? 'Patient Name' : 'Supplier Name';
@@ -821,8 +819,16 @@
         }
 
         // ── Rows ──────────────────────────────────────────────────────────────
+        function calcTotalFromRows() {
+            const payTo = document.getElementById('payTo').value;
+            if (payTo !== 'Account Tree') return;
+            const total = rows.reduce((sum, r) => sum + (parseFloat(r.amount) || 0), 0);
+            document.getElementById('amount').value = total.toFixed(2);
+            calcAmountAfterDiscount();
+        }
+
         function addEmptyRow() {
-            rows.push({ entityId: 0, entityCode: '', entityName: '', invoiceNo: '', receivedDate: '', amount: 0, note: '' });
+            rows.push({ entityId: 0, entityCode: '', entityName: '', invoiceNo: '', receivedDate: '', department: '', costCenter: '', amount: 0, note: '' });
             renderGrid();
         }
 
@@ -850,9 +856,19 @@
                         <td>
                             <span class="grid-cell-readonly">${esc(row.entityName)}</span>
                         </td>
+                        <td>
+                            <select class="grid-cell-input" style="width:100%;" onfocus="selectRow(${i})"
+                                onchange="rows[${i}].department = this.value; checkAddRow(${i});">
+                                <option value="">--</option>
+                                ${buildDeptOptions(row.department)}
+                            </select>
+                        </td>
+                        <td>
+                            <input type="text" class="grid-cell-input" value="${esc(row.costCenter)}" readonly />
+                        </td>
                         <td style="width:110px;">
                             <input type="number" class="grid-cell-input" value="${row.amount || ''}" min="0" step="0.01"
-                                onchange="rows[${i}].amount = parseFloat(this.value)||0; checkAddRow(${i});" onfocus="selectRow(${i})" />
+                                onchange="rows[${i}].amount = parseFloat(this.value)||0; checkAddRow(${i}); calcTotalFromRows();" onfocus="selectRow(${i})" />
                         </td>
                         <td>
                             <input type="text" class="grid-cell-input" value="${esc(row.note)}"
@@ -909,15 +925,65 @@
             rows.splice(selectedRowIndex, 1);
             selectedRowIndex = Math.min(selectedRowIndex, rows.length - 1);
             renderGrid();
+            calcTotalFromRows();
         }
 
         // ── Account Tree Popup ────────────────────────────────────────────────
         let acctTargetRow = -1;
         let acctSearchTimer;
+        let allCostCenters = [];
+        let allDepartments = [];
+
+        function buildDeptOptions(selected) {
+            return allDepartments.map(d =>
+                `<option value="${esc(d.name)}" ${d.name === selected ? 'selected' : ''}>${esc(d.name)}</option>`
+            ).join('');
+        }
+
+        async function loadPopupFilters() {
+            const [deptRes, ccRes] = await Promise.all([
+                fetch('/CashTransaction/GetDepartments'),
+                fetch('/CashTransaction/GetCostCenters')
+            ]);
+            const depts = await deptRes.json();
+            const ccs   = await ccRes.json();
+            allDepartments = depts;
+            allCostCenters = ccs;
+
+            const deptSel = document.getElementById('filterDepartment');
+            depts.forEach(d => {
+                const o = document.createElement('option');
+                o.value = d.id;
+                o.textContent = `${d.code} - ${d.name}`;
+                deptSel.appendChild(o);
+            });
+
+            populateCostCenterFilter();
+        }
+
+        function populateCostCenterFilter(filteredCcs) {
+            const sel = document.getElementById('filterCostCenter');
+            const prev = sel.value;
+            sel.innerHTML = '<option value="">-- All --</option>';
+            (filteredCcs || allCostCenters).forEach(c => {
+                const o = document.createElement('option');
+                o.value = c.id;
+                o.textContent = `${c.code} - ${c.name}`;
+                sel.appendChild(o);
+            });
+            sel.value = prev;
+        }
+
+        function onDeptFilterChange() {
+            populateCostCenterFilter();
+            searchAcctTree();
+        }
 
         function openAccountTreePopup(rowIndex) {
             acctTargetRow = (rowIndex !== undefined) ? rowIndex : (rows.length - 1);
             document.getElementById('acctTreeSearch').value = '';
+            document.getElementById('filterDepartment').value = '';
+            document.getElementById('filterCostCenter').value = '';
             document.getElementById('acctTreeBody').innerHTML = '';
             document.getElementById('acctTreePopup').style.display = 'block';
             document.getElementById('acctTreeSearch').focus();
@@ -931,18 +997,21 @@
         function searchAcctTree() {
             clearTimeout(acctSearchTimer);
             acctSearchTimer = setTimeout(async () => {
-                const term = document.getElementById('acctTreeSearch').value;
-                const res  = await fetch(`/CashTransaction/SearchAccounts?term=${encodeURIComponent(term)}`);
+                const term       = document.getElementById('acctTreeSearch').value;
+                const costCenter = document.getElementById('filterCostCenter').value;
+                let url = `/CashTransaction/SearchAccounts?term=${encodeURIComponent(term)}`;
+                if (costCenter) url += `&costCenterId=${costCenter}`;
+                const res  = await fetch(url);
                 const list = await res.json();
                 const tbody = document.getElementById('acctTreeBody');
                 tbody.innerHTML = '';
                 if (list.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="4" class="no-data">No accounts found.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="5" class="no-data">No accounts found.</td></tr>';
                     return;
                 }
                 list.forEach(a => {
                     const tr = document.createElement('tr');
-                    tr.innerHTML = `<td>${esc(a.accountNo)}</td><td>${esc(a.accountName)}</td><td>${esc(a.parentName)}</td><td>${esc(a.natureOfAccount)}</td>`;
+                    tr.innerHTML = `<td>${esc(a.accountNo)}</td><td>${esc(a.accountName)}</td><td>${esc(a.parentName)}</td><td>${esc(a.natureOfAccount)}</td><td>${esc(a.costCenter)}</td>`;
                     tr.onclick = () => selectAccountFromTree(a);
                     tbody.appendChild(tr);
                 });
@@ -954,6 +1023,7 @@
             rows[i].entityId   = a.id;
             rows[i].entityCode = a.accountNo;
             rows[i].entityName = a.accountName;
+            rows[i].costCenter = a.costCenter || '';
             checkAddRow(i);
             closeAcctTreePopup();
             renderGrid();
@@ -1013,9 +1083,6 @@
             const today = new Date();
             document.getElementById('transactionDate').value = today.toISOString().split('T')[0];
             document.getElementById('cashName').value       = '';
-            document.getElementById('accountInfo1').value   = '';
-            document.getElementById('accountInfo2').value   = '';
-            document.getElementById('accountInfo3').value   = '';
             document.getElementById('payTo').value          = 'Suppliers';
             document.getElementById('paymentMethod').value  = 'Cash';
             document.getElementById('note').value           = '';
@@ -1057,7 +1124,6 @@
             document.getElementById('formLegend').textContent = data.transactionType === 'CashReceive' ? 'Cash Receive' : 'Cash With Draw';
 
             document.getElementById('cashName').value          = data.cashName    || '';
-            document.getElementById('accountInfo1').value      = data.accountInfo || '';
             document.getElementById('payTo').value             = data.payTo;
             document.getElementById('paymentMethod').value     = data.paymentMethod;
             document.getElementById('transactionDate').value   = data.transactionDate;
@@ -1074,10 +1140,12 @@
                 entityName: d.entityName || '',
                 invoiceNo: d.invoiceNo || '',
                 receivedDate: d.receivedDate || '',
+                department: d.department || '',
+                costCenter: d.costCenter || '',
                 amount: d.amount || 0,
                 note: d.note || ''
             }));
-            rows.push({ entityId: 0, entityCode: '', entityName: '', invoiceNo: '', receivedDate: '', amount: 0, note: '' });
+            rows.push({ entityId: 0, entityCode: '', entityName: '', invoiceNo: '', receivedDate: '', department: '', costCenter: '', amount: 0, note: '' });
             selectedRowIndex = -1;
 
             applyPayToLayout();
@@ -1096,7 +1164,6 @@
                 invoiceNo:          document.getElementById('invoiceNo').value,
                 transactionType:    document.querySelector('input[name="transactionType"]:checked').value,
                 cashName:           document.getElementById('cashName').value,
-                accountInfo:        document.getElementById('accountInfo1').value,
                 payTo:              payTo,
                 discount:           parseFloat(document.getElementById('discountKwd').value) || 0,
                 amountAfterDiscount: parseFloat(document.getElementById('amountAfterDiscount').value) || 0,
@@ -1109,6 +1176,8 @@
                     entityId:     r.entityId,
                     invoiceNo:    r.invoiceNo,
                     receivedDate: r.receivedDate || null,
+                    department:   r.department || '',
+                    costCenter:   r.costCenter || '',
                     amount:       parseFloat(r.amount) || 0,
                     note:         r.note
                 }))

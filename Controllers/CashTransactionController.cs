@@ -27,7 +27,7 @@ namespace Concept.Controllers
             try
             {
                 int year = DateTime.Now.Year;
-                string prefix = $"CT{(year % 100):D2}";   // e.g.  CT26
+                string prefix = $"PV{(year % 100):D2}";   // e.g.  PV26
 
                 var existing = await _context.CashTransactionHeaders
                     .Where(h => h.InvoiceNo.StartsWith(prefix))
@@ -42,7 +42,7 @@ namespace Concept.Controllers
                         maxSeq = seq;
                 }
 
-                return Json(new { success = true, invoiceNo = $"{prefix}{(maxSeq + 1):D4}" }); // CT260001, CT260002 …
+                return Json(new { success = true, invoiceNo = $"{prefix}{(maxSeq + 1):D4}" }); // PV260001, PV260002 …
             }
             catch (Exception ex)
             {
@@ -86,20 +86,24 @@ namespace Concept.Controllers
                     entityId = d.EntityId ?? 0,
                     invoiceNo = d.InvoiceNo ?? "",
                     receivedDate = d.ReceivedDate.HasValue ? d.ReceivedDate.Value.ToString("yyyy-MM-dd") : "",
+                    department = d.Department ?? "",
+                    costCenter = d.CostCenter ?? "",
                     amount = d.Amount,
                     note = d.Note ?? ""
                 }).ToList()
             });
         }
 
-        // GET: CashTransaction/GetAccountTypes  (used for Cash Name dropdown)
+        // GET: CashTransaction/GetCashAccounts  (used for Cash Name dropdown - ChildAccounts where AccountType = Cash In Hand)
         [HttpGet]
-        public async Task<IActionResult> GetAccountTypes()
+        public async Task<IActionResult> GetCashAccounts()
         {
-            var list = await _context.DefAccountTypes
-                .Where(a => a.Active)
-                .OrderBy(a => a.Code)
-                .Select(a => new { id = a.Id, code = a.Code, name = a.Name })
+            var list = await _context.ChildAccounts
+                .Include(a => a.AccountType)
+                .Where(a => a.Active && a.AccountType != null &&
+                            a.AccountType.Name.ToLower() == "cash in hand")
+                .OrderBy(a => a.AccountNo)
+                .Select(a => new { id = a.Id, accountNo = a.AccountNo, accountName = a.AccountName })
                 .ToListAsync();
             return Json(list);
         }
@@ -129,17 +133,45 @@ namespace Concept.Controllers
             return Json(new { voucherNo = nextNo });
         }
 
-        // GET: CashTransaction/SearchAccounts?term=xxx
+        // GET: CashTransaction/GetDepartments
         [HttpGet]
-        public async Task<IActionResult> SearchAccounts(string? term)
+        public async Task<IActionResult> GetDepartments()
+        {
+            var list = await _context.DeffDepartments
+                .Where(d => d.Active)
+                .OrderBy(d => d.DepartmentCode)
+                .Select(d => new { id = d.Id, code = d.DepartmentCode, name = d.DepartmentName })
+                .ToListAsync();
+            return Json(list);
+        }
+
+        // GET: CashTransaction/GetCostCenters
+        [HttpGet]
+        public async Task<IActionResult> GetCostCenters()
+        {
+            var list = await _context.DeffCostCenters
+                .Where(c => c.Active)
+                .OrderBy(c => c.CostCenterCode)
+                .Select(c => new { id = c.Id, code = c.CostCenterCode, name = c.CostCenterName })
+                .ToListAsync();
+            return Json(list);
+        }
+
+        // GET: CashTransaction/SearchAccounts?term=xxx&costCenterId=0
+        [HttpGet]
+        public async Task<IActionResult> SearchAccounts(string? term, int? costCenterId)
         {
             var query = _context.ChildAccounts
                 .Include(a => a.ParentAccount)
                 .Include(a => a.NatureOfAccount)
+                .Include(a => a.CostCenter)
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(term))
                 query = query.Where(a => a.AccountNo.Contains(term) || a.AccountName.Contains(term));
+
+            if (costCenterId.HasValue && costCenterId.Value > 0)
+                query = query.Where(a => a.CostCenterId == costCenterId.Value);
 
             var results = await query
                 .Where(a => a.Active)
@@ -151,7 +183,8 @@ namespace Concept.Controllers
                     accountNo = a.AccountNo,
                     accountName = a.AccountName,
                     parentName = a.ParentAccount != null ? a.ParentAccount.AccountName : "",
-                    natureOfAccount = a.NatureOfAccount != null ? a.NatureOfAccount.Name : ""
+                    natureOfAccount = a.NatureOfAccount != null ? a.NatureOfAccount.Name : "",
+                    costCenter = a.CostCenter != null ? a.CostCenter.CostCenterName : ""
                 })
                 .ToListAsync();
 
@@ -226,6 +259,8 @@ namespace Concept.Controllers
                             EntityId = d.EntityId > 0 ? d.EntityId : null,
                             InvoiceNo = d.InvoiceNo,
                             ReceivedDate = string.IsNullOrEmpty(d.ReceivedDate) ? null : DateTime.Parse(d.ReceivedDate),
+                            Department = d.Department,
+                            CostCenter = d.CostCenter,
                             Amount = d.Amount,
                             Note = d.Note
                         });
@@ -278,6 +313,8 @@ namespace Concept.Controllers
                             EntityId = d.EntityId > 0 ? d.EntityId : null,
                             InvoiceNo = d.InvoiceNo,
                             ReceivedDate = string.IsNullOrEmpty(d.ReceivedDate) ? null : DateTime.Parse(d.ReceivedDate),
+                            Department = d.Department,
+                            CostCenter = d.CostCenter,
                             Amount = d.Amount,
                             Note = d.Note
                         });
@@ -342,6 +379,8 @@ namespace Concept.Controllers
         public int EntityId { get; set; }
         public string? InvoiceNo { get; set; }
         public string? ReceivedDate { get; set; }
+        public string? Department { get; set; }
+        public string? CostCenter { get; set; }
         public decimal Amount { get; set; }
         public string? Note { get; set; }
     }
