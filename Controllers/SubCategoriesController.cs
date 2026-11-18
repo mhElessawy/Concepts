@@ -37,6 +37,7 @@ namespace Concept.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(DeffSubCategory subCategory)
         {
+            await ValidateParentCategory(subCategory.CategoryId);
             if (ModelState.IsValid)
             {
                 subCategory.CreatedDate = DateTime.Now;
@@ -57,7 +58,7 @@ namespace Concept.Controllers
             var subCategory = await _context.DeffSubCategories.FindAsync(id);
             if (subCategory == null) return NotFound();
 
-            ViewBag.Categories = _context.DeffCategories.Where(c => c.Active).ToList();
+            ViewBag.Categories = _context.DeffCategories.Where(c => c.Active || c.Id == subCategory.CategoryId).ToList();
             return View(subCategory);
         }
 
@@ -67,6 +68,12 @@ namespace Concept.Controllers
         public async Task<IActionResult> Edit(int id, DeffSubCategory subCategory)
         {
             if (id != subCategory.Id) return NotFound();
+
+            var originalCategoryId = await _context.DeffSubCategories.Where(sc => sc.Id == id)
+                .Select(sc => (int?)sc.CategoryId).FirstOrDefaultAsync();
+            if (!originalCategoryId.HasValue) return NotFound();
+
+            await ValidateParentCategory(subCategory.CategoryId, originalCategoryId);
 
             if (ModelState.IsValid)
             {
@@ -85,7 +92,7 @@ namespace Concept.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewBag.Categories = _context.DeffCategories.Where(c => c.Active).ToList();
+            ViewBag.Categories = _context.DeffCategories.Where(c => c.Active || c.Id == originalCategoryId).ToList();
             return View(subCategory);
         }
 
@@ -115,6 +122,13 @@ namespace Concept.Controllers
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction(nameof(Index));
+        }
+
+        private async Task ValidateParentCategory(int categoryId, int? originalCategoryId = null)
+        {
+            if (categoryId != originalCategoryId &&
+                !await _context.DeffCategories.AnyAsync(c => c.Id == categoryId && c.Active))
+                ModelState.AddModelError(nameof(DeffSubCategory.CategoryId), "Select an active category.");
         }
 
         private bool SubCategoryExists(int id)

@@ -472,7 +472,19 @@
         let subUOMs = [];
 
 
-        let existingDetails = @Html.Raw(Json.Serialize(details));
+        const existingDetails = @Json.Serialize(details?.Select(detail => new
+        {
+            detail.SubCategoryId,
+            SubCategoryName = detail.SubCategory?.Name,
+            detail.ItemId,
+            ItemName = detail.Item?.ItemName,
+            detail.BatchNo,
+            detail.Quantity,
+            detail.SubUOMId,
+            detail.PriceType,
+            detail.TotalType,
+            detail.ExpiredDate
+        }));
 
 
 
@@ -691,7 +703,7 @@
                                 <select class="form-select form-select-sm itemSelect" data-row="${itemCounter}" required>
 
 
-                                    <option value="${detail.itemId}" selected>${detail.item?.itemName || 'Item'}</option>
+                                    <option value="${detail.itemId}" selected></option>
 
 
                                 </select>
@@ -763,9 +775,11 @@
 
 
 
-                    // Load items for this sub category
-
-
+                    const subCategorySelect = document.querySelector(`.subCategorySelect[data-row="${itemCounter}"]`);
+                    if (!subCategories.some(category => category.id === detail.subCategoryId)) {
+                        subCategorySelect.add(new Option(detail.subCategoryName || detail.subCategoryId, detail.subCategoryId, true, true));
+                    }
+                    $(`.itemSelect[data-row="${itemCounter}"] option:selected`).text(detail.itemName || detail.itemId);
                     loadItemsForRow(detail.subCategoryId, itemCounter, detail.itemId);
 
 
@@ -964,6 +978,7 @@
                 let itemSelect = $(`.itemSelect[data-row="${rowId}"]`);
 
 
+                if (!data.some(item => item.id === selectedItemId)) return;
                 itemSelect.empty();
 
 

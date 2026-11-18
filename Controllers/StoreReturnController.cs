@@ -217,6 +217,9 @@ namespace Concept.Controllers
             }
 
             var details = await _context.StoreReturnDetails
+                .Include(d => d.Category)
+                .Include(d => d.SubCategory)
+                .Include(d => d.Item)
                 .Where(d => d.StoreReturnHeaderId == id)
                 .ToListAsync();
 
@@ -483,7 +486,7 @@ namespace Concept.Controllers
         public async Task<JsonResult> GetSubCategoriesByCategory(int categoryId)
         {
             var subCategories = await _context.DeffSubCategories
-                .Where(sc => sc.CategoryId == categoryId && sc.Active)
+                .Where(sc => sc.CategoryId == categoryId && sc.Active && sc.Category!.Active)
                 .Select(sc => new { sc.Id, sc.Name })
                 .ToListAsync();
 
@@ -495,7 +498,7 @@ namespace Concept.Controllers
         public async Task<JsonResult> GetItemsBySubCategory(int subCategoryId)
         {
             var items = await _context.StoreItems
-                .Where(i => i.SubCategoryId == subCategoryId && i.Active)
+                .Where(i => i.SubCategoryId == subCategoryId && i.Active && i.SubCategory!.Category!.Active)
                 .Include(i => i.SubUOM)
                 .Select(i => new
                 {
@@ -608,7 +611,7 @@ namespace Concept.Controllers
             );
 
             ViewBag.SubCategories = new SelectList(
-                _context.DeffSubCategories.Where(sc => sc.Active).ToList(),
+                _context.DeffSubCategories.Where(sc => sc.Active && sc.Category!.Active).ToList(),
                 "Id",
                 "Name"
             );

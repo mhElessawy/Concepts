@@ -182,7 +182,9 @@
                                         <text>
                                         addExistingItem(@item.CategoryId, @item.SubCategoryId, @item.ItemId, @item.UOMId,
                                                         '@item.BatchNo', @item.Quantity, @item.SubUOMId, @item.PackSize,
-                                                        @item.ValueOrUnit, @item.PriceType, '@item.ExpiredDate.ToString("yyyy-MM-dd")');
+                                                        @item.ValueOrUnit, @item.PriceType, '@item.ExpiredDate.ToString("yyyy-MM-dd")',
+                                                        @Json.Serialize(item.Category?.Name), @Json.Serialize(item.SubCategory?.Name),
+                                                        @Json.Serialize(item.Item?.ItemName));
                                         </text>
                             }
                         }, 1000);
@@ -283,7 +285,8 @@
             attachEventHandlers(itemCounter);
         }
 
-        function addExistingItem(catId, subCatId, itemId, uomId, batchNo, qty, subUomId, packSize, valueUnit, price, expDate) {
+        function addExistingItem(catId, subCatId, itemId, uomId, batchNo, qty, subUomId, packSize, valueUnit, price, expDate,
+            categoryName, subCategoryName, itemName) {
             itemCounter++;
             let row = `
                 <tr id="row_${itemCounter}">
@@ -336,8 +339,13 @@
 
             $('#itemsTableBody').append(row);
 
-            // Load subcategories and subuoms
-            loadSubCategories(catId, itemCounter);
+            const categorySelect = document.querySelector(`.categorySelect[data-row="${itemCounter}"]`);
+            if (!categories.some(category => category.id == catId)) {
+                categorySelect.add(new Option(categoryName || catId, catId, true, true));
+            }
+            $(`.subCategorySelect[data-row="${itemCounter}"] option:selected`).text(subCategoryName || subCatId);
+            $(`.itemSelect[data-row="${itemCounter}"] option:selected`).text(itemName || itemId);
+            loadSubCategories(catId, itemCounter, true);
             loadSubUOMs(uomId, itemCounter);
 
             attachEventHandlers(itemCounter);
@@ -345,6 +353,7 @@
 
         function attachEventHandlers(rowId) {
             $(`.categorySelect[data-row="${rowId}"]`).change(function () {
+                $(`.itemSelect[data-row="${rowId}"]`).empty().append(new Option('Select SubCategory First', ''));
                 loadSubCategories($(this).val(), rowId);
             });
 
@@ -362,18 +371,22 @@
             });
         }
 
-        function loadSubCategories(categoryId, rowId) {
+        function loadSubCategories(categoryId, rowId, keepExisting = false) {
             if (!categoryId) return;
 
             $.get(`@Url.Action("GetSubCategoriesByCategory", "StoreReturn")?categoryId=${categoryId}`, function (data) {
                 let subCategorySelect = $(`.subCategorySelect[data-row="${rowId}"]`);
-                let currentVal = subCategorySelect.val();
+                const selected = keepExisting ? subCategorySelect.find('option:selected')[0] : null;
                 subCategorySelect.empty();
                 subCategorySelect.append('<option value="">Select SubCategory</option>');
 
                 data.forEach(sc => {
-                    subCategorySelect.append(`<option value="${sc.id}" ${sc.id == currentVal ? 'selected' : ''}>${sc.name}</option>`);
+                    subCategorySelect.append(new Option(sc.name, sc.id));
                 });
+                if (selected) {
+                    if (!data.some(sc => sc.id == selected.value)) subCategorySelect.append(selected);
+                    subCategorySelect.val(selected.value);
+                }
             });
         }
 

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Concept.Data;
@@ -346,7 +346,7 @@ namespace Concept.Controllers
         public JsonResult GetSubCategoriesByCategory(int categoryId)
         {
             var subCategories = _context.DeffSubCategories
-                .Where(sc => sc.CategoryId == categoryId && sc.Active)
+                .Where(sc => sc.CategoryId == categoryId && sc.Active && sc.Category!.Active)
                 .OrderBy(sc => sc.Name)
                 .Select(sc => new
                 {
@@ -362,7 +362,7 @@ namespace Concept.Controllers
         public JsonResult GetItemsBySubCategory(int subCategoryId)
         {
             var items = _context.StoreItems
-                .Where(i => i.SubCategoryId == subCategoryId && i.Active)
+                .Where(i => i.SubCategoryId == subCategoryId && i.Active && i.SubCategory!.Category!.Active)
                 .OrderBy(i => i.ItemName)
                 .Select(i => new
                 {

@@ -21,6 +21,7 @@ namespace Concept.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            modelBuilder.HasSequence("CategoryCodeSequence");
 
             modelBuilder.Entity("Concept.Models.CashTransactionDetail", b =>
                 {
@@ -489,6 +490,15 @@ namespace Concept.Migrations
 
                     b.HasIndex("Code")
                         .IsUnique();
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasComputedColumnSql("LTRIM(RTRIM([Name])) COLLATE Latin1_General_100_CI_AS", true);
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasFilter(null);
 
                     b.ToTable("Deff_Category", (string)null);
                 });

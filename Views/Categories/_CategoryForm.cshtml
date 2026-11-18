@@ -1,0 +1,60 @@
+@model CategoryForm
+@{
+    var id = ViewData["CategoryId"];
+    var action = id == null ? "Create" : "Edit";
+}
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card">
+            <div class="card-body p-4">
+                <form asp-action="@action" asp-route-id="@id" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="mb-3">
+                        <label for="category-code" class="form-label">Category Code</label>
+                        <input id="category-code" class="form-control" value="@(ViewData["CategoryCode"] ?? "Assigned on save")" readonly />
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label">Category Name <span class="text-danger">*</span></label>
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="category-account-label" class="form-label">Category Code Account ID</label>
+                        <input type="hidden" asp-for="AccountId" />
+                        <div class="input-group">
+                            <input id="category-account-label" class="form-control" value="@ViewData["Account"]" placeholder="No account selected" readonly />
+                            <button type="button" class="btn btn-outline-primary" id="category-account-open">Open Account Tree</button>
+                            <button type="button" class="btn btn-outline-secondary" id="category-account-clear">Clear</button>
+                        </div>
+                        <span asp-validation-for="AccountId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3 form-check form-switch">
+                        <input asp-for="Active" class="form-check-input" />
+                        <label asp-for="Active" class="form-check-label">Active</label>
+                    </div>
+
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Save</button>
+                        <a asp-action="Index" id="category-cancel" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Cancel
+                        </a>
+                    </div>
+
+                    <dialog id="category-account-tree" class="rounded border shadow p-4"
+                            aria-labelledby="category-account-tree-title" data-url="@Url.Action("AccountTree")"
+                            style="width: min(42rem, calc(100% - 2rem));">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h3 id="category-account-tree-title" class="h5 mb-0">Select an Account</h3>
+                            <button type="button" id="category-account-close" class="btn-close" aria-label="Close" autofocus></button>
+                        </div>
+                        <div id="category-account-options" style="max-height: 55vh; overflow: auto;"></div>
+                    </dialog>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,4 +1,4 @@
-﻿@model StoreItem
+@model StoreItem
 
 @{
     ViewData["Title"] = "Edit Item";
@@ -72,7 +72,8 @@
                                     .DistinctBy(c => c.Id)
                                     .OrderBy(c => c.Name)
                                     .ToList();
-                                    var selectedCategoryId = Model.SubCategory?.CategoryId;
+                                    var selectedCategoryId = (ViewBag.SubCategories as List<DeffSubCategory>)?
+                                        .FirstOrDefault(sc => sc.Id == Model.SubCategoryId)?.CategoryId;
                                 }
                                 @if (categories != null)
                                 {

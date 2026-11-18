@@ -80,6 +80,11 @@ namespace Concept.Data
             modelBuilder.Entity<DeffCountry>().HasIndex(c => c.Code).IsUnique();
             modelBuilder.Entity<DeffCity>().HasIndex(c => c.Code).IsUnique();
             modelBuilder.Entity<DeffCategory>().HasIndex(c => c.Code).IsUnique();
+            modelBuilder.HasSequence<long>("CategoryCodeSequence");
+            modelBuilder.Entity<DeffCategory>().Property<string>("NormalizedName")
+                .HasMaxLength(50)
+                .HasComputedColumnSql("LTRIM(RTRIM([Name])) COLLATE Latin1_General_100_CI_AS", stored: true);
+            modelBuilder.Entity<DeffCategory>().HasIndex("NormalizedName").IsUnique().HasFilter(null);
             modelBuilder.Entity<DeffSubCategory>().HasIndex(sc => sc.Code).IsUnique();
 
             // Configure indexes for better performance

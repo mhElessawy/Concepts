@@ -2,14 +2,52 @@
 
 @{
     ViewData["Title"] = "Categories";
+    var active = ViewData["Active"] as bool?;
+    var sort = ViewData["Sort"] as string;
 }
 
 <div class="page-header d-flex justify-content-between align-items-center">
     <h2><i class="bi bi-tags"></i> Categories Management</h2>
-    <a href="/Categories/Create" class="btn btn-primary">
+    <a asp-action="Create" class="btn btn-primary">
         <i class="bi bi-plus-circle"></i> Add New Category
     </a>
 </div>
+
+<form asp-action="Index" method="get" class="card card-body mb-4">
+    <div class="row g-3 align-items-end">
+        <div class="col-sm-6 col-lg">
+            <label for="name" class="form-label">Name</label>
+            <input id="name" name="name" value="@ViewData["Name"]" class="form-control" />
+        </div>
+        <div class="col-sm-6 col-lg">
+            <label for="code" class="form-label">Code</label>
+            <input id="code" name="code" value="@ViewData["Code"]" class="form-control" />
+        </div>
+        <div class="col-sm-6 col-lg">
+            <label for="active" class="form-label">Status</label>
+            <select id="active" name="active" class="form-select">
+                <option value="">All statuses</option>
+                <option value="true" selected="@(active == true)">Active</option>
+                <option value="false" selected="@(active == false)">Inactive</option>
+            </select>
+        </div>
+        <div class="col-sm-6 col-lg">
+            <label for="sort" class="form-label">Sort by</label>
+            <select id="sort" name="sort" class="form-select">
+                <option value="name">Name (A–Z)</option>
+                <option value="name-desc" selected="@(sort == "name-desc")">Name (Z–A)</option>
+                <option value="code" selected="@(sort == "code")">Code (ascending)</option>
+                <option value="code-desc" selected="@(sort == "code-desc")">Code (descending)</option>
+                <option value="active" selected="@(sort == "active")">Active first</option>
+                <option value="inactive" selected="@(sort == "inactive")">Inactive first</option>
+            </select>
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Search</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">Reset</a>
+        </div>
+    </div>
+</form>
 
 <div class="row g-4">
     @foreach (var category in Model)
@@ -32,13 +70,19 @@
                         }
                     </div>
 
-                    <div class="d-flex gap-2 mt-3">
-                        <a href="/Categories/Edit/@category.Id" class="btn btn-sm btn-warning flex-fill">
+                    <div class="d-flex flex-wrap gap-2 mt-3" aria-label="Actions for @category.Name">
+                        <a asp-action="Details" asp-route-id="@category.Id" class="btn btn-sm btn-outline-primary flex-fill">
+                            <i class="bi bi-eye"></i> View
+                        </a>
+                        <a asp-action="Edit" asp-route-id="@category.Id" class="btn btn-sm btn-warning flex-fill">
                             <i class="bi bi-pencil"></i> Edit
                         </a>
-                        <a href="/Categories/Delete/@category.Id" class="btn btn-sm btn-danger flex-fill">
-                            <i class="bi bi-trash"></i> Delete
-                        </a>
+                        @if (category.Active)
+                        {
+                            <a asp-action="Delete" asp-route-id="@category.Id" class="btn btn-sm btn-danger flex-fill">
+                                <i class="bi bi-slash-circle"></i> Deactivate
+                            </a>
+                        }
                     </div>
                 </div>
             </div>
@@ -49,6 +93,6 @@
 @if (!Model.Any())
 {
     <div class="alert alert-info mt-4">
-        <i class="bi bi-info-circle"></i> No categories found. Click "Add New Category" to create one.
+        <i class="bi bi-info-circle"></i> No categories found.
     </div>
 }

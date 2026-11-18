@@ -59,6 +59,8 @@ namespace Concept.Controllers
                 }
             }
 
+            await ValidateCategorySelection(item.SubCategoryId);
+
             if (ModelState.IsValid)
             {
                 try
@@ -67,7 +69,7 @@ namespace Concept.Controllers
                     if (await _context.StoreItems.AnyAsync(i => i.ItemCode == item.ItemCode))
                     {
                         ModelState.AddModelError("ItemCode", "Item Code already exists");
-                        LoadDropdowns(item);
+                        LoadDropdowns();
                         return View(item);
                     }
 
@@ -113,7 +115,7 @@ namespace Concept.Controllers
                 }
             }
 
-            LoadDropdowns(item);
+            LoadDropdowns();
             return View(item);
         }
 
@@ -131,7 +133,7 @@ namespace Concept.Controllers
                 return NotFound();
             }
 
-            LoadDropdowns(item);
+            LoadDropdowns(item.SubCategoryId);
             return View(item);
         }
 
@@ -150,6 +152,9 @@ namespace Concept.Controllers
             ModelState.Remove("SubUOM");
             ModelState.Remove("User");
 
+            var existingSubCategoryId = await _context.StoreItems.Where(i => i.Id == id).Select(i => i.SubCategoryId).FirstOrDefaultAsync();
+            await ValidateCategorySelection(item.SubCategoryId, existingSubCategoryId);
+
             if (ModelState.IsValid)
             {
                 try
@@ -157,7 +162,7 @@ namespace Concept.Controllers
                     if (await _context.StoreItems.AnyAsync(i => i.ItemCode == item.ItemCode && i.Id != item.Id))
                     {
                         ModelState.AddModelError("ItemCode", "Item Code already exists");
-                        LoadDropdowns(item);
+                        LoadDropdowns(existingSubCategoryId);
                         return View(item);
                     }
 
@@ -210,7 +215,7 @@ namespace Concept.Controllers
                 }
             }
 
-            LoadDropdowns(item);
+            LoadDropdowns(existingSubCategoryId);
             return View(item);
         }
 
@@ -285,7 +290,7 @@ namespace Concept.Controllers
         public JsonResult GetSubCategoriesByCategory(int categoryId)
         {
             var subCategories = _context.DeffSubCategories
-                .Where(sc => sc.CategoryId == categoryId && sc.Active)
+                .Where(sc => sc.CategoryId == categoryId && sc.Active && sc.Category!.Active)
                 .OrderBy(sc => sc.Name)
                 .Select(sc => new
                 {
@@ -319,8 +324,15 @@ namespace Concept.Controllers
             return _context.StoreItems.Any(e => e.Id == id);
         }
 
+        private async Task ValidateCategorySelection(int? subCategoryId, int? existingSubCategoryId = null)
+        {
+            if (subCategoryId.HasValue && subCategoryId != existingSubCategoryId &&
+                !await _context.DeffSubCategories.AnyAsync(sc => sc.Id == subCategoryId && sc.Active && sc.Category!.Active))
+                ModelState.AddModelError(nameof(StoreItem.SubCategoryId), "Select a subcategory under an active category.");
+        }
+
         // Helper method لتحميل Dropdowns
-        private void LoadDropdowns(StoreItem item = null)
+        private void LoadDropdowns(int? existingSubCategoryId = null)
         {
             // Categories
             ViewBag.Categories = _context.DeffCategories
@@ -332,7 +344,7 @@ namespace Concept.Controllers
             // SubCategories (كل SubCategories مع معلومات Category)
             ViewBag.SubCategories = _context.DeffSubCategories
                 .Include(sc => sc.Category)
-                .Where(sc => sc.Active)
+                .Where(sc => (sc.Active && sc.Category!.Active) || sc.Id == existingSubCategoryId)
                 .OrderBy(sc => sc.Category!.Name)
                 .ThenBy(sc => sc.Name)
                 .ToList();
