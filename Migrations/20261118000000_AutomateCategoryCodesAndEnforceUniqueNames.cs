@@ -31,11 +31,12 @@ public partial class AutomateCategoryCodesAndEnforceUniqueNames : Migration
             computedColumnSql: "LTRIM(RTRIM([Name])) COLLATE Latin1_General_100_CI_AS",
             stored: true);
 
-        migrationBuilder.CreateIndex(
-            name: "IX_Deff_Category_NormalizedName",
-            table: "Deff_Category",
-            column: "NormalizedName",
-            unique: true);
+        // EF's SQL Server generator can add an implicit filter for a nullable unique index.
+        // SQL Server does not allow a computed column in a filter expression.
+        migrationBuilder.Sql("""
+            CREATE UNIQUE INDEX [IX_Deff_Category_NormalizedName]
+                ON [Deff_Category] ([NormalizedName]);
+            """);
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
